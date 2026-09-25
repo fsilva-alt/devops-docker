@@ -63,7 +63,7 @@ strong{font-weight:600;color:var(--ink)}
 kbd{display:inline-block;border:1px solid var(--line-2);border-radius:4px;padding:0 6px;font-size:.9em;color:var(--ink-2);line-height:1.6;margin:0 2px;background:var(--panel)}
 
 /* ---------- Deck ---------- */
-#deck{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto}
+#deck{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:minmax(0,1fr)}
 .rail{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px var(--gutter);border-bottom:1px solid var(--line);background:rgba(17,18,20,.92);backdrop-filter:blur(8px);font-family:var(--mono);font-size:.78em;position:sticky;top:0;z-index:5}
 .rail.bottom{border-bottom:0;border-top:1px solid var(--line);position:sticky;bottom:0}
 .rail .crumb{color:var(--muted);text-align:center;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -89,7 +89,9 @@ kbd{display:inline-block;border:1px solid var(--line-2);border-radius:4px;paddin
 .cols.w2{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
 .cols.s2{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
 @media (max-width:820px){.cols.s2{grid-template-columns:1fr}}
-.stack{display:grid;gap:clamp(14px,2vh,22px)}
+/* minmax(0,…) e min-width:0: uma linha longa de comando rola dentro do bloco em vez de alargar a coluna */
+.cols>*{min-width:0}
+.stack{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(14px,2vh,22px)}
 .box{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:clamp(16px,1.6vw,22px)}
 .box.lift{border-color:var(--line-2);background:var(--panel-2)}
 .box.soft{background:transparent}
@@ -110,7 +112,7 @@ pre.cmd .mk{color:var(--amber)}
 .chip{font-family:var(--mono);font-size:.76em;border:1px solid var(--line-2);border-radius:999px;color:var(--ink-2);padding:4px 12px;background:transparent}
 .chip.amber{border-color:var(--amber);color:var(--amber)}
 .steps{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:s}
-.steps li{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start;counter-increment:s}
+.steps li{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:start;counter-increment:s}
 .steps li::before{content:counter(s);font-family:var(--mono);font-size:.8em;color:var(--accent);border:1px solid var(--line-2);border-radius:50%;width:24px;height:24px;display:grid;place-items:center;margin-top:3px}
 .steps li .t{margin-bottom:8px;color:var(--ink-2)}
 .steps li>div{color:var(--ink-2)}
