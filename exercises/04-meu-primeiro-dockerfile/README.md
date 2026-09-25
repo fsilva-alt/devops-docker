@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Empacotar um programa seu numa **imagem**: escrever um `Dockerfile`, construir a imagem com `docker build` e rodá-la como qualquer outra.
+Criar uma **imagem** com o programa de receitas fornecido pelo curso. Você vai escrever um `Dockerfile`, construir a imagem com `docker build` e executar um container a partir dela.
 
 ## Onde
 
@@ -14,11 +14,11 @@ cd ~/labs/04-meu-primeiro-dockerfile
 
 ## Estado inicial
 
-Um único arquivo, `receitas.py`, que imprime o livro de receitas. Veja com `cat receitas.py`.
+O arquivo `receitas.py` já está pronto e mostra o livro de receitas no terminal. Você pode ler seu conteúdo com `cat receitas.py`. Não precisa escrever nem alterar o programa neste desafio.
 
 ## Dockerfile
 
-Um `Dockerfile` é a receita da imagem: uma lista de instruções, uma por linha, executadas de cima para baixo.
+Um `Dockerfile` é um arquivo de texto com as instruções para construir uma imagem. O Docker lê essas instruções de cima para baixo. A construção da imagem também é chamada de **build**.
 
 | Instrução | O que faz |
 |---|---|
@@ -28,7 +28,7 @@ Um `Dockerfile` é a receita da imagem: uma lista de instruções, uma por linha
 
 ## Tarefa
 
-1. Crie um arquivo chamado exatamente `Dockerfile` (D maiúsculo, sem extensão) com:
+1. Na pasta do desafio, execute `code Dockerfile` para abrir um novo arquivo no editor. O nome deve ser exatamente `Dockerfile`, com D maiúsculo e sem `.txt` no final. Copie o conteúdo abaixo para esse arquivo e salve:
 
    ```dockerfile
    FROM python:3.12-slim
@@ -38,21 +38,21 @@ Um `Dockerfile` é a receita da imagem: uma lista de instruções, uma por linha
    CMD ["python", "/app/receitas.py"]
    ```
 
-2. Construa a imagem. O `-t` dá nome e tag; o `.` no final é o **contexto**: a pasta cujos arquivos o `COPY` pode enxergar:
+2. Volte ao terminal e construa a imagem. A opção `-t` define o nome `receitas` e a tag `1.0`. O ponto `.` no final indica a pasta atual, chamada de **contexto de construção**: é nela que o Docker procura os arquivos usados pelo `COPY`:
 
    ```bash
    docker build -t receitas:1.0 .
    ```
 
-   Leia a saída: um passo por instrução (`[1/2] FROM`, `[2/2] COPY`).
+   Acompanhe as mensagens da construção. Você verá etapas como `FROM` e `COPY`; a numeração pode variar.
 
-3. A imagem existe:
+3. Confira se a imagem aparece na lista:
 
    ```bash
    docker images receitas
    ```
 
-4. Rode. Não é preciso dizer o comando: ele já está no `CMD`:
+4. Execute um container com a imagem criada. Não é preciso informar o comando Python, porque ele já foi definido em `CMD`:
 
    ```bash
    docker run --rm receitas:1.0
@@ -64,11 +64,11 @@ Um `Dockerfile` é a receita da imagem: uma lista de instruções, uma por linha
 check.sh 04
 ```
 
-A verificação constrói nada: ela roda a sua imagem e confere que o livro de receitas aparece.
+A verificação usa a imagem que você construiu e confere se ela mostra o livro de receitas. Por isso, execute o `docker build` antes de usar `check.sh`.
 
 ## Dicas
 
-- Errou o Dockerfile? Corrija e rode o `docker build` de novo com o mesmo nome; a imagem é substituída.
+- Se precisar corrigir o `Dockerfile`, salve o arquivo e execute `docker build -t receitas:1.0 .` novamente. O nome `receitas:1.0` passará a apontar para a imagem atualizada.
 - O `CMD` pode ser sobrescrito na hora: `docker run --rm receitas:1.0 python --version` ignora o `CMD` e roda o que você pediu.
 
 ## Missão extra

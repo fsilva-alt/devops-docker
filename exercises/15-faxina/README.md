@@ -1,6 +1,6 @@
 # Desafio 15 — Faxina
 
-⏱ 4 minutos · Encerramento · desafio elástico
+⏱ 4 minutos · Encerramento · pode ficar para depois da aula
 
 ## Objetivo
 
@@ -10,13 +10,13 @@ Descobrir quanto disco o Docker está usando e limpar o que sobrou da aula: cont
 
 Em qualquer pasta.
 
-## Onde o disco vai
+## O que está ocupando espaço?
 
-Tudo o que você fez hoje continua ocupando espaço: cada `docker run` sem `--rm` deixou um container parado; cada `build` que substituiu uma tag deixou uma imagem `<none>` (*dangling*) para trás. `docker system df` mostra o total por categoria e quanto dele é **reclaimable** (recuperável).
+Os containers criados sem `--rm` continuam existindo até serem removidos, mesmo depois que o programa termina. Reconstruir uma imagem com a mesma tag também pode deixar a versão anterior sem nome, identificada como `<none>` ou *dangling*. O comando `docker system df` mostra o espaço usado por categoria. A coluna **RECLAIMABLE** indica o espaço que pode ser liberado.
 
 ## Tarefa
 
-1. Veja a conta:
+1. Consulte o uso de espaço e a lista de containers:
 
    ```bash
    docker system df
@@ -30,7 +30,7 @@ Tudo o que você fez hoje continua ocupando espaço: cada `docker run` sem `--rm
    docker container prune
    ```
 
-   `$(docker ps -q)` vira a lista de IDs dos containers rodando; se não houver nenhum, o `stop` reclama que faltou argumento, e está tudo bem.
+   O trecho `$(docker ps -q)` executa primeiro `docker ps -q` e insere os IDs encontrados no comando `docker stop`. Se não houver containers rodando, `stop` avisará que falta um argumento. Nesse caso, você pode seguir para `docker container prune`.
 
 3. Remova as imagens sem nome, sobras dos builds:
 
@@ -39,7 +39,7 @@ Tudo o que você fez hoje continua ocupando espaço: cada `docker run` sem `--rm
    docker images
    ```
 
-4. Compare:
+4. Consulte o uso de espaço novamente e compare com o resultado da primeira etapa:
 
    ```bash
    docker system df
@@ -55,8 +55,8 @@ Aprova sem nenhum container (rodando ou parado) e sem imagens `<none>`.
 
 ## Dicas
 
-- Depois da faxina, `check.sh` dos desafios anteriores volta a reprovar. É esperado: os containers deles não existem mais. `reset.sh NN` e o enunciado recriam qualquer um em segundos.
-- Prune só apaga o que **não está em uso**. Uma imagem com um container (mesmo parado) apontando para ela não é removida.
+- Depois da limpeza, as verificações dos desafios que dependem dos containers removidos deixam de aprovar. Para praticar novamente, use `reset.sh NN`, substituindo `NN` pelo número, e siga o enunciado desde o início.
+- `docker container prune` remove containers parados. Já `docker image prune` remove imagens sem nome que não são usadas por nenhum container, mesmo parado. Por isso, removemos primeiro os containers e depois as imagens.
 
 ## Missão extra
 
@@ -70,6 +70,6 @@ docker images                                   # veja o que sobrou com nome
 docker image rm -f $(docker images -q 'receitas*' | sort -u) bloco:1.0
 ```
 
-(`docker images -q 'receitas*'` lista os IDs de `receitas`, `receitas-api` e `receitas-web`; o `-f` é para as imagens que têm duas tags, como `receitas:1.0` e `receitas:latest`.)
+Na primeira linha, `&&` executa cada comando somente se o anterior funcionar; `cd -` volta à pasta anterior. Na última, `docker images -q 'receitas*'` lista os IDs das imagens de receitas, e `sort -u` retira os IDs repetidos. O `-f` permite remover imagens com mais de uma tag, como `receitas:1.0` e `receitas:latest`.
 
-E o botão vermelho: `docker system prune -a --volumes` remove **tudo** o que não está em uso, imagens-base inclusive. Leia o aviso antes de responder `y`; na próxima aula, o `setup.sh` baixa tudo de novo.
+Para uma limpeza mais ampla, `docker system prune -a --volumes` remove containers parados, redes sem uso, imagens não usadas por containers, cache de construção e volumes anônimos sem uso. Isso pode incluir as imagens-base da aula, mas não remove volumes nomeados como `notas`. Leia o aviso antes de responder `y`. Se precisar das imagens-base novamente, execute `setup.sh`.

@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Colocar um site (HTML, CSS e JavaScript) num container com o **nginx**, um servidor web pronto. Mesmo fluxo do Python: `FROM` de uma imagem oficial, `COPY` dos seus arquivos, `build`, `run -p`.
+Executar um site em um container usando o **nginx**, um servidor web: ele entrega os arquivos da página ao navegador. Os arquivos já estão prontos. Você vai criar a imagem, copiar o site para ela e publicar uma porta, como fez com a API.
 
 ## Onde
 
@@ -18,12 +18,12 @@ Uma pasta `site/` com:
 
 | Arquivo | O quê |
 |---|---|
-| `index.html` | A página: um título e uma lista vazia `<ul id="receitas">` |
-| `app.js` | Faz `fetch("receitas.json")` e preenche a lista |
-| `receitas.json` | Os dados |
-| `style.css` | Um pouco de estilo |
+| `index.html` | Define a estrutura da página em HTML: o título e o espaço para a lista de receitas |
+| `app.js` | Código JavaScript que o navegador executa para buscar as receitas e preencher a lista |
+| `receitas.json` | A lista de receitas em JSON, um formato de texto para organizar dados |
+| `style.css` | Define a aparência da página, como cores, fontes e espaçamentos, usando CSS |
 
-Não há `Dockerfile`: é você quem escreve.
+Neste **site estático**, o nginx entrega arquivos prontos; a lista de receitas vem de `receitas.json`. No desafio 14, o site buscará essa lista na API. Por enquanto, falta criar apenas o `Dockerfile`.
 
 ## Imagens prontas
 
@@ -31,7 +31,7 @@ A imagem `nginx:alpine` já traz um servidor web configurado para servir o que e
 
 ## Tarefa
 
-1. Crie o `Dockerfile`:
+1. Execute `code Dockerfile`, copie o conteúdo abaixo para o arquivo e salve:
 
    ```dockerfile
    FROM nginx:alpine
@@ -48,7 +48,7 @@ A imagem `nginx:alpine` já traz um servidor web configurado para servir o que e
    docker run -d --name web -p 8080:80 receitas-web:1.0
    ```
 
-3. Confira pelo terminal e pelo navegador (aba **PORTS** → 8080 → globo). A lista de receitas na página é preenchida pelo `app.js`; se ela aparece, o JavaScript rodou no seu navegador e o nginx serviu os três arquivos:
+3. Execute os comandos abaixo para consultar o HTML e os dados pelo terminal. Depois, abra a aba **PORTS**, localize a porta **8080** e clique no ícone de globo para ver a página no navegador. A lista de receitas é preenchida por `app.js`, executado pelo navegador:
 
    ```bash
    curl localhost:8080/
@@ -63,16 +63,16 @@ check.sh 12
 
 ## Dicas
 
-- `COPY` de uma pasta copia o **conteúdo** dela, não a pasta: `site/index.html` vira `/usr/share/nginx/html/index.html`. Se quisesse uma subpasta, teria de dizer no destino: `COPY site/ /usr/share/nginx/html/site/` (e aí o nginx não acharia o `index.html`).
+- Ao copiar uma pasta com `COPY`, o Docker copia seu **conteúdo** para o destino. Aqui, `site/index.html` deve virar `/usr/share/nginx/html/index.html`. Se o destino terminar em `/html/site/`, a página ficará em uma subpasta, e o endereço inicial poderá continuar mostrando a página padrão do nginx.
 - `docker logs web` mostra o log de acesso do nginx: uma linha por arquivo pedido pelo navegador.
 
 ## Missão extra
 
-Editar o site sem reconstruir, como no desafio 10: pare o `web`, suba outro com a pasta montada por cima da do nginx e mude o `<h1>` no `index.html`:
+Edite o site sem reconstruir a imagem, como no desafio 10. Primeiro, remova o container `web` e crie outro com a pasta `site` compartilhada:
 
 ```bash
 docker rm -f web
 docker run -d --name web -p 8080:80 -v "$PWD/site:/usr/share/nginx/html" receitas-web:1.0
 ```
 
-Recarregue a página. (A verificação continua passando: o que importa é o `web` na 8080 servindo o site.)
+Abra `site/index.html` com `code site/index.html`. Troque apenas o texto entre `<h1>` e `</h1>` por `Livro de receitas da turma`, salve e recarregue a página no navegador. Mantenha a expressão `Livro de receitas` no título para que a verificação continue reconhecendo o site.

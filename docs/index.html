@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!--ARTIFACT-START-->
 <title>Docker no Codespaces</title>
-<meta name="description" content="Slides do curso de Docker no GitHub Codespaces: 16 desafios, conceitos, diagramas e links de documentação.">
+<meta name="description" content="Aprenda Docker desde os primeiros comandos, com explicações em português e 16 desafios no GitHub Codespaces. Não é preciso saber programar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -230,29 +230,29 @@ function layers(items, cap='', base=''){
 function ports(host, cont, o={}){
   const {app='uvicorn', quem='navegador / curl'} = o;
   return `<div class="flow">
-    <div class="node"><b>${quem}</b><small>localhost:${host} · ou a aba PORTS</small></div>
+    <div class="node"><b>${quem}</b><small>curl: localhost:${host} · navegador: endereço da aba PORTS</small></div>
     <div class="arr"><span class="a">→</span><strong>-p ${host}:${cont}</strong></div>
-    <div class="node hi"><b>Codespace :${host}</b><small>a porta "de fora" (host)</small></div>
+    <div class="node hi"><b>Codespace :${host}</b><small>porta da máquina que executa o Docker</small></div>
     <div class="arr"><span class="a">→</span>encaminha</div>
-    <div class="node"><b>container :${cont}</b><small>${app} escuta em 0.0.0.0:${cont}</small></div>
+    <div class="node"><b>container :${cont}</b><small>${app} recebe os pedidos nesta porta</small></div>
   </div>`;
 }
 
 // registro → imagem → container
 function imgflow(o={}){
-  const {hi='cont', pull='docker pull (ou o primeiro docker run)', run='docker run'} = o;
+  const {hi='cont', pull='docker pull · baixa a imagem', run='docker run · cria e inicia'} = o;
   const n=(k,t,s)=>`<div class="node ${hi===k?'hi':''}"><b>${t}</b><small>${s}</small></div>`;
   return `<div class="flow">
     ${n('reg','Registro','Docker Hub · onde as imagens ficam publicadas')}
     <div class="arr"><span class="a">→</span>${pull}</div>
-    ${n('img','Imagem','o molde · só leitura · baixada uma vez')}
+    ${n('img','Imagem','programa e arquivos prontos para criar containers')}
     <div class="arr"><span class="a">→</span>${run}</div>
-    ${n('cont','Container','uma execução · imagem + camada gravável + processo')}
+    ${n('cont','Container','ambiente criado a partir da imagem para executar o programa')}
   </div>`;
 }
 
 function docs(items){
-  return '<ul class="links">' + items.map(i=>`<li><div><a href="${i.href}" target="_blank" rel="noopener">${i.t}</a>${i.s?`<small>${i.s}</small>`:''}</div></li>`).join('') + '</ul>';
+  return '<p style="margin-bottom:14px;color:var(--muted)">Links para consultar depois. A documentação do Docker está em inglês.</p><ul class="links">' + items.map(i=>`<li><div><a href="${i.href}" target="_blank" rel="noopener">${i.t}</a>${i.s?`<small>${i.s}</small>`:''}</div></li>`).join('') + '</ul>';
 }
 function kv(rows, head=['Comando','Para quê']){
   return `<div class="tw"><table class="kv"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>` +
@@ -269,11 +269,11 @@ function cover(d, objetivo, onde, extra=''){
     ${chips(d.cmds)}
     ${extra}
   </div><div class="stack">
-    <div class="box lift"><h3>Onde</h3>${onde}</div>
-    <div class="box soft"><h3>Ficha</h3>${kv([['⏱ tempo', `${d.time} min${d.el?' · <span class="chip amber">elástico</span>':''}`],['módulo', d.mod],['verificação', `<code>check.sh ${String(d.n).padStart(2,'0')}</code>`]], ['',''])}</div>
+    <div class="box lift"><h3>Onde fazer</h3>${onde}</div>
+    <div class="box soft"><h3>Para este desafio</h3>${kv([['⏱ tempo', `${d.time} min${d.el?' · pode ficar para depois da aula':''}`],['módulo', d.mod],['verificação', `<code>check.sh ${String(d.n).padStart(2,'0')}</code>`]], ['',''])}</div>
   </div></div>`;
 }
-const qualquer = '<p>Em <strong>qualquer pasta</strong>. Containers e imagens não moram em pasta nenhuma: ficam com o Docker.</p>';
+const qualquer = '<p>No terminal do Codespace, em <strong>qualquer pasta</strong>. Estes comandos usam recursos gerenciados pelo Docker e não dependem de arquivos da pasta atual.</p>';
 </script>
 <script>
 /* ---------- doc links ---------- */
@@ -281,18 +281,18 @@ const DD = 'https://docs.docker.com/';
 const CLI = c => DD + 'reference/cli/docker/' + c + '/';
 const HUB = i => 'https://hub.docker.com/_/' + i;
 const L = {
-  ov:        {t:'Docker Docs · Docker overview', href:DD+'get-started/docker-overview/', s:'docs.docker.com · em inglês'},
-  c_cont:    {t:'Docker Docs · What is a container?', href:DD+'get-started/docker-concepts/the-basics/what-is-a-container/', s:'em inglês'},
-  c_img:     {t:'Docker Docs · What is an image?', href:DD+'get-started/docker-concepts/the-basics/what-is-an-image/', s:'em inglês'},
-  c_reg:     {t:'Docker Docs · What is a registry?', href:DD+'get-started/docker-concepts/the-basics/what-is-a-registry/', s:'Docker Hub e outros'},
-  c_df:      {t:'Docker Docs · Writing a Dockerfile', href:DD+'get-started/docker-concepts/building-images/writing-a-dockerfile/'},
-  c_layers:  {t:'Docker Docs · Understanding image layers', href:DD+'get-started/docker-concepts/building-images/understanding-image-layers/'},
-  c_cache:   {t:'Docker Docs · Using the build cache', href:DD+'get-started/docker-concepts/building-images/using-the-build-cache/'},
-  c_ports:   {t:'Docker Docs · Publishing ports', href:DD+'get-started/docker-concepts/running-containers/publishing-ports/'},
-  c_over:    {t:'Docker Docs · Overriding container defaults', href:DD+'get-started/docker-concepts/running-containers/overriding-container-defaults/', s:'-e, -p, --name, comando'},
-  c_persist: {t:'Docker Docs · Persisting container data', href:DD+'get-started/docker-concepts/running-containers/persisting-container-data/', s:'volumes'},
-  c_share:   {t:'Docker Docs · Sharing local files with containers', href:DD+'get-started/docker-concepts/running-containers/sharing-local-files/', s:'bind mounts'},
-  c_multi:   {t:'Docker Docs · Multi-container applications', href:DD+'get-started/docker-concepts/running-containers/multi-container-applications/', s:'redes e Compose'},
+  ov:        {t:'Visão geral do Docker', href:DD+'get-started/docker-overview/', s:'documentação oficial · em inglês'},
+  c_cont:    {t:'O que é um container?', href:DD+'get-started/docker-concepts/the-basics/what-is-a-container/', s:'documentação oficial · em inglês'},
+  c_img:     {t:'O que é uma imagem?', href:DD+'get-started/docker-concepts/the-basics/what-is-an-image/', s:'documentação oficial · em inglês'},
+  c_reg:     {t:'Onde as imagens são publicadas?', href:DD+'get-started/docker-concepts/the-basics/what-is-a-registry/', s:'Docker Hub e outros registros · em inglês'},
+  c_df:      {t:'Como escrever um Dockerfile', href:DD+'get-started/docker-concepts/building-images/writing-a-dockerfile/', s:'em inglês'},
+  c_layers:  {t:'Como funcionam as camadas de uma imagem', href:DD+'get-started/docker-concepts/building-images/understanding-image-layers/', s:'em inglês'},
+  c_cache:   {t:'Como reutilizar etapas da construção: cache', href:DD+'get-started/docker-concepts/building-images/using-the-build-cache/', s:'em inglês'},
+  c_ports:   {t:'Como publicar portas', href:DD+'get-started/docker-concepts/running-containers/publishing-ports/', s:'em inglês'},
+  c_over:    {t:'Como mudar a configuração de um container', href:DD+'get-started/docker-concepts/running-containers/overriding-container-defaults/', s:'-e, -p, --name e comando · em inglês'},
+  c_persist: {t:'Como guardar dados em volumes', href:DD+'get-started/docker-concepts/running-containers/persisting-container-data/', s:'em inglês'},
+  c_share:   {t:'Como compartilhar arquivos com containers', href:DD+'get-started/docker-concepts/running-containers/sharing-local-files/', s:'bind mounts · em inglês'},
+  c_multi:   {t:'Como usar vários containers em uma aplicação', href:DD+'get-started/docker-concepts/running-containers/multi-container-applications/', s:'redes e Compose · em inglês'},
   df:        {t:'Referência · Dockerfile', href:DD+'reference/dockerfile/', s:'todas as instruções'},
   df_from:   {t:'Dockerfile · FROM', href:DD+'reference/dockerfile/#from'},
   df_copy:   {t:'Dockerfile · COPY', href:DD+'reference/dockerfile/#copy'},
@@ -302,39 +302,39 @@ const L = {
   df_wd:     {t:'Dockerfile · WORKDIR', href:DD+'reference/dockerfile/#workdir'},
   df_env:    {t:'Dockerfile · ENV', href:DD+'reference/dockerfile/#env'},
   df_expose: {t:'Dockerfile · EXPOSE', href:DD+'reference/dockerfile/#expose'},
-  best:      {t:'Docker Docs · Building best practices', href:DD+'build/building/best-practices/', s:'ordem das instruções, .dockerignore, imagens pequenas'},
-  cache:     {t:'Docker Docs · Build cache', href:DD+'build/cache/'},
-  ctx:       {t:'Docker Docs · Build context e .dockerignore', href:DD+'build/concepts/context/#dockerignore-files'},
-  run_guide: {t:'Docker Docs · Running containers', href:DD+'engine/containers/run/', s:'o guia do docker run'},
-  r_run:     {t:'CLI · docker run', href:CLI('container/run'), s:'-d, -it, --rm, --name, -p, -e, -v, --network'},
-  r_ps:      {t:'CLI · docker ps', href:CLI('container/ls'), s:'-a, --filter, --format'},
-  r_exec:    {t:'CLI · docker exec', href:CLI('container/exec')},
-  r_logs:    {t:'CLI · docker logs', href:CLI('container/logs'), s:'-f, --tail'},
-  r_stop:    {t:'CLI · docker stop', href:CLI('container/stop')},
-  r_start:   {t:'CLI · docker start', href:CLI('container/start'), s:'-ai'},
-  r_rm:      {t:'CLI · docker rm', href:CLI('container/rm'), s:'-f'},
-  r_cp:      {t:'CLI · docker cp', href:CLI('container/cp')},
-  r_port:    {t:'CLI · docker port', href:CLI('container/port')},
-  r_cprune:  {t:'CLI · docker container prune', href:CLI('container/prune')},
-  r_build:   {t:'CLI · docker build', href:CLI('buildx/build'), s:'-t, --no-cache, -f'},
-  r_images:  {t:'CLI · docker images', href:CLI('image/ls')},
-  r_tag:     {t:'CLI · docker tag', href:CLI('image/tag')},
-  r_hist:    {t:'CLI · docker history', href:CLI('image/history')},
-  r_iprune:  {t:'CLI · docker image prune', href:CLI('image/prune'), s:'-a'},
-  r_vol:     {t:'CLI · docker volume create', href:CLI('volume/create')},
-  r_net:     {t:'CLI · docker network create', href:CLI('network/create')},
-  vols:      {t:'Docker Docs · Volumes', href:DD+'engine/storage/volumes/'},
-  binds:     {t:'Docker Docs · Bind mounts', href:DD+'engine/storage/bind-mounts/'},
-  net:       {t:'Docker Docs · Networking', href:DD+'engine/network/', s:'DNS por nome em redes criadas por você'},
-  bridge:    {t:'Docker Docs · Bridge network driver', href:DD+'engine/network/drivers/bridge/'},
-  compose:   {t:'Docker Docs · Compose', href:DD+'compose/'},
-  cfile:     {t:'Referência · Compose file', href:DD+'reference/compose-file/', s:'services, build, ports, environment, volumes'},
-  c_up:      {t:'CLI · docker compose up', href:CLI('compose/up'), s:'-d, --build'},
-  c_ps:      {t:'CLI · docker compose ps', href:CLI('compose/ps')},
-  c_logs:    {t:'CLI · docker compose logs', href:CLI('compose/logs')},
-  c_down:    {t:'CLI · docker compose down', href:CLI('compose/down'), s:'-v, --rmi'},
-  sdf:       {t:'CLI · docker system df', href:CLI('system/df')},
-  sprune:    {t:'CLI · docker system prune', href:CLI('system/prune'), s:'-a, --volumes'},
+  best:      {t:'Recomendações para construir imagens', href:DD+'build/building/best-practices/', s:'ordem das instruções, .dockerignore e tamanho · em inglês'},
+  cache:     {t:'Cache de construção de imagens', href:DD+'build/cache/', s:'em inglês'},
+  ctx:       {t:'Contexto de construção e .dockerignore', href:DD+'build/concepts/context/#dockerignore-files', s:'em inglês'},
+  run_guide: {t:'Guia para executar containers', href:DD+'engine/containers/run/', s:'opções de docker run · em inglês'},
+  r_run:     {t:'Comando · docker run', href:CLI('container/run'), s:'-d, -it, --rm, --name, -p, -e, -v, --network'},
+  r_ps:      {t:'Comando · docker ps', href:CLI('container/ls'), s:'-a, --filter, --format'},
+  r_exec:    {t:'Comando · docker exec', href:CLI('container/exec')},
+  r_logs:    {t:'Comando · docker logs', href:CLI('container/logs'), s:'-f, --tail'},
+  r_stop:    {t:'Comando · docker stop', href:CLI('container/stop')},
+  r_start:   {t:'Comando · docker start', href:CLI('container/start'), s:'-ai'},
+  r_rm:      {t:'Comando · docker rm', href:CLI('container/rm'), s:'-f'},
+  r_cp:      {t:'Comando · docker cp', href:CLI('container/cp')},
+  r_port:    {t:'Comando · docker port', href:CLI('container/port')},
+  r_cprune:  {t:'Comando · docker container prune', href:CLI('container/prune')},
+  r_build:   {t:'Comando · docker build', href:CLI('buildx/build'), s:'-t, --no-cache, -f'},
+  r_images:  {t:'Comando · docker images', href:CLI('image/ls')},
+  r_tag:     {t:'Comando · docker tag', href:CLI('image/tag')},
+  r_hist:    {t:'Comando · docker history', href:CLI('image/history')},
+  r_iprune:  {t:'Comando · docker image prune', href:CLI('image/prune'), s:'-a'},
+  r_vol:     {t:'Comando · docker volume create', href:CLI('volume/create')},
+  r_net:     {t:'Comando · docker network create', href:CLI('network/create')},
+  vols:      {t:'Como usar volumes', href:DD+'engine/storage/volumes/'},
+  binds:     {t:'Como usar bind mounts', href:DD+'engine/storage/bind-mounts/'},
+  net:       {t:'Redes entre containers', href:DD+'engine/network/', s:'comunicação pelo nome em redes criadas por você · em inglês'},
+  bridge:    {t:'Redes do tipo bridge', href:DD+'engine/network/drivers/bridge/', s:'em inglês'},
+  compose:   {t:'Guia do Docker Compose', href:DD+'compose/'},
+  cfile:     {t:'Referência do arquivo Compose', href:DD+'reference/compose-file/', s:'services, build, ports, environment, volumes · em inglês'},
+  c_up:      {t:'Comando · docker compose up', href:CLI('compose/up'), s:'-d, --build'},
+  c_ps:      {t:'Comando · docker compose ps', href:CLI('compose/ps')},
+  c_logs:    {t:'Comando · docker compose logs', href:CLI('compose/logs')},
+  c_down:    {t:'Comando · docker compose down', href:CLI('compose/down'), s:'-v, --rmi'},
+  sdf:       {t:'Comando · docker system df', href:CLI('system/df')},
+  sprune:    {t:'Comando · docker system prune', href:CLI('system/prune'), s:'-a, --volumes'},
   h_python:  {t:'Docker Hub · python', href:HUB('python'), s:'tags: 3.12-slim, 3.12-alpine…'},
   h_nginx:   {t:'Docker Hub · nginx', href:HUB('nginx'), s:'onde colocar os arquivos do site'},
   h_alpine:  {t:'Docker Hub · alpine', href:HUB('alpine'), s:'a imagem Linux de 5 MB'},
@@ -346,84 +346,92 @@ const L = {
 
 /* ---------- INTRO ---------- */
 const INTRO = {
-  n:'intro', key:'intro', title:'Antes de começar', short:'Introdução', mod:'Abertura', time:8, el:false, cmds:['o que é um container','história','Docker ≠ Docker Hub'],
+  n:'intro', key:'intro', title:'Antes de começar', short:'Comece por aqui', mod:'Abertura', time:8, el:false, cmds:['como acompanhar','imagem e container','para que serve o Docker'],
   slides:[
-    {h:'O que é um container?', eyebrow:'Introdução · 1 de 5', body:`
+    {h:'Como acompanhar a aula', eyebrow:'Introdução · 1 de 6', body:`
+      <div class="stack">
+        <p class="lead">Você não precisa saber programar. Os programas do curso já estão prontos; vamos usá-los para aprender Docker, um passo de cada vez.</p>
+        <div class="cols">
+          <div class="box"><h3>Seu ambiente no navegador</h3><p>O <strong>Codespace</strong> é um computador Linux acessado pela internet. Nele, o <strong>VS Code</strong> é o editor de arquivos, e o <strong>terminal</strong> é a área onde você digita comandos.</p><p>Abra o terminal em <strong>Terminal → New Terminal</strong>. A preparação completa está no <a href="https://github.com/fsilva-alt/devops-docker#antes-da-aula" target="_blank" rel="noopener">README do curso</a>.</p></div>
+          <div class="box lift"><h3>Comando ou conteúdo de arquivo?</h3><p>Nos slides, <code>$</code> marca uma linha para executar no terminal. Copie o comando sem esse símbolo e pressione <strong>Enter</strong>. Execute uma linha por vez.</p><p>Quando a instrução pedir um arquivo, copie o conteúdo no editor e salve com <strong>Ctrl+S</strong> ou <strong>Cmd+S</strong> no Mac. Linhas com <code>#</code> são comentários.</p></div>
+          <div class="box"><h3>Como fazer os desafios</h3><p>Leia o objetivo, entre na pasta indicada e siga a tarefa. Ao terminar, execute <code>check.sh</code> com o número do desafio: ele confirma o resultado ou mostra o que ajustar.</p><p>A <strong>Missão extra</strong> é opcional. Para executar os comandos, use os exemplos completos da tarefa. Nas tabelas de consulta, <code>&lt;nome&gt;</code> indica um valor a substituir, <code>[opção]</code> indica algo opcional, e <code>…</code> indica um exemplo abreviado.</p></div>
+        </div>
+        <div class="callout"><strong>Comandos para se localizar:</strong> <code>pwd</code> mostra a pasta atual; <code>ls</code> lista seu conteúdo; <code>cd caminho</code> entra em outra pasta. O símbolo <code>~</code> representa sua pasta pessoal. Para abrir um arquivo no editor, use <code>code nome-do-arquivo</code>.</div>
+      </div>`},
+    {h:'O que é um container?', eyebrow:'Introdução · 2 de 6', body:`
       <div class="cols s2"><div class="stack">
-        <p class="lead">Um <strong>processo comum</strong> do Linux, rodando <strong>isolado</strong>: com o seu próprio sistema de arquivos, a sua própria rede e sem enxergar os outros processos da máquina. Ele acha que está sozinho num computador só dele.</p>
-        <div class="box"><h3>O problema de sempre</h3>${cmd(`$ python app.py
+        <p class="lead">Um <strong>container</strong> é um ambiente isolado para executar um programa. Ele tem seus próprios arquivos e configurações, mas compartilha o núcleo do sistema operacional com a máquina em que está rodando.</p>
+        <div class="box"><h3>Por que isso ajuda?</h3><p>Um programa pode precisar de uma versão específica do Python e de outros pacotes de software, chamados <strong>dependências</strong>. Se faltar um deles, aparece um erro como este:</p>${cmd(`$ python app.py
 > ModuleNotFoundError: No module named 'fastapi'
-# "mas na minha máquina funciona…"
-# versão do Python, biblioteca, variável de ambiente, arquivo de config:
-# cada máquina é um pouco diferente.`)}</div>
+# A mensagem diz que o pacote fastapi não foi encontrado.`)}</div>
       </div><div class="stack">
         <div class="box lift"><h3>Imagem e container</h3>${kv([
-          ['imagem','o <strong>molde</strong>: sistema de arquivos pronto (Linux + Python + FastAPI + o seu código). Só leitura. Baixa-se uma vez'],
-          ['container','uma <strong>execução</strong> da imagem: o molde + uma camada gravável + um processo rodando. Cria-se quantos quiser'],
-          ['registro','onde as imagens ficam publicadas (Docker Hub, por exemplo)'],
+          ['imagem','reúne o programa, suas dependências e os arquivos necessários. Serve de base para criar containers'],
+          ['container','é criado a partir de uma imagem para executar o programa. Cada container tem seu próprio estado e pode ser iniciado, parado ou removido'],
+          ['registro','é um serviço que armazena e distribui imagens, como o Docker Hub'],
         ], ['','' ])}</div>
-        <div class="callout"><strong>A frase da aula</strong> — <em>a imagem é a mesma em todo lugar</em>. Se roda no seu Codespace, roda no servidor, no computador do colega e na nuvem. Com o container, "funciona na minha máquina" vira "funciona em qualquer máquina".</div>
+        <div class="callout"><strong>Uma imagem, vários containers.</strong> Você pode usar a mesma imagem em ambientes compatíveis, levando junto as versões do programa e de suas dependências. Isso reduz diferenças entre o ambiente de quem desenvolve e o de quem executa.</div>
       </div></div>`},
-    {h:'Uma breve história', eyebrow:'Introdução · 2 de 5', body:`
+    {h:'De onde veio o Docker?', eyebrow:'Introdução · 3 de 6', body:`
       <div class="gwrap" style="margin-bottom:22px"><svg class="tl" viewBox="0 0 1000 150" role="img" aria-label="Linha do tempo: 1979 chroot; 2006-2008 cgroups e namespaces no kernel Linux; 2008 LXC; 2013 nasce o Docker; 2015 OCI; hoje Compose e Kubernetes">
         <line x1="40" y1="80" x2="960" y2="80"/>
         <g><circle cx="100" cy="80" r="14"/><text x="100" y="85">79</text></g>
         <text class="cap" x="100" y="118">chroot</text><text class="cap" x="100" y="134">um processo "preso" numa pasta</text>
         <g><circle cx="300" cy="80" r="14"/><text x="300" y="85">06</text></g>
-        <text class="cap" x="300" y="118">cgroups + namespaces</text><text class="cap" x="300" y="134">o kernel Linux aprende a isolar</text>
+        <text class="cap" x="300" y="118">cgroups + namespaces</text><text class="cap" x="300" y="134">isolamento e limites de recursos</text>
         <g><circle cx="450" cy="80" r="14"/><text x="450" y="85">08</text></g>
-        <text class="cap" x="450" y="118">LXC</text><text class="cap" x="450" y="134">containers, mas difíceis de usar</text>
+        <text class="cap" x="450" y="118">LXC</text><text class="cap" x="450" y="134">ferramentas para containers Linux</text>
         <g class="hi"><circle cx="620" cy="80" r="18"/><text x="620" y="85" style="font-size:12px">13</text></g>
         <text class="title" x="620" y="40">março de 2013 · nasce o Docker</text>
         <text class="cap" x="620" y="120">Solomon Hykes mostra o Docker</text><text class="cap" x="620" y="136">numa palestra de 5 min na PyCon</text>
         <g><circle cx="790" cy="80" r="14"/><text x="790" y="85">15</text></g>
         <text class="cap" x="790" y="118">OCI</text><text class="cap" x="790" y="134">o formato vira padrão aberto</text>
         <g class="end"><circle cx="930" cy="80" r="14"/><text x="930" y="85" style="font-size:10px">hoje</text></g>
-        <text class="cap" x="930" y="118">Compose · Kubernetes</text><text class="cap" x="930" y="134">padrão da indústria</text>
+        <text class="cap" x="930" y="118">Compose · Kubernetes</text><text class="cap" x="930" y="134">gerenciamento de containers</text>
       </svg></div>
       <div class="cols">
-        <div class="box"><div class="up">antes de 2013</div><h3>A tecnologia já existia</h3><p>O kernel Linux já sabia isolar processos (<em>namespaces</em>) e limitar recursos (<em>cgroups</em>). Só que usar isso exigia especialistas: era coisa de empresas grandes.</p></div>
-        <div class="box lift"><div class="up">março de 2013</div><h3>O Docker embala tudo</h3><p>A dotCloud, uma pequena empresa de hospedagem, abre o código da ferramenta que usava por dentro. O que ela trouxe de novo foi a <strong>imagem</strong> (um formato para empacotar e distribuir) e um comando simples: <code>docker run</code>.</p></div>
-        <div class="box"><div class="up">2015 em diante</div><h3>Padrão aberto e ecossistema</h3><p>O formato de imagem e o runtime viram a <strong>OCI</strong> (Open Container Initiative). Hoje qualquer ferramenta (Podman, Kubernetes, os serviços de nuvem) roda as mesmas imagens que você vai construir aqui.</p></div>
+        <div class="box"><div class="up">antes de 2013</div><h3>O Linux já oferecia isolamento</h3><p>O <strong>kernel</strong>, núcleo do Linux, já tinha recursos para separar programas em execução e limitar seu uso de memória e processador. São os <em>namespaces</em> e <em>cgroups</em> da linha do tempo.</p></div>
+        <div class="box lift"><div class="up">março de 2013</div><h3>O Docker facilita o uso</h3><p>A empresa de hospedagem dotCloud publica o código do Docker. A ferramenta reúne a construção e a distribuição de imagens com comandos como <code>docker run</code> para executar containers.</p></div>
+        <div class="box"><div class="up">2015 em diante</div><h3>Formatos compartilhados</h3><p>A <strong>OCI</strong> (Open Container Initiative) define padrões abertos para imagens e execução de containers. Esses padrões permitem usar imagens com diferentes ferramentas compatíveis.</p></div>
       </div>
       <div class="cols" style="margin-top:22px">
-        <div class="callout"><strong>Curiosidade</strong> — o Docker foi escrito em Go, mas a dotCloud era uma empresa de Python. A demo de 2013 foi na PyCon, e a primeira comunidade a adotá-lo foi a de Python.</div>
-        <div class="callout"><strong>Antes dele</strong> — a alternativa era a <em>máquina virtual</em>: um computador inteiro simulado, com o seu próprio sistema operacional, gigabytes de tamanho e minutos para ligar. Um container sobe em milissegundos.</div>
+        <div class="callout"><strong>Sobre os nomes da linha do tempo:</strong> você não precisa memorizá-los para fazer os exercícios. O ponto principal é que o Docker tornou mais fácil construir, compartilhar e executar ambientes com containers.</div>
+        <div class="callout"><strong>E a máquina virtual?</strong> Ela executa um sistema operacional próprio. Um container compartilha o kernel da máquina que o executa; por isso, normalmente exige menos recursos para iniciar.</div>
       </div>`},
-    {h:'Que problema o Docker resolve', eyebrow:'Introdução · 3 de 5', body:`
+    {h:'Para que vamos usar o Docker?', eyebrow:'Introdução · 4 de 6', body:`
       <div class="cols w2">
-        <div class="box lift"><h3>O mesmo ambiente em todo lugar</h3><p>Sistema, versão do Python, bibliotecas e configuração viajam dentro da imagem. Desenvolvimento, teste e produção rodam a <strong>mesma coisa</strong>.</p></div>
-        <div class="box"><h3>Dependências junto com o programa</h3><p>Não há "instale o FastAPI antes": o <code>pip install</code> aconteceu no build. Quem recebe a imagem só roda.</p></div>
-        <div class="box"><h3>Subir e derrubar em segundos</h3><p>Precisa de um banco de dados para testar? <code>docker run postgres</code>. Acabou? <code>docker rm</code>. Nada fica instalado na sua máquina.</p></div>
-        <div class="box"><h3>Isolamento</h3><p>Dois projetos com versões diferentes do Python, cada um no seu container, sem brigar. Um programa que quebra não derruba o outro.</p></div>
+        <div class="box lift"><h3>Reutilizar um ambiente preparado</h3><p>A imagem guarda o programa, as bibliotecas que ele usa e a versão do Python. Podemos usar essa mesma imagem ao desenvolver, testar e disponibilizar o programa para outras pessoas.</p></div>
+        <div class="box"><h3>Instalar dependências na imagem</h3><p>Vamos instalar o FastAPI durante a construção da imagem, chamada de <strong>build</strong>. Depois, cada container criado a partir dela já terá esse pacote disponível.</p></div>
+        <div class="box"><h3>Criar e remover ambientes de teste</h3><p>Podemos criar um container para experimentar um programa e removê-lo ao terminar. Não é preciso instalar esse programa diretamente no sistema do Codespace.</p></div>
+        <div class="box"><h3>Separar projetos</h3><p>Dois projetos podem usar versões diferentes do Python, cada um em seu container. Os arquivos e as dependências de um não substituem os do outro.</p></div>
       </div>
-      <p class="lead" style="margin-top:22px;color:var(--muted)">Em uma frase: o Docker responde <em>"como eu rodo isto exatamente do mesmo jeito em qualquer máquina?"</em></p>`},
-    {h:'O que o Docker não resolve', eyebrow:'Introdução · 4 de 5', body:`
+      <p class="lead" style="margin-top:22px;color:var(--muted)">Na prática, usaremos um livro de receitas: primeiro no terminal, depois como uma API que fornece dados e, por fim, como um site no navegador.</p>`},
+    {h:'O que ainda precisa de cuidado?', eyebrow:'Introdução · 5 de 6', body:`
       <div class="cols w2">
-        <div class="box"><h3>Não é uma máquina virtual</h3><p>Todos os containers <strong>compartilham o kernel</strong> do Linux da máquina. Por isso são leves; por isso também um container Linux não roda Windows, e um <code>root</code> descuidado dentro dele merece atenção.</p></div>
-        <div class="box"><h3>Não é backup</h3><p>O que um container grava <strong>morre com ele</strong> no <code>docker rm</code>. Dados que importam vão para um volume (desafio 11), e volume também não é backup.</p></div>
-        <div class="box"><h3>Não orquestra</h3><p>Um Docker cuida de uma máquina. Dezenas de containers em dezenas de máquinas, com reinício automático e balanceamento, é trabalho do Kubernetes e parentes. O Compose (desafio 14) é o primeiro degrau.</p></div>
-        <div class="box"><h3>Não substitui testes</h3><p>A imagem garante que o ambiente é o mesmo, não que o programa está certo. Um bug empacotado continua sendo um bug, agora reproduzível em todo lugar.</p></div>
-        <div class="box"><h3>Não emagrece sozinho</h3><p>Uma imagem com lixo, cache e fotos (desafio 7) fica enorme e lenta para transferir. O tamanho é responsabilidade de quem escreve o Dockerfile.</p></div>
-        <div class="box"><h3>Não esconde segredos</h3><p>Tudo o que entra na imagem pode ser lido por quem tiver a imagem. Senhas entram na hora de rodar (desafio 9), nunca no build.</p></div>
+        <div class="box"><h3>Compatibilidade do sistema</h3><p>Os containers desta aula usam o kernel Linux do Codespace. A imagem precisa ser compatível com o sistema e a arquitetura que vão executá-la; ela não simula um computador completo.</p></div>
+        <div class="box"><h3>Armazenamento dos dados</h3><p>Remover um container apaga os arquivos guardados apenas na camada própria dele. No desafio 11, usaremos <strong>volumes</strong> para manter dados fora dessa camada. Um volume não substitui uma cópia de segurança.</p></div>
+        <div class="box"><h3>Várias máquinas</h3><p>Nesta aula, os containers rodam em um único Codespace. Distribuí-los entre várias máquinas exige outras ferramentas, como Kubernetes. Esse gerenciamento é chamado de <strong>orquestração</strong>.</p></div>
+        <div class="box"><h3>Funcionamento do programa</h3><p>A imagem reúne o que o programa precisa para executar, mas não corrige erros no código. Ainda é necessário testar se o programa produz o resultado esperado.</p></div>
+        <div class="box"><h3>Arquivos incluídos na imagem</h3><p>Arquivos desnecessários aumentam o tamanho da imagem e o tempo de transferência. No desafio 7, vamos escolher o que fica de fora usando <code>.dockerignore</code>.</p></div>
+        <div class="box"><h3>Senhas e outras informações privadas</h3><p>Quem tem acesso à imagem pode ler os arquivos que ela contém. Senhas devem ser fornecidas na execução, nunca durante a construção da imagem. Veremos configurações de execução no desafio 9.</p></div>
       </div>`},
-    {h:'Docker não é Docker Hub', eyebrow:'Introdução · 5 de 5', body:`
+    {h:'Docker, Docker Hub e Docker Desktop', eyebrow:'Introdução · 6 de 6', body:`
       <div class="cols s2">
         <div class="stack">
           <div class="flow">
-            <div class="node hi"><b>Docker (Engine)</b><small>o daemon + o comando docker · roda no Codespace · software livre</small></div>
-            <div class="arr"><span class="a">⇄</span>pull / push</div>
-            <div class="node"><b>Docker Hub</b><small>site · hospeda imagens · hub.docker.com · empresa (Docker Inc.)</small></div>
+            <div class="node hi"><b>Docker Engine</b><small>constrói imagens e executa containers no Codespace</small></div>
+            <div class="arr"><span class="a">⇄</span>baixar / publicar imagens</div>
+            <div class="node"><b>Docker Hub</b><small>serviço de armazenamento e distribuição de imagens</small></div>
           </div>
           ${kv([
-            ['Docker Engine','O programa que constrói imagens e roda containers. É o que usamos hoje. Funciona sem conta e sem internet (depois de baixar as imagens).'],
-            ['Docker Hub','O registro público padrão: de lá vêm <code>python</code>, <code>nginx</code>, <code>alpine</code>. Há outros (GitHub Container Registry, os das nuvens). Nenhum comando desta aula precisa de conta.'],
-            ['Docker Desktop','O aplicativo para Windows e Mac, que roda um Linux por baixo. No Codespace ele não existe: o Docker está direto no Linux.'],
+            ['Docker Engine','É o Docker instalado no Codespace. Depois de obter uma imagem, ele pode criar containers com ela sem baixá-la novamente.'],
+            ['Docker Hub','É de onde vêm as imagens <code>python</code>, <code>nginx</code> e <code>alpine</code> usadas no curso. Nesta aula, você não precisa criar uma conta no Docker Hub.'],
+            ['Docker Desktop','É um aplicativo para usar Docker no computador pessoal. Não precisamos instalá-lo, pois usaremos o Docker que já está no Codespace.'],
           ], ['','' ])}
         </div>
         <div class="stack">
-          <div class="callout"><strong>Nesta aula</strong> — tudo acontece dentro do Codespace, num Docker que já vem instalado (<em>docker-in-docker</em>). Nada para instalar, nenhuma conta além da do GitHub.</div>
-          <div class="callout"><strong>A aba PORTS</strong> — o Codespace roda num servidor do GitHub. Quando um container publicar uma porta (desafio 8), a aba <strong>PORTS</strong> do VS Code, ao lado de TERMINAL, cria um endereço para você abri-la no navegador.</div>
+          <div class="callout"><strong>Para acompanhar:</strong> tenha sua conta no GitHub e o Codespace preparado conforme o README. Os comandos da aula serão executados no terminal desse ambiente.</div>
+          <div class="callout"><strong>Para abrir o site:</strong> a aba <strong>PORTS</strong> (portas), ao lado de TERMINAL no VS Code, fornece o endereço de acesso pelo navegador. Vamos usá-la a partir do desafio 8.</div>
           <div class="box soft"><h3>Para ler depois</h3>${docs([L.ov, L.c_cont, L.c_img, L.c_reg, L.livro])}</div>
         </div>
       </div>`},
@@ -439,43 +447,43 @@ D.push({n:0, key:'00', title:'Docker funciona?', mod:'Abertura', time:3, el:fals
     {h:'Docker funciona?', body: cover({n:0,time:3,el:false,mod:'Abertura · feito antes da aula, logo depois do instalador',cmds:['docker version','docker run hello-world','docker compose version','check.sh 00']},
       'Confirmar que o seu Codespace consegue <strong>rodar containers</strong>. Se algo estiver errado, é melhor descobrir com um dia de folga do que no meio da aula.',
       qualquer)},
-    {h:'Cliente e daemon', eyebrow:'Conceito', body:`
+    {h:'O comando e o serviço do Docker', eyebrow:'Conceito', body:`
       <div class="cols s2"><div class="stack">
         <div class="flow">
           <div class="node"><b>docker</b><small>o <strong>cliente</strong>: o comando que você digita</small></div>
           <div class="arr"><span class="a">→</span>pede</div>
-          <div class="node hi"><b>dockerd</b><small>o <strong>daemon</strong>: quem baixa imagens, cria e roda containers</small></div>
+          <div class="node hi"><b>dockerd</b><small>o <strong>daemon</strong>: serviço que recebe e executa os pedidos</small></div>
           <div class="arr"><span class="a">→</span>administra</div>
           <div class="node"><b>containers · imagens · volumes · redes</b><small>tudo o que a aula vai criar</small></div>
         </div>
-        <div class="box"><h3>O que o hello-world conta</h3>${cmd(`$ docker run hello-world
+        <div class="box"><h3>A mensagem do primeiro container</h3>${cmd(`$ docker run hello-world
 > Hello from Docker!
 > To generate this message, Docker took the following steps:
 >  1. The Docker client contacted the Docker daemon.
 >  2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
 >  3. The Docker daemon created a new container from that image…
->  4. The Docker daemon streamed that output to the Docker client…`)}</div>
+>  4. The Docker daemon streamed that output to the Docker client…`)}<p style="margin-top:10px">O texto explica que o cliente fez um pedido, o serviço obteve a imagem, criou o container e mostrou a mensagem no terminal. Se a imagem já estiver disponível, não precisa ser baixada novamente.</p></div>
       </div><div class="stack">
-        <div class="box lift"><h3>Duas peças, duas versões</h3><p><code>docker version</code> mostra <em>Client</em> e <em>Server</em>. Se só o cliente aparece e há um erro <em>Cannot connect to the Docker daemon</em>, o serviço ainda não subiu. Num Codespace recém-aberto, espere um minuto.</p></div>
-        <div class="callout"><strong>No Codespace</strong> — um template <strong>Blank</strong> já traz o Docker (o daemon roda dentro do próprio Codespace: <em>docker-in-docker</em>) e o plugin Compose. O instalador do curso não instala nada disso; só confere.</div>
+        <div class="box lift"><h3>Como saber se está funcionando</h3><p><code>docker version</code> mostra as seções <strong>Client</strong> (cliente) e <strong>Server</strong> (serviço). Se aparecer <em>Cannot connect to the Docker daemon</em>, o cliente não conseguiu acessar o serviço.</p><p>Em um Codespace recém-aberto, espere um minuto e tente novamente.</p></div>
+        <div class="callout"><strong>No modelo Blank</strong>, o Docker e o Compose já vêm instalados. O instalador do curso confere o ambiente, baixa as imagens e prepara os arquivos dos exercícios.</div>
       </div></div>`},
     {h:'O desafio', eyebrow:'Tarefa · 3 min', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">As versões do cliente e do servidor. Se as duas aparecem, eles estão conversando:</div>${cmd('$ docker version')}`,
-        `<div class="t">O primeiro container. Leia a mensagem: ela explica os quatro passos do que acabou de acontecer.</div>${cmd('$ docker run hello-world')}`,
-        `<div class="t">O Compose, usado no desafio 14, também está lá:</div>${cmd('$ docker compose version')}`,
+        `<div class="t">Confira se aparecem as versões de <strong>Client</strong> e <strong>Server</strong>. Isso indica que o comando conseguiu acessar o serviço:</div>${cmd('$ docker version')}`,
+        `<div class="t">Execute o container de teste e procure a mensagem <strong>Hello from Docker!</strong>:</div>${cmd('$ docker run hello-world')}`,
+        `<div class="t">Confira a versão do Compose, a ferramenta que usaremos no desafio 14 para iniciar o site e a API juntos:</div>${cmd('$ docker compose version')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 00')}<p style="margin-top:10px;color:var(--muted)">Confere também que o instalador baixou as quatro imagens-base da aula (<code>hello-world</code>, <code>alpine</code>, <code>python:3.12-slim</code>, <code>nginx:alpine</code>). Faltou alguma? <code>setup.sh</code>.</p></div>
         <div class="callout warn"><strong>Depois, pare o Codespace</strong> — em github.com/codespaces, ⋯ → <em>Stop codespace</em>, para não gastar a franquia. No dia da aula é só abrir de novo: imagens e laboratórios continuam lá.</div>
-        <div class="box soft"><h3>Missão extra</h3><p><code>docker info</code> resume o daemon: quantos containers e imagens existem, o <em>storage driver</em>, onde ficam os dados (<code>Docker Root Dir</code>). Ache a linha <code>Containers:</code> e confira que o hello-world está contado.</p></div>
+        <div class="box soft"><h3>Missão extra · opcional</h3><p>Execute <code>docker info</code> para consultar um resumo do serviço Docker. Procure a linha <code>Containers:</code>: ela mostra o total de containers, incluindo os parados. O <code>hello-world</code> deve estar nessa contagem.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
-          ['docker version','versões do cliente e do daemon; prova que os dois se falam'],
-          ['docker info','resumo do daemon: containers, imagens, disco, versão do kernel'],
-          ['docker run hello-world','baixa a imagem (uma vez) e roda um container que só imprime a mensagem'],
-          ['docker compose version','o plugin Compose (v2, sem hífen) está instalado'],
+          ['docker version','mostra as versões do cliente e do serviço Docker'],
+          ['docker info','mostra informações do serviço: containers, imagens e armazenamento'],
+          ['docker run hello-world','cria e executa um container de teste; baixa a imagem se ela não estiver disponível'],
+          ['docker compose version','mostra a versão do Compose instalado'],
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.ov, L.h_hello, L.r_run, L.repo])}</div>
       </div>`},
@@ -485,35 +493,35 @@ D.push({n:0, key:'00', title:'Docker funciona?', mod:'Abertura', time:3, el:fals
 D.push({n:1, key:'01', title:'Olá, container', mod:'Módulo 1 · Fundamentos', time:5, el:false, cmds:['docker run','docker ps -a','docker images'],
   slides:[
     {h:'Olá, container', body: cover({n:1,time:5,el:false,mod:'Módulo 1 · Fundamentos',cmds:['docker run <imagem> <comando>','docker ps','docker ps -a','docker images']},
-      'Rodar um programa Python <strong>dentro de um container</strong> sem instalar nada, e ver a diferença entre <strong>imagem</strong> (o molde, baixado uma vez) e <strong>container</strong> (uma execução, criada a cada <code>docker run</code>).',
-      qualquer + '<p style="margin-top:10px;color:var(--muted)">Você já rodou <code>hello-world</code> no desafio 0. Nada mais.</p>')},
-    {h:'Imagem × container', eyebrow:'Conceito · o modelo mental de toda a aula', body:`
+      'Executar um programa Python <strong>dentro de um container</strong> e comparar a imagem usada como base com os containers criados a partir dela.',
+      qualquer + '<p style="margin-top:10px;color:var(--muted)">Continue depois de concluir o desafio 0. Não é preciso preparar arquivos para este exercício.</p>')},
+    {h:'Qual é a diferença entre imagem e container?', eyebrow:'Conceito', body:`
       <div class="stack">
         ${imgflow()}
         <div class="cols s2">
           ${layers([
-            {t:'camada gravável', s:'só deste container · some no docker rm', cls:'rw'},
+            {t:'camada gravável', s:'arquivos próprios do container · apagados ao removê-lo', cls:'rw'},
             {t:'python:3.12-slim', s:'Python 3.12 instalado', cls:'hi'},
             {t:'debian:bookworm-slim', s:'um Debian mínimo'},
-          ], 'um container = a imagem (só leitura) + uma camada só dele', 'imagem: compartilhada por todos os containers que a usam')}
+          ], 'arquivos do container: base da imagem e alterações próprias', 'a imagem-base pode ser usada por vários containers')}
           <div class="stack">
-            <div class="box lift"><h3>Anatomia de docker run</h3>${cmd('$ docker run python:3.12-slim python -c "print(\'Olá, Docker!\')"\n#          └── imagem ──────┘ └──── comando executado lá dentro ────┘')}<p style="margin-top:10px">Nome e <strong>tag</strong>: <code>python</code> é a imagem, <code>3.12-slim</code> a versão. Sem tag, o Docker assume <code>latest</code>.</p></div>
+            <div class="box lift"><h3>Como ler o comando</h3>${cmd('$ docker run python:3.12-slim python -c "print(\'Olá, Docker!\')"\n#          └── imagem ──────┘ └──── comando executado lá dentro ────┘')}<p style="margin-top:10px"><code>python</code> é o nome da imagem; <code>3.12-slim</code> é a <strong>tag</strong>, um rótulo de versão ou variante. Sem tag, o Docker usa <code>latest</code>.</p><p>Python é uma linguagem de programação. Neste exemplo, <code>-c</code> pede que ela execute o texto entre aspas, e <code>print</code> mostra a mensagem na tela.</p></div>
             <div class="callout"><strong>docker run sempre cria um container novo.</strong> Rodou três vezes, três containers. Quando o comando termina, o container <em>para</em>, mas continua existindo (<code>docker ps -a</code>) até ser removido.</div>
           </div>
         </div>
       </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">O <code>hello-world</code> de novo. Repare no que <strong>não</strong> aparece: <em>Unable to find image… Pulling</em>. A imagem já está aqui; só o container é novo.</div>${cmd('$ docker run hello-world')}`,
+        `<div class="t">Execute o teste novamente. Como a imagem já está disponível, não devem aparecer mensagens de download, como <em>Pulling</em>. O Docker cria um novo container:</div>${cmd('$ docker run hello-world')}`,
         `<div class="t">Um container com Python dentro. O que vem depois da imagem é o comando a executar lá:</div>${cmd('$ docker run python:3.12-slim python -c "print(\'Olá, Docker!\')"')}`,
-        `<div class="t"><code>ps</code> mostra só os que estão rodando (nenhum: os dois já terminaram). Com <code>-a</code>, todos. Repare em IMAGE, COMMAND, STATUS (<code>Exited (0)</code>) e NAMES (aleatório, porque você não escolheu):</div>${cmd('$ docker ps\n$ docker ps -a')}`,
-        `<div class="t">E os moldes:</div>${cmd('$ docker images')}`,
+        `<div class="t">Liste os containers em execução e, depois, todos os containers. Os dois programas já terminaram, mas seus containers aparecem na segunda lista:</div>${cmd('$ docker ps\n$ docker ps -a')}`,
+        `<div class="t">Agora liste as imagens disponíveis:</div>${cmd('$ docker images')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 01')}<p style="margin-top:10px;color:var(--muted)">Aprova com um container do <code>hello-world</code> e um do <code>python:3.12-slim</code> rodando um <code>print</code>.</p></div>
-        <div class="callout"><strong>O que mostrar na tela</strong> — o <code>docker ps -a</code> crescendo a cada <code>run</code>. É a prova visual de que imagem e container são coisas diferentes.</div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker run python:3.12-slim cat /etc/os-release\n$ cat /etc/os-release')}<p style="margin-top:8px;color:var(--muted)">Um é Debian, o outro é Ubuntu. Mesma máquina, dois "sistemas".</p></div>
+        <div class="callout"><strong>Como ler a lista:</strong> IMAGE é a imagem; COMMAND, o comando; STATUS, o estado; e NAMES, o nome. <code>Exited (0)</code> significa que o programa terminou sem erro. Cada <code>docker run</code> acrescenta um container.</div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker run python:3.12-slim cat /etc/os-release\n$ cat /etc/os-release')}<p style="margin-top:8px;color:var(--muted)"><code>cat</code> mostra o conteúdo do arquivo. Compare as distribuições Linux do container e do Codespace: seus arquivos podem ser diferentes, mesmo compartilhando o kernel.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
           ['docker run <imagem> [comando]','cria um container novo e roda o comando (ou o padrão da imagem)'],
@@ -531,7 +539,7 @@ D.push({n:1, key:'01', title:'Olá, container', mod:'Módulo 1 · Fundamentos', 
 D.push({n:2, key:'02', title:'Dentro do container', mod:'Módulo 1 · Fundamentos', time:5, el:false, cmds:['docker run -it','--rm','--name','docker start -ai'],
   slides:[
     {h:'Dentro do container', body: cover({n:2,time:5,el:false,mod:'Módulo 1 · Fundamentos',cmds:['docker run -it --rm','docker run -it --name','exit','docker start -ai']},
-      'Entrar num container de forma interativa, mexer no sistema de arquivos dele e comprovar que <strong>cada container tem o seu próprio</strong>: o que você cria num, o outro não vê.',
+      'Digitar comandos dentro de um container e criar um arquivo nele. Depois, verificar que esse arquivo <strong>não aparece em outro container</strong> criado a partir da mesma imagem.',
       qualquer)},
     {h:'Cada container, seu sistema de arquivos', eyebrow:'Conceito', body:`
       <div class="stack">
@@ -547,34 +555,34 @@ D.push({n:2, key:'02', title:'Dentro do container', mod:'Módulo 1 · Fundamento
         </div>
         <div class="cols">
           <div class="box lift"><h3>As opções de hoje</h3>${kv([
-            ['-i','mantém a entrada aberta: o que você digita chega ao processo'],
-            ['-t','aloca um terminal: prompt, cores, Ctrl+C. Quase sempre vêm juntos: -it'],
+            ['-i','permite enviar o que você digita para o programa no container'],
+            ['-t','fornece um terminal para essa interação; aqui, usamos as duas opções juntas: -it'],
             ['--rm','remove o container assim que ele terminar. Ideal para experiências'],
             ['--name x','nome fixo em vez de um aleatório; facilita todos os comandos seguintes'],
           ], ['Opção','Efeito'])}</div>
           <div class="stack">
-            <div class="callout"><strong>Parado não é morto.</strong> Ao sair com <code>exit</code>, o processo termina e o container para, mas a camada gravável continua lá. <code>docker start -ai explorador</code> religa o container <em>e</em> o seu terminal a ele.</div>
-            <div class="callout"><strong>Sair sem parar</strong> — <kbd>Ctrl+P</kbd> <kbd>Ctrl+Q</kbd> desliga o terminal e deixa o container rodando. Na prática, <code>exit</code> é o que você vai usar.</div>
+            <div class="callout"><strong>Parar e remover são ações diferentes.</strong> Sem <code>--rm</code>, sair com <code>exit</code> para o container e mantém seus arquivos. <code>docker start -ai explorador</code> inicia o mesmo container e permite interagir com ele novamente.</div>
+            <div class="callout"><strong>Para sair neste exercício:</strong> use <code>exit()</code> no Python e <code>exit</code> no Bash. Para desconectar o terminal sem parar um container interativo, use <kbd>Ctrl+P</kbd> e depois <kbd>Ctrl+Q</kbd>.</div>
           </div>
         </div>
       </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Um Python interativo dentro do container. No prompt <code>&gt;&gt;&gt;</code>, tente <code>import platform; platform.platform()</code> e saia com <code>exit()</code>. Depois, <code>docker ps -a</code>: nada novo, por causa do <code>--rm</code>.</div>${cmd('$ docker run -it --rm python:3.12-slim')}`,
-        `<div class="t">Agora um shell, num container <strong>com nome</strong>, sem <code>--rm</code>. O prompt muda para <code>root@&lt;id&gt;:/#</code>: você está lá dentro.</div>${cmd('$ docker run -it --name explorador python:3.12-slim bash\n$ cat /etc/os-release\n$ ls /\n$ hostname\n$ python --version')}`,
-        `<div class="t">Deixe uma marca e saia:</div>${cmd('$ echo "eu estive aqui" > /marca.txt\n$ exit')}`,
-        `<div class="t"><strong>Outro</strong> container da mesma imagem não tem a marca. <em>No such file or directory</em>: o <code>/marca.txt</code> existe só no <code>explorador</code>, parado em <code>docker ps -a</code>.</div>${cmd('$ docker run --rm python:3.12-slim cat /marca.txt')}`,
+        `<div class="t">Abra o Python interativo. Quando aparecer <code>&gt;&gt;&gt;</code>, digite <code>import platform; platform.platform()</code> para ver informações do sistema. Saia com <code>exit()</code>. De volta ao Codespace, <code>docker ps -a</code> confirma que <code>--rm</code> removeu esse container.</div>${cmd('$ docker run -it --rm python:3.12-slim')}`,
+        `<div class="t">Abra o <strong>Bash</strong>, um interpretador de comandos, também chamado de <em>shell</em>. Depois da primeira linha, os comandos serão executados <strong>dentro do container</strong>:</div>${cmd('$ docker run -it --name explorador python:3.12-slim bash\n$ cat /etc/os-release\n$ ls /\n$ hostname\n$ python --version')}`,
+        `<div class="t">Ainda dentro do container, crie um arquivo e saia. O símbolo <code>&gt;</code> grava o texto produzido por <code>echo</code> no arquivo indicado:</div>${cmd('$ echo "eu estive aqui" > /marca.txt\n$ exit')}`,
+        `<div class="t">De volta ao Codespace, tente ler o arquivo em <strong>outro</strong> container. O erro <em>No such file or directory</em> é esperado: o arquivo existe apenas no <code>explorador</code>.</div>${cmd('$ docker run --rm python:3.12-slim cat /marca.txt')}`,
       ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 02')}<p style="margin-top:10px;color:var(--muted)">Reclama se sobrarem containers do Python interativo sem nome: sinal de que faltou o <code>--rm</code>.</p></div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker start -ai explorador\n$ cat /marca.txt\n$ exit')}<p style="margin-top:8px;color:var(--muted)">A marca continua lá. Os dados de um container só se perdem no <code>docker rm</code>, não quando ele para.</p></div>
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 02')}<p style="margin-top:10px;color:var(--muted)">Execute no terminal do Codespace. A verificação procura o arquivo no <code>explorador</code> e avisa se faltou remover o container do Python interativo.</p></div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker start -ai explorador\n$ cat /marca.txt\n$ exit')}<p style="margin-top:8px;color:var(--muted)">O arquivo continua lá. Parar o container preserva sua camada de arquivos; removê-lo com <code>docker rm</code> apaga essa camada.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
-          ['docker run -it --rm <imagem> bash','o jeito mais rápido de espiar o que tem numa imagem'],
+          ['docker run -it --rm <imagem> bash','abre o Bash, se disponível na imagem, em um container temporário'],
           ['docker run -it --name <nome> <imagem> <cmd>','interativo, com nome, e fica depois de sair'],
-          ['docker start -ai <nome>','religa um container parado, com o terminal preso a ele'],
-          ['docker exec -it <nome> bash','abre um segundo shell num container que já está rodando (desafio 9)'],
+          ['docker start -ai <nome>','inicia um container parado e permite interagir com ele pelo terminal'],
+          ['docker exec -it <nome> bash','abre outro Bash em um container que já está rodando (desafio 9)'],
           ['docker cp <nome>:/arquivo .','copia um arquivo de dentro do container (mesmo parado)'],
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.c_cont, L.r_run, L.r_start, L.r_exec, L.r_cp])}</div>
@@ -586,7 +594,7 @@ D.push({n:2, key:'02', title:'Dentro do container', mod:'Módulo 1 · Fundamento
 D.push({n:3, key:'03', title:'Ciclo de vida', mod:'Módulo 1 · Fundamentos', time:5, el:false, cmds:['docker run -d','docker logs','docker stop','docker start','docker rm'],
   slides:[
     {h:'Ciclo de vida', body: cover({n:3,time:5,el:false,mod:'Módulo 1 · Fundamentos',cmds:['docker run -d --name','docker logs -f','docker stop','docker start','docker rm','docker rm -f']},
-      'Rodar um container em <strong>segundo plano</strong>, ler os logs dele, parar, iniciar de novo e remover. É o dia a dia com qualquer serviço em container.',
+      'Executar um container em <strong>segundo plano</strong>, mantendo o terminal livre. Consultar os <strong>logs</strong>, que são as mensagens do programa, e praticar como parar, iniciar e remover containers.',
       qualquer)},
     {h:'O ciclo', eyebrow:'Conceito', body:`
       <div class="stack">
@@ -600,33 +608,35 @@ D.push({n:3, key:'03', title:'Ciclo de vida', mod:'Módulo 1 · Fundamentos', ti
           <div class="node dim"><b>não existe mais</b><small>logs e camada gravável somem</small></div>
         </div>
         <div class="cols">
-          <div class="box lift"><h3>start volta para "rodando"</h3><p><code>docker start</code> religa o <strong>mesmo</strong> container: mesmos arquivos, mesmos logs antigos. Não é um <code>run</code> novo.</p></div>
-          <div class="box"><h3>stop é educado</h3><p>Manda o processo encerrar (SIGTERM) e espera até 10 s antes de matá-lo (SIGKILL). O <code>sh</code> do relógio ignora o pedido, então o <code>stop</code> dele demora os 10 s inteiros; programas bem-comportados encerram na hora. <code>docker stop -t 1</code> encurta a espera.</p></div>
-          <div class="box"><h3>rm só em parado</h3><p>Tentar remover um container rodando dá erro. <code>docker rm -f</code> faz <code>stop</code> + <code>rm</code> de uma vez.</p></div>
+          <div class="box lift"><h3>Iniciar novamente: start</h3><p><code>docker start</code> inicia o <strong>mesmo</strong> container, com os arquivos e logs anteriores. Já <code>docker run</code> cria um novo container.</p></div>
+          <div class="box"><h3>Parar: stop</h3><p>Envia ao programa um pedido de encerramento, chamado <code>SIGTERM</code>. Neste ambiente, a espera padrão é de até 10 segundos. Se o programa não encerrar, o Docker força a parada com <code>SIGKILL</code>.</p></div>
+          <div class="box"><h3>Remover: rm</h3><p><code>docker rm</code> remove um container parado. Se ele estiver rodando, aparece um erro. A opção <code>-f</code> força o encerramento e a remoção, sem a espera de <code>stop</code>.</p></div>
         </div>
-        <div class="callout"><strong>-d (detached)</strong> — devolve o terminal na hora e imprime o ID. O programa continua rodando lá; <code>docker logs</code> é a janela para a saída dele. <code>logs -f</code> segue ao vivo, e <kbd>Ctrl+C</kbd> sai do <em>logs</em>, não do container.</div>
+        <div class="callout"><strong>-d: execução em segundo plano.</strong> O comando mostra o ID, uma sequência que identifica o container, e libera o terminal. Use <code>docker logs</code> para ler as mensagens ou <code>docker logs -f</code> para acompanhá-las. <kbd>Ctrl+C</kbd> encerra esse acompanhamento, mas mantém o container rodando.</div>
       </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Um container que fica vivo: um relógio que imprime a hora a cada segundo. <code>alpine</code> é uma imagem Linux de uns 5 MB, boa para testes.</div>${cmd("$ docker run -d --name relogio alpine sh -c 'while true; do date; sleep 1; done'")}`,
+        `<div class="t">Crie um relógio que mostra a hora a cada segundo. O trecho entre aspas repete <code>date</code> (data e hora) e <code>sleep 1</code> (espera de um segundo). Você pode copiá-lo como está:</div>${cmd("$ docker run -d --name relogio alpine sh -c 'while true; do date; sleep 1; done'")}`,
         `<div class="t">Rodando (<code>Up … seconds</code>) e escrevendo nos logs:</div>${cmd('$ docker ps\n$ docker logs relogio\n$ docker logs -f relogio      # Ctrl+C sai do logs, não do container')}`,
-        `<div class="t">Pare e observe as duas listas:</div>${cmd('$ docker stop relogio\n$ docker ps                   # vazio\n$ docker ps -a                # Exited')}`,
+        `<div class="t">Pare o relógio e compare as duas listas. Neste exemplo, a parada pode demorar cerca de 10 segundos; aguarde o terminal ficar disponível:</div>${cmd('$ docker stop relogio\n$ docker ps                   # só os containers em execução\n$ docker ps -a                # inclui o relogio parado: Exited')}`,
         `<div class="t">Inicie de novo. Os logs antigos continuam, e novos vão aparecendo:</div>${cmd('$ docker start relogio\n$ docker logs --tail 3 relogio')}`,
-        `<div class="t">Removendo: um descartável, e a tentativa de removê-lo enquanto roda:</div>${cmd('$ docker run -d --name descartavel alpine sleep 600\n$ docker rm descartavel                 # erro: está rodando\n$ docker stop descartavel && docker rm descartavel')}`,
+        `<div class="t">Crie outro container e tente removê-lo. O erro da segunda linha é esperado. Na terceira, <code>&amp;&amp;</code> executa a remoção apenas se a parada funcionar:</div>${cmd('$ docker run -d --name descartavel alpine sleep 600\n$ docker rm descartavel                 # erro: está rodando\n$ docker stop descartavel && docker rm descartavel')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 03')}<p style="margin-top:10px;color:var(--muted)">Aprova com o <code>relogio</code> rodando (e já parado e iniciado ao menos uma vez) e o <code>descartavel</code> removido.</p></div>
-        <div class="callout"><strong>Nome ou ID</strong> — todo comando aceita o nome ou o começo do ID: <code>docker stop relogio</code> e <code>docker stop 3f2</code> dão no mesmo. Sem <code>--name</code>, o Docker inventa um (<code>brave_curie</code>…).</div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker top relogio\n$ docker stats --no-stream relogio\n$ docker inspect relogio      # procure "State"')}</div>
+        <div class="callout"><strong>Nome ou ID:</strong> os comandos que recebem um container aceitam seu nome ou um início de ID que o identifique sem ambiguidade. Aqui, use <code>relogio</code> e <code>descartavel</code>.</div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker top relogio\n$ docker stats --no-stream relogio\n$ docker inspect relogio      # procure "State"')}<p style="margin-top:8px;color:var(--muted)">Consulte os programas em execução, o uso de processador e memória e os detalhes do container. <code>inspect</code> usa JSON, um formato de texto com nomes e valores.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
           ['docker run -d --name <n> <imagem> <cmd>','em segundo plano, com nome'],
           ['docker logs <n>','a saída do processo; -f segue ao vivo; --tail N as últimas linhas'],
-          ['docker stop <n>','encerra com educação (10 s de prazo)'],
-          ['docker start <n>','religa o mesmo container'],
+          ['docker stop <n>','pede o encerramento e aguarda; neste ambiente, o prazo padrão é de 10 s'],
+          ['docker start <n>','inicia novamente o mesmo container'],
           ['docker rm <n>','remove um container parado; -f remove mesmo rodando'],
-          ['docker top / stats / inspect <n>','processos, consumo de CPU e memória, tudo em JSON'],
+          ['docker top <n>','lista os processos, isto é, os programas em execução no container'],
+          ['docker stats --no-stream <n>','mostra o uso de processador e memória naquele momento'],
+          ['docker inspect <n>','mostra detalhes do container em JSON'],
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.run_guide, L.r_logs, L.r_stop, L.r_start, L.r_rm, L.r_ps, L.h_alpine])}</div>
       </div>`},
@@ -636,16 +646,16 @@ D.push({n:3, key:'03', title:'Ciclo de vida', mod:'Módulo 1 · Fundamentos', ti
 D.push({n:4, key:'04', title:'Meu primeiro Dockerfile', mod:'Módulo 2 · Dockerfile', time:6, el:false, cmds:['FROM','COPY','CMD','docker build -t'],
   slides:[
     {h:'Meu primeiro Dockerfile', body: cover({n:4,time:6,el:false,mod:'Módulo 2 · Dockerfile',cmds:['Dockerfile','FROM','COPY','CMD','docker build -t receitas:1.0 .','docker run --rm receitas:1.0']},
-      'Empacotar um programa seu numa <strong>imagem</strong>: escrever um <code>Dockerfile</code>, construir com <code>docker build</code> e rodar como qualquer outra.',
-      cmd('$ cd ~/labs/04-meu-primeiro-dockerfile') + '<p style="margin-top:10px;color:var(--muted)">Um único arquivo, <code>receitas.py</code>, que imprime o livro de receitas. Veja com <code>cat receitas.py</code>.</p>')},
+      'Criar uma <strong>imagem</strong> com o programa de receitas fornecido pelo curso. Você vai escrever o arquivo de instruções, chamado <code>Dockerfile</code>, construir a imagem e executar um container com ela.',
+      cmd('$ cd ~/labs/04-meu-primeiro-dockerfile') + '<p style="margin-top:10px;color:var(--muted)">Execute este comando para entrar na pasta do desafio. O programa <code>receitas.py</code> já está pronto e mostra as receitas no terminal. Leia seu conteúdo com <code>cat receitas.py</code>.</p>')},
     {h:'Dockerfile → imagem → container', eyebrow:'Conceito', body:`
       <div class="stack">
         <div class="flow">
-          <div class="node"><b>Dockerfile + contexto</b><small>a receita e a pasta (o <code>.</code>)</small></div>
+          <div class="node"><b>Dockerfile + pasta do projeto</b><small>instruções e arquivos usados para construir a imagem</small></div>
           <div class="arr"><span class="a">→</span><strong>docker build -t receitas:1.0 .</strong></div>
-          <div class="node hi"><b>imagem receitas:1.0</b><small>molde só leitura · aparece em docker images</small></div>
+          <div class="node hi"><b>imagem receitas:1.0</b><small>resultado da construção · aparece em docker images</small></div>
           <div class="arr"><span class="a">→</span><strong>docker run --rm receitas:1.0</strong></div>
-          <div class="node"><b>container</b><small>roda o CMD · imprime o livro · some (--rm)</small></div>
+          <div class="node"><b>container</b><small>executa o programa, mostra as receitas e é removido por --rm</small></div>
         </div>
         <div class="cols s2">
           <div class="stack">
@@ -656,32 +666,32 @@ COPY receitas.py /app/receitas.py
 CMD ["python", "/app/receitas.py"]`)}
             ${kv([
               ['FROM imagem','começa a partir de uma imagem existente (aqui, a que já tem Python)'],
-              ['COPY origem destino','copia arquivos do contexto para dentro da imagem'],
-              ['CMD ["prog","arg"]','o comando padrão quando alguém rodar docker run nesta imagem'],
+              ['COPY origem destino','copia arquivos da pasta do projeto para a imagem'],
+              ['CMD ["prog","arg"]','define o programa e seus argumentos; aqui, o Python e o caminho do arquivo receitas.py'],
             ], ['Instrução','O que faz'])}
           </div>
           <div class="stack">
             ${layers([
-              {t:'CMD ["python", "/app/receitas.py"]', s:'só metadado: não ocupa espaço', cls:'dim'},
+              {t:'CMD ["python", "/app/receitas.py"]', s:'configuração do comando; não executa o programa no build', cls:'dim'},
               {t:'COPY receitas.py /app/receitas.py', s:'uma camada nova com o seu arquivo', cls:'hi'},
               {t:'FROM python:3.12-slim', s:'todas as camadas da imagem-base'},
             ], 'a imagem receitas:1.0, de cima para baixo')}
-            <div class="callout"><strong>O contexto</strong> é a pasta que você passa ao build (o <code>.</code>). O <code>COPY</code> só enxerga o que está nela; nada de <code>COPY ../outra-pasta</code>. E tudo o que está nela pode acabar na imagem (desafio 7).</div>
+            <div class="callout"><strong>Build</strong> significa construção da imagem. O ponto <code>.</code> em <code>docker build</code> indica a pasta atual: ela é o <strong>contexto de construção</strong>. O <code>COPY</code> usa os arquivos dessa pasta. No desafio 7, vamos escolher quais deles ficam de fora.</div>
           </div>
         </div>
       </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 6 min', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Crie um arquivo chamado exatamente <code>Dockerfile</code> (D maiúsculo, sem extensão) com as três instruções do slide anterior.</div>`,
-        `<div class="t">Construa. <code>-t</code> dá nome e tag; o <code>.</code> é o contexto. Leia a saída: um passo por instrução.</div>${cmd('$ docker build -t receitas:1.0 .')}`,
-        `<div class="t">A imagem existe:</div>${cmd('$ docker images receitas')}`,
-        `<div class="t">Rode. Não é preciso dizer o comando: ele está no <code>CMD</code>.</div>${cmd('$ docker run --rm receitas:1.0')}`,
+        `<div class="t">Execute <code>code Dockerfile</code>. No editor, copie as três instruções do slide anterior e salve. Use D maiúsculo e não acrescente <code>.txt</code> ao nome do arquivo.</div>`,
+        `<div class="t">Volte ao terminal e construa a imagem. <code>-t</code> define o nome <code>receitas</code> e a tag <code>1.0</code>; o ponto indica a pasta atual:</div>${cmd('$ docker build -t receitas:1.0 .')}`,
+        `<div class="t">Confira se a imagem aparece na lista:</div>${cmd('$ docker images receitas')}`,
+        `<div class="t">Execute um container. O comando Python já está definido em <code>CMD</code>, por isso você só precisa informar a imagem:</div>${cmd('$ docker run --rm receitas:1.0')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 04')}<p style="margin-top:10px;color:var(--muted)">Roda a sua imagem e confere que o livro de receitas aparece.</p></div>
-        <div class="callout"><strong>Errou o Dockerfile?</strong> Corrija e construa de novo com o mesmo nome; a imagem é substituída. O <code>CMD</code> também pode ser sobrescrito na hora: <code>docker run --rm receitas:1.0 python --version</code>.</div>
+        <div class="callout"><strong>Se precisar corrigir:</strong> salve o Dockerfile e repita o <code>docker build</code>. A tag passará a apontar para a imagem atualizada. Para executar outro comando no lugar de <code>CMD</code>, use, por exemplo, <code>docker run --rm receitas:1.0 python --version</code>.</div>
         <div class="box soft"><h3>Missão extra · tags</h3>${cmd('$ docker tag receitas:1.0 receitas:latest\n$ docker images receitas      # mesmo IMAGE ID, dois nomes\n$ docker run --rm receitas    # sem tag = latest')}</div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
           ['docker build -t nome:tag .','constrói a imagem a partir do Dockerfile da pasta atual'],
@@ -698,14 +708,14 @@ CMD ["python", "/app/receitas.py"]`)}
 D.push({n:5, key:'05', title:'Instalando dependências', mod:'Módulo 2 · Dockerfile', time:6, el:false, cmds:['WORKDIR','RUN pip install','requirements.txt'],
   slides:[
     {h:'Instalando dependências', body: cover({n:5,time:6,el:false,mod:'Módulo 2 · Dockerfile',cmds:['WORKDIR /app','COPY . .','RUN pip install -r requirements.txt','docker build -t receitas-api:1.0 .']},
-      'Colocar numa imagem um programa que <strong>depende de bibliotecas</strong> (o FastAPI e o servidor uvicorn), instalando-as durante o build com <code>RUN</code>. A partir daqui, o projeto é uma pequena API web.',
-      cmd('$ cd ~/labs/05-instalando-dependencias') + '<p style="margin-top:10px;color:var(--muted)"><code>app.py</code>: uma API em FastAPI com as rotas <code>/</code> e <code>/receitas</code>. <code>requirements.txt</code>: <code>fastapi</code> e <code>uvicorn</code>. Tente <code>python3 app.py</code> no Codespace: falta o FastAPI.</p>')},
-    {h:'RUN é no build, CMD é no run', eyebrow:'Conceito', body:`
+      'Instalar na imagem os pacotes de software de que o programa precisa: suas <strong>dependências</strong>. Agora, o livro de receitas é uma <strong>API</strong>, um programa que recebe pedidos pela rede e responde com dados.',
+      cmd('$ cd ~/labs/05-instalando-dependencias') + '<p style="margin-top:10px;color:var(--muted)"><code>app.py</code> é o programa, já pronto. Ele usa FastAPI e uvicorn, listados em <code>requirements.txt</code>. Vamos instalar esses pacotes na imagem.</p>')},
+    {h:'Construir a imagem e executar o programa', eyebrow:'Conceito · RUN e CMD', body:`
       <div class="cols s2"><div class="stack">
         <div class="flow">
-          <div class="node hi"><b>build</b><small><strong>RUN</strong> pip install · acontece <em>uma vez</em> · o resultado fica na imagem</small></div>
+          <div class="node hi"><b>build: construção</b><small><strong>RUN</strong> instala as dependências · o resultado fica na imagem</small></div>
           <div class="arr"><span class="a">→</span>imagem pronta</div>
-          <div class="node"><b>run</b><small><strong>CMD</strong> python app.py · acontece a <em>cada</em> docker run</small></div>
+          <div class="node"><b>run: execução</b><small><strong>CMD</strong> define o comando padrão ao iniciar o container</small></div>
         </div>
         ${cmd(`FROM python:3.12-slim
 
@@ -716,9 +726,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["python", "app.py"]`)}
         ${kv([
-          ['WORKDIR /app','define (e cria) a pasta atual dentro da imagem; COPY, RUN e CMD passam a acontecer nela'],
-          ['RUN comando','executa durante o build e guarda o resultado numa camada'],
-          ['COPY . .','tudo do contexto para o WORKDIR'],
+          ['WORKDIR /app','define a pasta de trabalho na imagem e a cria, se necessário'],
+          ['RUN comando','executa durante a construção; aqui, instala os pacotes do Python'],
+          ['COPY . .','copia da pasta do projeto (primeiro ponto) para a pasta de trabalho /app (segundo ponto)'],
         ], ['Instrução','O que faz'])}
       </div><div class="stack">
         <div class="box lift"><h3>O app.py, em resumo</h3>${cmd(`import uvicorn
@@ -730,21 +740,21 @@ def receitas():
     return RECEITAS
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)`)}<p style="margin-top:10px">O FastAPI define as rotas; o uvicorn é o servidor que as atende. <code>0.0.0.0</code> = aceita conexões de fora do container. O <code>127.0.0.1</code> de lá é só de lá (desafio 8).</p></div>
-        <div class="callout"><strong>Cada RUN vira uma camada.</strong> Se o <code>pip install</code> falhar, o build para ali e mostra o erro; corrija e construa de novo. O <code>--no-cache-dir</code> só evita que o pip deixe arquivos temporários na imagem.</div>
+    uvicorn.run(app, host="0.0.0.0", port=8000)`)}<p style="margin-top:10px">Este trecho é apenas para consulta. O FastAPI define as <strong>rotas</strong>, caminhos como <code>/receitas</code>. O uvicorn recebe os pedidos e envia as respostas. A porta <code>8000</code> identifica onde ele recebe conexões; veremos o acesso no desafio 8.</p></div>
+        <div class="callout"><strong>Como ler pip install:</strong> <code>pip</code> instala pacotes Python; <code>-r requirements.txt</code> indica a lista de pacotes; <code>--no-cache-dir</code> evita guardar os arquivos de download na imagem. Se a instalação falhar, a construção para e mostra o erro.</div>
       </div></div>`},
     {h:'O desafio', eyebrow:'Tarefa · 6 min', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Crie o <code>Dockerfile</code> com as cinco instruções do slide anterior (nesta ordem: <code>COPY . .</code> antes do pip; o desafio 6 mostra por que isso não é o ideal).</div>`,
+        `<div class="t">Execute <code>code Dockerfile</code>, copie as cinco instruções do slide anterior e salve. Mantenha a ordem do exemplo; no próximo desafio, vamos melhorá-la.</div>`,
         `<div class="t">Construa e acompanhe o <code>pip install</code> rodando <strong>dentro</strong> do build:</div>${cmd('$ docker build -t receitas-api:1.0 .')}`,
         `<div class="t">As bibliotecas ficaram na imagem:</div>${cmd('$ docker run --rm receitas-api:1.0 pip list')}`,
-        `<div class="t">Rode a API. Ela sobe e fica esperando; <kbd>Ctrl+C</kbd> encerra. Ainda <strong>não</strong> dá para acessar pelo navegador: a porta 8000 existe só dentro do container. Isso é o desafio 8.</div>${cmd('$ docker run --rm receitas-api:1.0')}`,
+        `<div class="t">Execute a API e observe as mensagens. Ela continuará aguardando pedidos. Pressione <kbd>Ctrl+C</kbd> para encerrar antes de verificar o desafio. O acesso pelo navegador será configurado no desafio 8.</div>${cmd('$ docker run --rm receitas-api:1.0')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 05')}<p style="margin-top:10px;color:var(--muted)">Confere WORKDIR, o pip no Dockerfile, o FastAPI dentro da imagem e o CMD rodando o app.py.</p></div>
-        <div class="callout"><strong>Tag nova</strong> — <code>receitas-api</code>, não <code>receitas</code>: são projetos diferentes (script vs. API). Tag é só um nome; você escolhe.</div>
+        <div class="callout"><strong>Nome e tag:</strong> em <code>receitas-api:1.0</code>, o nome é <code>receitas-api</code>, e a tag é <code>1.0</code>. Isso distingue a API do programa anterior, <code>receitas:1.0</code>. Use os nomes do enunciado para que a verificação encontre as imagens.</div>
         <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker images\n$ docker run --rm receitas-api:1.0 python -c "import fastapi; print(fastapi.__version__)"')}<p style="margin-top:8px;color:var(--muted)">A diferença de tamanho entre <code>python:3.12-slim</code> e <code>receitas-api:1.0</code> é o FastAPI, o uvicorn e o seu código.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
           ['WORKDIR /app','pasta de trabalho dentro da imagem'],
@@ -761,48 +771,48 @@ if __name__ == "__main__":
 D.push({n:6, key:'06', title:'Camadas e cache', mod:'Módulo 2 · Dockerfile', time:5, el:false, cmds:['ordem das instruções','docker history','CACHED'],
   slides:[
     {h:'Camadas e cache', body: cover({n:6,time:5,el:false,mod:'Módulo 2 · Dockerfile',cmds:['COPY requirements.txt .','RUN pip install','COPY . .','docker history']},
-      'Entender por que a <strong>ordem</strong> das instruções importa: cada uma vira uma camada, e o Docker reaproveita camadas até a primeira que mudou. Bem ordenado, mudar o código não reinstala as dependências.',
+      'Organizar o Dockerfile para <strong>reaproveitar a instalação das dependências</strong> quando você alterar apenas o código. Esse reaproveitamento de resultados anteriores é chamado de <strong>cache</strong>.',
       cmd('$ cd ~/labs/06-camadas-e-cache') + '<p style="margin-top:10px;color:var(--muted)"><code>app.py</code>, <code>requirements.txt</code> e um <code>Dockerfile</code> igual ao do desafio 5: <code>COPY . .</code> <strong>antes</strong> do <code>pip install</code>.</p>')},
-    {h:'Uma camada por instrução', eyebrow:'Conceito · como o cache decide', body:`
+    {h:'O que precisa ser construído de novo?', eyebrow:'Conceito · camadas e cache', body:`
       <div class="stack">
         <div class="cols w2">
           ${layers([
             {t:'CMD ["python", "app.py"]', s:'', cls:'dim'},
-            {t:'RUN pip install …', s:'roda de novo (30 s)', tag:'REFAZ', tagCls:'redo'},
+            {t:'RUN pip install …', s:'instala as dependências novamente', tag:'REFAZ', tagCls:'redo'},
             {t:'COPY . .', s:'app.py mudou → camada nova', tag:'REFAZ', tagCls:'redo', cls:'hi'},
             {t:'WORKDIR /app', tag:'CACHED', tagCls:'ok'},
             {t:'FROM python:3.12-slim', tag:'CACHED', tagCls:'ok'},
-          ], 'ordem ingênua: editou o app.py e…')}
+          ], 'código copiado antes: alterar app.py também refaz a instalação')}
           ${layers([
             {t:'CMD ["python", "app.py"]', s:'', cls:'dim'},
             {t:'COPY . .', s:'app.py mudou → camada nova', tag:'REFAZ', tagCls:'redo', cls:'hi'},
-            {t:'RUN pip install …', s:'nada acima mudou', tag:'CACHED', tagCls:'ok'},
+            {t:'RUN pip install …', s:'as etapas anteriores não mudaram', tag:'CACHED', tagCls:'ok'},
             {t:'COPY requirements.txt .', s:'mesmo arquivo', tag:'CACHED', tagCls:'ok'},
             {t:'WORKDIR /app', tag:'CACHED', tagCls:'ok'},
             {t:'FROM python:3.12-slim', tag:'CACHED', tagCls:'ok'},
-          ], 'ordem boa: editou o app.py e só a última camada é refeita')}
+          ], 'código copiado depois: a instalação pode ser reutilizada')}
         </div>
         <div class="cols">
-          <div class="box lift"><h3>A pergunta do cache</h3><p>Para cada instrução, de cima para baixo: "já construí esta camada, com esta instrução, sobre a mesma camada anterior, com os mesmos arquivos?" Sim → <code>CACHED</code>. Não → executa, <strong>e todas as seguintes também</strong>, porque partem de uma base diferente.</p></div>
-          <div class="box"><h3>A regra</h3><p><strong>O que muda menos vai primeiro</strong> (sistema, dependências); <strong>o que muda mais vai por último</strong> (o seu código). O <code>requirements.txt</code> muda uma vez por mês; o <code>app.py</code>, dez vezes por hora.</p></div>
+          <div class="box lift"><h3>O que significa CACHED?</h3><p>A imagem guarda alterações em arquivos como <strong>camadas</strong>. Se a instrução, sua base e os arquivos usados continuam iguais, o Docker pode reutilizar o resultado: <code>CACHED</code>. Ao mudar uma etapa, as seguintes que dependem dela precisam ser refeitas.</p></div>
+          <div class="box"><h3>Como organizar o Dockerfile</h3><p>Copie primeiro <code>requirements.txt</code> e instale as dependências. Depois, copie o código. Assim, editar uma receita em <code>app.py</code> não obriga o Docker a repetir a instalação.</p><p>Nem toda instrução acrescenta arquivos: <code>CMD</code>, por exemplo, guarda uma configuração.</p></div>
         </div>
       </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
       <div class="cols s2"><div class="stack">${steps([
         `<div class="t">Construa uma vez:</div>${cmd('$ docker build -t receitas-api:1.1 .')}`,
-        `<div class="t">Mude o código: acrescente uma receita à lista <code>RECEITAS</code> em <code>app.py</code> (por exemplo <code>{"nome": "Mousse de maracujá", "rende": "6 porções"}</code>). Construa de novo e repare: o <code>pip install</code> <strong>rodou outra vez</strong>, por uma mudança que não tinha nada a ver com ele.</div>${cmd('$ docker build -t receitas-api:1.1 .')}`,
-        `<div class="t">Reordene o <code>Dockerfile</code>: primeiro só o <code>requirements.txt</code>, depois o pip, e só então o resto:</div>${cmd(`COPY requirements.txt .
+        `<div class="t">Abra <code>app.py</code> com <code>code app.py</code>. Na lista <code>RECEITAS = [</code>, acrescente a linha abaixo antes do <code>]</code> final, alinhada às outras receitas:</div>${cmd('{"nome": "Mousse de maracujá", "rende": "6 porções"},')}<p>Salve e repita a construção no terminal; o pip será executado novamente:</p>${cmd('$ docker build -t receitas-api:1.1 .')}`,
+        `<div class="t">No Dockerfile, substitua as linhas <code>COPY . .</code> e <code>RUN pip install…</code> pelo trecho abaixo. Mantenha <code>FROM</code>, <code>WORKDIR</code> e <code>CMD</code> como estão:</div>${cmd(`COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .`)}`,
-        `<div class="t">Construa (o pip roda uma última vez: a sequência é nova). Mude <code>app.py</code> mais uma vez e construa de novo: agora o pip é <code>CACHED</code> e o build leva segundos.</div>${cmd('$ docker build -t receitas-api:1.1 .\n# edite app.py\n$ docker build -t receitas-api:1.1 .')}`,
-        `<div class="t">As camadas, uma por instrução, com o tamanho de cada uma:</div>${cmd('$ docker history receitas-api:1.1')}`,
+        `<div class="t">Salve o Dockerfile e construa a imagem. Depois, troque <code>Mousse de maracujá</code> por <code>Mousse de limão</code> em <code>app.py</code>, salve e construa de novo. A etapa do pip deve aparecer como <code>CACHED</code>:</div>${cmd('$ docker build -t receitas-api:1.1 .\n# edite e salve app.py antes de continuar\n$ docker build -t receitas-api:1.1 .')}`,
+        `<div class="t">Consulte o histórico da imagem, com as instruções e o tamanho de cada etapa:</div>${cmd('$ docker history receitas-api:1.1')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 06')}<p style="margin-top:10px;color:var(--muted)">Aprova com o Dockerfile na ordem certa, o <code>app.py</code> alterado e a imagem contendo a versão atual dele.</p></div>
-        <div class="callout"><strong>O que mostrar na tela</strong> — a linha <code>CACHED [3/5] RUN pip install…</code> na saída do último build. É a diferença entre 30 segundos e 2.</div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ time docker build --no-cache -t receitas-api:1.1 .\n$ time docker build -t receitas-api:1.1 .')}</div>
+        <div class="callout"><strong>O que observar:</strong> procure <code>CACHED</code> na etapa <code>RUN pip install</code>. O instalador já preparou parte do cache, então essa indicação também pode aparecer na primeira construção com a nova ordem.</div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ time docker build --no-cache -t receitas-api:1.1 .\n$ time docker build -t receitas-api:1.1 .')}<p style="margin-top:8px;color:var(--muted)"><code>time</code> mede a duração. Compare o valor de <code>real</code> na construção sem cache e na seguinte.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
           ['docker history <imagem>','as camadas, com instrução e tamanho'],
@@ -820,50 +830,50 @@ COPY . .`)}`,
 D.push({n:7, key:'07', title:'O que não entra na imagem', mod:'Módulo 2 · Dockerfile', time:4, el:true, cmds:['.dockerignore','contexto de build'],
   slides:[
     {h:'O que não entra na imagem', body: cover({n:7,time:4,el:true,mod:'Módulo 2 · Dockerfile',cmds:['.dockerignore','docker build','docker run --rm <img> ls -A /app']},
-      'Impedir que lixo e segredos da sua pasta entrem na imagem com um <code>.dockerignore</code>. <code>COPY . .</code> copia <strong>tudo</strong> o que está no contexto, inclusive o que você não queria.',
-      cmd('$ cd ~/labs/07-o-que-nao-entra') + '<p style="margin-top:10px;color:var(--muted)">Além de <code>app.py</code>, <code>requirements.txt</code> e um Dockerfile correto, a pasta tem <code>.venv/</code> (3 MB), <code>__pycache__/</code>, um <code>.env</code> com senha, <code>notas-pessoais.md</code> e <code>fotos/</code> (2 MB). Veja com <code>ls -A</code> e <code>du -sh .venv fotos</code>.</p>')},
+      'Escolher quais arquivos do projeto devem ficar <strong>fora da imagem</strong>. Você vai criar um <code>.dockerignore</code>, um arquivo de texto com a lista do que o Docker deve ignorar.',
+      cmd('$ cd ~/labs/07-o-que-nao-entra') + '<p style="margin-top:10px;color:var(--muted)">A pasta inclui arquivos de exemplo que a API não precisa, como fotos e uma senha fictícia. <code>ls -A</code> lista também os arquivos que começam com ponto; <code>du -sh .venv fotos</code> mostra o tamanho dessas pastas.</p>')},
     {h:'O contexto passa por um filtro', eyebrow:'Conceito', body:`
       <div class="stack">
         <div class="flow">
           <div class="node"><b>a pasta (contexto)</b><small>app.py · requirements.txt · .venv · .env · fotos…</small></div>
           <div class="arr"><span class="a">→</span>filtro<br><strong>.dockerignore</strong></div>
-          <div class="node hi"><b>o que o daemon recebe</b><small>só app.py, requirements.txt, Dockerfile</small></div>
+          <div class="node hi"><b>arquivos disponíveis para cópia</b><small>os itens listados no .dockerignore ficam de fora</small></div>
           <div class="arr"><span class="a">→</span>COPY . .</div>
-          <div class="node"><b>imagem</b><small>enxuta, sem segredos</small></div>
+          <div class="node"><b>imagem</b><small>sem os arquivos excluídos pelo filtro</small></div>
         </div>
         <div class="cols">
           <div class="box">${kv([
-            ['.venv','ambiente virtual do Codespace; no container o pip instala de novo, limpo'],
-            ['__pycache__','cache do Python, gerado automaticamente'],
-            ['.env','uma senha: tudo o que entra na imagem pode ser lido por quem tiver a imagem'],
+            ['.venv','simula dependências locais do Python; na imagem, o pip já instala o necessário'],
+            ['__pycache__','arquivos gerados automaticamente pelo Python, que podem ser recriados'],
+            ['.env','contém uma senha fictícia; arquivos na imagem podem ser lidos por quem tem acesso a ela'],
             ['notas-pessoais.md','anotações suas, não do projeto'],
-            ['fotos','não tem nada a ver com a API; só engorda a imagem'],
+            ['fotos','não são usadas pela API e aumentam o tamanho da imagem'],
           ], ['Padrão','Por que fica de fora'])}</div>
           <div class="stack">
-            <div class="box lift"><h3>Quatro famílias de lixo</h3><ul class="plain"><li><strong>gerado</strong> — cache, build, logs: recriável;</li><li><strong>dependências locais</strong> — <code>.venv</code>, <code>node_modules</code>: enormes e reinstaláveis no build;</li><li><strong>segredos</strong> — <code>.env</code>, chaves: uma vez na imagem, considere vazado;</li><li><strong>dados</strong> — fotos, dumps: não são o programa.</li></ul></div>
-            <div class="callout"><strong>Mesma sintaxe do .gitignore</strong> — um padrão por linha. E vale para o contexto inteiro: o que está nele nem é enviado ao daemon, o que também deixa o build mais rápido.</div>
+            <div class="box lift"><h3>O que a API precisa para executar?</h3><p>Neste exercício, ela precisa do código e das dependências instaladas pelo pip. As anotações pessoais, as fotos e os arquivos temporários não fazem parte do programa.</p><p>O <code>.dockerignore</code> exclui esses itens da cópia sem apagá-los da pasta do Codespace.</p></div>
+            <div class="callout"><strong>Um nome por linha.</strong> Crie o arquivo na mesma pasta do Dockerfile. Você pode listar arquivos e pastas. O filtro vale para todo o contexto de construção.</div>
           </div>
         </div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 4 min · elástico', body:`
+    {h:'O desafio', eyebrow:'Tarefa · 4 min · pode ficar para depois da aula', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Construa e olhe o que foi parar dentro da imagem, senha inclusive:</div>${cmd('$ docker build -t receitas-api:1.2 .\n$ docker run --rm receitas-api:1.2 ls -A /app\n$ docker run --rm receitas-api:1.2 cat /app/.env')}`,
-        `<div class="t">Crie o <code>.dockerignore</code>, um padrão por linha:</div>${cmd(`.venv
+        `<div class="t">Construa a imagem e liste os arquivos em <code>/app</code>. Sem o filtro, a senha fictícia também é copiada:</div>${cmd('$ docker build -t receitas-api:1.2 .\n$ docker run --rm receitas-api:1.2 ls -A /app\n$ docker run --rm receitas-api:1.2 cat /app/.env')}`,
+        `<div class="t">Execute <code>code .dockerignore</code>, copie a lista abaixo para o arquivo e salve:</div>${cmd(`.venv
 __pycache__
 .env
 notas-pessoais.md
 fotos`)}`,
-        `<div class="t">Construa de novo e confira: só o que interessa.</div>${cmd('$ docker build -t receitas-api:1.2 .\n$ docker run --rm receitas-api:1.2 ls -A /app')}`,
+        `<div class="t">Construa novamente e confira se os cinco itens ficaram fora da imagem:</div>${cmd('$ docker build -t receitas-api:1.2 .\n$ docker run --rm receitas-api:1.2 ls -A /app')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 07')}<p style="margin-top:10px;color:var(--muted)">Lista <code>/app</code> dentro da imagem e reprova se algum dos cinco estiver lá.</p></div>
         <div class="box soft"><h3>Missão extra</h3><p>Inclua também <code>Dockerfile</code> e <code>.dockerignore</code> no <code>.dockerignore</code>: servem para construir a imagem, não precisam estar dentro dela. Compare os tamanhos com <code>docker images receitas-api</code>.</p></div>
-        <div class="callout warn"><strong>⏱ Elástico</strong> — se a aula atrasou ao fim do módulo 2, vira tarefa de casa. Intervalo depois deste.</div>
+        <div class="callout warn"><strong>Se faltar tempo:</strong> este desafio pode ser feito depois da aula. O intervalo está previsto para o fim deste bloco.</div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
-          ['.dockerignore','arquivo na raiz do contexto; um padrão por linha; mesma sintaxe do .gitignore'],
-          ['docker run --rm <img> ls -A /app','o jeito de ver o que entrou'],
+          ['.dockerignore','arquivo na pasta do projeto; lista os itens que devem ficar fora da imagem'],
+          ['docker run --rm <img> ls -A /app','lista os arquivos copiados para /app, inclusive os que começam com ponto'],
           ['docker images <nome>','tamanhos de cada tag'],
           ['docker build --progress=plain .','mostra "transferring context: X MB": quanto foi enviado ao daemon'],
         ])}
@@ -877,37 +887,37 @@ D.push({n:8, key:'08', title:'Abrindo portas', mod:'Módulo 3 · Portas e config
     {h:'Abrindo portas', body: cover({n:8,time:5,el:false,mod:'Módulo 3 · Portas e configuração',cmds:['EXPOSE 8000','docker run -d -p 8001:8000','curl localhost:8001/receitas','docker port','aba PORTS','/docs']},
       'Acessar, do navegador, uma API que roda <strong>dentro</strong> de um container: publicar a porta com <code>-p</code> e documentá-la com <code>EXPOSE</code>.',
       cmd('$ cd ~/labs/08-abrindo-portas') + '<p style="margin-top:10px;color:var(--muted)">A API (<code>app.py</code>, <code>requirements.txt</code>, <code>.dockerignore</code>) e um <code>Dockerfile</code> pronto, na ordem certa, mas sem <code>EXPOSE</code>.</p>')},
-    {h:'Dentro e fora', eyebrow:'Conceito · -p fora:dentro', body:`
+    {h:'Como acessar a porta do container?', eyebrow:'Conceito · -p fora:dentro', body:`
       <div class="stack">
         ${ports(8001, 8000, {app:'uvicorn'})}
         <div class="cols">
-          <div class="box lift"><h3>-p é o que abre</h3><p>O container tem a sua própria rede. O uvicorn escuta na 8000 <em>de lá</em>; ninguém de fora enxerga. <code>-p 8001:8000</code> liga a porta 8001 do Codespace à 8000 do container. A ordem é sempre <strong><code>fora:dentro</code></strong>.</p></div>
-          <div class="box"><h3>EXPOSE só documenta</h3><p>Não abre porta nenhuma. Diz a quem for rodar a imagem qual porta o programa usa (e aparece no <code>docker ps</code>). Bom hábito; sem efeito sozinho.</p></div>
-          <div class="box"><h3>0.0.0.0, não 127.0.0.1</h3><p>Dentro do container, <code>127.0.0.1</code> é só o próprio container. Um servidor preso nele nunca recebe conexões de fora, mesmo com <code>-p</code>. Por isso o <code>uvicorn.run(app, host="0.0.0.0", port=8000)</code>.</p></div>
+          <div class="box lift"><h3>Publicar uma porta com -p</h3><p>Uma <strong>porta</strong> é um número que direciona conexões a um programa. <code>-p 8001:8000</code> encaminha os pedidos recebidos na porta 8001 do Codespace à porta 8000 do container.</p><p>A ordem é <strong><code>fora:dentro</code></strong>: primeiro o Codespace, depois o container.</p></div>
+          <div class="box"><h3>Registrar a porta com EXPOSE</h3><p><code>EXPOSE 8000</code> informa, no Dockerfile, qual porta o programa usa. Essa instrução sozinha não publica a porta no Codespace; fazemos isso com <code>-p</code> ao criar o container.</p></div>
+          <div class="box"><h3>A configuração do servidor</h3><p><code>127.0.0.1</code> aceita conexões apenas do próprio ambiente em que o programa roda. No container, isso impediria o acesso de fora. O código fornecido usa <code>0.0.0.0</code> para aceitar essas conexões.</p></div>
         </div>
-        <div class="callout"><strong>No Codespace</strong> — a aba <strong>PORTS</strong> (ao lado de TERMINAL) lista as portas publicadas. Passe o mouse e clique no globo (<em>Open in Browser</em>): o GitHub cria um endereço público temporário que leva até a porta 8001 do seu Codespace.</div>
+        <div class="callout"><strong>Terminal e navegador usam endereços diferentes.</strong> No terminal do Codespace, <code>localhost</code> aponta para o Codespace. No navegador do seu computador, use o endereço fornecido pela aba <strong>PORTS</strong>: passe o mouse sobre a porta e clique no globo, <em>Open in Browser</em>. O acesso depende da configuração de visibilidade da porta.</div>
       </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">No <code>Dockerfile</code>, antes do <code>CMD</code>, acrescente <code>EXPOSE 8000</code>. Construa:</div>${cmd('$ docker build -t receitas-api:1.3 .')}`,
+        `<div class="t">Abra o <code>Dockerfile</code>, acrescente <code>EXPOSE 8000</code> antes de <code>CMD</code> e salve. No terminal, construa a imagem:</div>${cmd('$ docker build -t receitas-api:1.3 .')}`,
         `<div class="t">Rode em segundo plano, publicando a porta:</div>${cmd('$ docker run -d --name api -p 8001:8000 receitas-api:1.3')}`,
-        `<div class="t">Do terminal:</div>${cmd('$ curl localhost:8001/receitas\n$ docker port api')}`,
-        `<div class="t">Do navegador: aba <strong>PORTS</strong> → porta 8001 → globo (<em>Open in Browser</em>). Acrescente <code>/docs</code> ao endereço: o FastAPI gera essa página de documentação sozinho, e dá para testar as rotas por ela.</div>`,
-        `<div class="t">Cada requisição aparece nos logs do uvicorn:</div>${cmd('$ docker logs api')}`,
+        `<div class="t">Teste com <code>curl</code>, que acessa o endereço e mostra a resposta no terminal. Depois, consulte a ligação entre as portas:</div>${cmd('$ curl localhost:8001/receitas\n$ docker port api')}`,
+        `<div class="t">Na aba <strong>PORTS</strong>, abra a porta <strong>8001</strong> pelo ícone de globo. Acrescente <code>/docs</code> ao endereço. Nessa página, expanda <strong>GET /receitas</strong>, clique em <strong>Try it out</strong> e depois em <strong>Execute</strong> para testar a API.</div>`,
+        `<div class="t">Cada pedido à API, chamado de <strong>requisição</strong>, aparece nos logs:</div>${cmd('$ docker logs api')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 08')}<p style="margin-top:10px;color:var(--muted)">Confere o <code>EXPOSE</code>, o container <code>api</code> na 8001 e a resposta de <code>/receitas</code>.</p></div>
-        <div class="callout warn"><strong>port is already allocated</strong> — outra coisa já usa a 8001 no Codespace. Escolha outra porta de fora (<code>-p 8011:8000</code>); a de dentro não muda.</div>
+        <div class="callout warn"><strong>Se a conexão falhar logo no início:</strong> espere alguns segundos e tente novamente. Já <em>port is already allocated</em> significa que a porta está ocupada. Consulte <code>docker ps</code> para identificar o container que a usa; a verificação deste desafio espera a porta 8001.</div>
         <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker run -d --name api2 -p 8005:8000 receitas-api:1.3\n$ curl localhost:8005/receitas\n$ docker rm -f api2')}<p style="margin-top:8px;color:var(--muted)">Duas cópias da mesma imagem, lado a lado, em portas diferentes.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
           ['docker run -p <fora>:<dentro> …','publica a porta; pode repetir -p para várias'],
           ['EXPOSE 8000','documenta a porta no Dockerfile (sem abrir)'],
-          ['docker port <nome>','os mapeamentos de um container'],
-          ['curl localhost:<fora>/…','testa do terminal do Codespace'],
+          ['docker port <nome>','mostra quais portas do Codespace estão ligadas às do container'],
+          ['curl localhost:<fora>/…','acessa a aplicação pelo terminal do Codespace'],
           ['docker ps','a coluna PORTS mostra 0.0.0.0:8001->8000/tcp'],
-          ['/docs','a documentação interativa que o FastAPI gera para qualquer API'],
+          ['/docs','página gerada pelo FastAPI para consultar e testar as rotas deste projeto'],
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.c_ports, L.df_expose, L.r_port, L.gh_ports, L.r_run])}</div>
       </div>`},
@@ -917,36 +927,37 @@ D.push({n:8, key:'08', title:'Abrindo portas', mod:'Módulo 3 · Portas e config
 D.push({n:9, key:'09', title:'Configuração por ambiente', mod:'Módulo 3 · Portas e configuração', time:5, el:false, cmds:['ENV','-e','--env-file','docker exec'],
   slides:[
     {h:'Configuração por ambiente', body: cover({n:9,time:5,el:false,mod:'Módulo 3 · Portas e configuração',cmds:['ENV COZINHA="…"','docker run -e COZINHA="…"','--env-file cozinha.env','docker exec <nome> env']},
-      'Configurar um container <strong>sem reconstruir a imagem</strong>: a mesma imagem, com valores diferentes, via variáveis de ambiente.',
-      cmd('$ cd ~/labs/09-configuracao-por-ambiente') + '<p style="margin-top:10px;color:var(--muted)">O <code>app.py</code> agora lê <code>os.environ.get("COZINHA", "Cozinha sem nome")</code>, e a rota <code>/</code> responde <code>{"mensagem": "Livro de receitas da &lt;COZINHA&gt;", …}</code>. O Dockerfile está completo, mas não define a variável. Há um <code>cozinha.env</code> para a missão extra.</p>')},
-    {h:'Três lugares para o mesmo valor', eyebrow:'Conceito · o mais específico vence', body:`
+      'Mudar o nome da cozinha exibido pela API <strong>sem reconstruir a imagem</strong>. Vamos usar uma <strong>variável de ambiente</strong>: uma configuração com nome e valor que o programa lê ao iniciar.',
+      cmd('$ cd ~/labs/09-configuracao-por-ambiente') + '<p style="margin-top:10px;color:var(--muted)">O programa já lê a variável <code>COZINHA</code> e usa seu valor na mensagem da rota <code>/</code>. O Dockerfile ainda não define esse valor. O arquivo <code>cozinha.env</code> será usado na missão extra.</p>')},
+    {h:'Qual valor o programa usa?', eyebrow:'Conceito · variável COZINHA', body:`
       <div class="stack">
         <div class="flow">
-          <div class="node dim"><b>no código</b><small>os.environ.get("COZINHA", "Cozinha sem nome") · se ninguém definiu</small></div>
-          <div class="arr"><span class="a">→</span>ganha de</div>
-          <div class="node"><b>na imagem</b><small>ENV COZINHA="Cozinha do Curso" · padrão gravado no build</small></div>
-          <div class="arr"><span class="a">→</span>ganha de</div>
-          <div class="node hi"><b>no container</b><small>-e COZINHA="Cozinha da Ana" · ou --env-file · só naquele run</small></div>
+          <div class="node dim"><b>Valor de reserva no código</b><small>"Cozinha sem nome" · usado se a variável não estiver definida</small></div>
+          <div class="arr"><span class="a">→</span>substituído por</div>
+          <div class="node"><b>Padrão da imagem</b><small>ENV COZINHA="Cozinha do Curso"</small></div>
+          <div class="arr"><span class="a">→</span>substituído por</div>
+          <div class="node hi"><b>Valor deste container</b><small>-e COZINHA="Cozinha da Ana" · ou um arquivo com --env-file</small></div>
         </div>
         <div class="cols s2">
-          <div class="box lift"><h3>A regra</h3><p><strong>A imagem é a mesma em todo lugar; o que muda entre ambientes vem de fora.</strong> Nome da cozinha, endereço do banco, senha, modo debug: tudo isso entra na hora de rodar, e a mesma imagem serve para desenvolvimento, teste e produção.</p>${cmd(`import os
-COZINHA = os.environ.get("COZINHA", "Cozinha sem nome")`)}</div>
+          <div class="box lift"><h3>Como o programa lê a configuração</h3><p>Neste trecho, já pronto em <code>app.py</code>, o programa procura a variável <code>COZINHA</code>. Se ela não existir, usa <code>Cozinha sem nome</code>.</p>${cmd(`import os
+COZINHA = os.environ.get("COZINHA", "Cozinha sem nome")`)}<p style="margin-top:10px">Definir outro valor ao criar o container permite mudar a configuração usando a mesma imagem.</p></div>
           <div class="stack">
             <div class="callout warn"><strong>Segredos não vão em ENV no Dockerfile.</strong> Ficam gravados na imagem, como o <code>.env</code> do desafio 7. Senhas entram por <code>-e</code> ou <code>--env-file</code>, na hora de rodar.</div>
-            <div class="callout"><strong>docker exec</strong> roda um comando dentro de um container que <em>já está rodando</em>: <code>docker exec cozinha env</code> mostra o ambiente que a API está vendo.</div>
+            <div class="callout"><strong>docker exec</strong> executa um comando em um container que já está rodando. <code>docker exec cozinha env</code> lista suas variáveis de ambiente, incluindo o valor de <code>COZINHA</code>.</div>
           </div>
         </div>
       </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Dê um padrão à imagem. No <code>Dockerfile</code>, antes do <code>EXPOSE</code>, <code>ENV COZINHA="Cozinha do Curso"</code>. Construa e confira:</div>${cmd('$ docker build -t receitas-api:1.4 .\n$ docker run --rm receitas-api:1.4 env | grep COZINHA')}`,
-        `<div class="t">Sobrescreva na hora de rodar, sem mexer na imagem:</div>${cmd('$ docker run -d --name cozinha -p 8002:8000 -e COZINHA="Cozinha da Ana" receitas-api:1.4\n$ curl localhost:8002/')}`,
-        `<div class="t">O que o container recebeu:</div>${cmd('$ docker exec cozinha env | grep COZINHA')}`,
+        `<div class="t">No Dockerfile, acrescente <code>ENV COZINHA="Cozinha do Curso"</code> antes de <code>EXPOSE</code> e salve. Construa e consulte o valor padrão:</div>${cmd('$ docker build -t receitas-api:1.4 .\n$ docker run --rm receitas-api:1.4 env | grep COZINHA')}`,
+        `<div class="t">Crie o container com outro valor, usando <code>-e</code>. A resposta da API deve incluir <code>Cozinha da Ana</code>:</div>${cmd('$ docker run -d --name cozinha -p 8002:8000 -e COZINHA="Cozinha da Ana" receitas-api:1.4\n$ curl localhost:8002/')}`,
+        `<div class="t">Confira o valor configurado nesse container:</div>${cmd('$ docker exec cozinha env | grep COZINHA')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 09')}<p style="margin-top:10px;color:var(--muted)">Aprova quando a imagem tem um padrão e o <code>cozinha</code> roda com um valor <strong>diferente</strong>, respondendo em <code>localhost:8002</code>.</p></div>
-        <div class="box soft"><h3>Missão extra · --env-file</h3>${cmd('$ cat cozinha.env\n$ docker rm -f cozinha\n$ docker run -d --name cozinha -p 8002:8000 --env-file cozinha.env receitas-api:1.4\n$ curl localhost:8002/')}<p style="margin-top:8px;color:var(--muted)">A verificação reconhece a extra quando o container roda com a cozinha do arquivo.</p></div>
+        <div class="callout"><strong>O que faz o símbolo |?</strong> Ele passa a saída de um comando para o seguinte. Aqui, <code>env</code> lista as variáveis, e <code>grep COZINHA</code> seleciona as linhas que contêm esse nome.</div>
+        <div class="box soft"><h3>Missão extra · usar um arquivo</h3>${cmd('$ cat cozinha.env\n$ docker rm -f cozinha\n$ docker run -d --name cozinha -p 8002:8000 --env-file cozinha.env receitas-api:1.4\n$ curl localhost:8002/')}<p style="margin-top:8px;color:var(--muted)">O arquivo usa uma linha <code>NOME=valor</code> por variável. A verificação reconhece a missão extra quando o container usa o nome de cozinha desse arquivo.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
           ['ENV CHAVE="valor"','padrão gravado na imagem'],
@@ -963,39 +974,39 @@ COZINHA = os.environ.get("COZINHA", "Cozinha sem nome")`)}</div>
 D.push({n:10, key:'10', title:'Editando ao vivo', mod:'Módulo 4 · Dados', time:5, el:false, cmds:['bind mount','-v "$PWD:/app"'],
   slides:[
     {h:'Editando ao vivo', body: cover({n:10,time:5,el:false,mod:'Módulo 4 · Dados',cmds:['docker run -v "$PWD:/app"','reload=True','docker logs','docker exec']},
-      'Desenvolver dentro do container <strong>sem reconstruir a imagem a cada mudança</strong>: montar a pasta do projeto dentro do container com um <em>bind mount</em>, editar no VS Code e ver a API mudar na hora.',
+      'Editar o programa no VS Code e ver a alteração na API <strong>sem reconstruir a imagem</strong>. Você vai compartilhar a pasta do projeto com o container usando um <strong>bind mount</strong>.',
       cmd('$ cd ~/labs/10-editando-ao-vivo') + '<p style="margin-top:10px;color:var(--muted)">A API completa. Uma diferença no <code>app.py</code>: <code>uvicorn.run("app:app", ..., reload=True)</code>, que faz o servidor reiniciar sozinho quando o arquivo muda.</p>')},
     {h:'Bind mount', eyebrow:'Conceito · a mesma pasta, vista dos dois lados', body:`
       <div class="stack">
         <div class="flow">
           <div class="node"><b>Codespace</b><small>~/labs/10-editando-ao-vivo/app.py · você edita no VS Code</small></div>
-          <div class="arr"><span class="a">⇄</span><strong>-v "$PWD:/app"</strong><br>não é cópia: é a mesma pasta</div>
+          <div class="arr"><span class="a">⇄</span><strong>-v "$PWD:/app"</strong><br>acesso aos mesmos arquivos</div>
           <div class="node hi"><b>container dev</b><small>/app/app.py · o uvicorn lê daqui</small></div>
         </div>
         <div class="cols s2">
           ${layers([
-            {t:'/app  ← bind mount', s:'a sua pasta, montada por cima', cls:'rw'},
-            {t:'COPY . .  → /app', s:'escondido enquanto o mount existe', cls:'dim'},
+            {t:'/app  ← bind mount', s:'pasta do Codespace acessível no container', cls:'rw'},
+            {t:'COPY . .  → /app', s:'arquivos originais ocultos enquanto a montagem está ativa', cls:'dim'},
             {t:'RUN pip install', s:'FastAPI e uvicorn continuam vindo da imagem'},
             {t:'FROM python:3.12-slim'},
           ], 'o que o container enxerga em /app')}
           <div class="stack">
-            <div class="box lift"><h3>Caminho absoluto</h3><p>O lado de fora precisa começar com <code>/</code>; por isso <code>$PWD</code>. Rode de dentro da pasta do desafio. <code>-v nome:/x</code> (sem barra) é outra coisa: um volume (desafio 11).</p></div>
-            <div class="callout warn"><strong>Ferramenta de desenvolvimento.</strong> Em produção a imagem deve ser autossuficiente. O bind mount também serve para dar ao container um arquivo de configuração que fica de fora da imagem.</div>
+            <div class="box lift"><h3>Como ler -v "$PWD:/app"</h3><p><code>$PWD</code> é o caminho completo da pasta atual no Codespace. <code>/app</code> é o caminho pelo qual o container acessa essa pasta. O compartilhamento é chamado de <strong>montagem</strong>.</p><p>Entre na pasta do desafio antes de executar o comando. Um nome no lugar de um caminho, como <code>-v notas:/dados</code>, indica um volume, assunto do desafio 11.</p></div>
+            <div class="callout"><strong>Durante o desenvolvimento:</strong> compartilhar o código ajuda a editar e testar. Para distribuir o programa atualizado, construa uma nova imagem. Um bind mount também pode fornecer arquivos de configuração ao container.</div>
           </div>
         </div>
       </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
       <div class="cols s2"><div class="stack">${steps([
         `<div class="t">Construa e rode com a pasta montada:</div>${cmd('$ docker build -t receitas-api:1.5 .\n$ docker run -d --name dev -p 8003:8000 -v "$PWD:/app" receitas-api:1.5\n$ curl localhost:8003/receitas')}`,
-        `<div class="t">Abra <code>app.py</code> no VS Code e acrescente à lista <code>RECEITAS</code>: <code>{"nome": "Pudim", "rende": "8 porções"},</code>. Salve. O uvicorn percebe (<em>detected changes in 'app.py'. Reloading...</em>):</div>${cmd('$ docker logs dev')}`,
-        `<div class="t">Sem build, sem restart. O Pudim está lá:</div>${cmd('$ curl localhost:8003/receitas')}`,
+        `<div class="t">Execute <code>code app.py</code>. Acrescente a linha abaixo à lista <code>RECEITAS</code>, antes do <code>]</code> final, com o mesmo alinhamento das outras receitas:</div>${cmd('{"nome": "Pudim", "rende": "8 porções"},')}<p>Salve e consulte os logs. Uma mensagem com <em>Reloading</em> indica que o programa está recarregando:</p>${cmd('$ docker logs dev')}`,
+        `<div class="t">Consulte a API novamente. O Pudim deve aparecer sem você reconstruir a imagem nem reiniciar o container manualmente:</div>${cmd('$ curl localhost:8003/receitas')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 10')}<p style="margin-top:10px;color:var(--muted)">Confere o mount desta pasta em <code>/app</code>, o Pudim no <code>app.py</code> e na resposta da API.</p></div>
-        <div class="callout"><strong>A imagem não mudou</strong> — <code>docker run --rm receitas-api:1.5 cat app.py</code> ainda não tem o Pudim. O <code>dev</code> lê a sua pasta, não a imagem.</div>
+        <div class="callout"><strong>Compare com a imagem:</strong> <code>docker run --rm receitas-api:1.5 cat app.py</code> mostra o arquivo original, sem Pudim. Já o container <code>dev</code> acessa o arquivo atualizado da pasta compartilhada.</div>
         <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker exec dev sh -c \'echo "escrito de dentro" > /app/de-dentro.txt\'\n$ cat de-dentro.txt\n$ rm de-dentro.txt')}<p style="margin-top:8px;color:var(--muted)">Escrito de dentro, aparece fora. É a mesma pasta.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
           ['docker run -v "$PWD:/app" …','monta a pasta atual em /app (bind mount)'],
@@ -1013,46 +1024,47 @@ D.push({n:10, key:'10', title:'Editando ao vivo', mod:'Módulo 4 · Dados', time
 D.push({n:11, key:'11', title:'Dados que ficam', mod:'Módulo 4 · Dados', time:5, el:true, cmds:['docker volume create','-v notas:/dados','ENTRYPOINT'],
   slides:[
     {h:'Dados que ficam', body: cover({n:11,time:5,el:true,mod:'Módulo 4 · Dados',cmds:['docker volume create notas','docker run -v notas:/dados','docker volume ls','docker volume inspect']},
-      'Ver que tudo o que um container grava <strong>morre com ele</strong>, e guardar dados num <strong>volume</strong>, que sobrevive a quantos containers forem necessários.',
+      'Guardar notas em um <strong>volume</strong>, um espaço de armazenamento gerenciado pelo Docker. Assim, os dados permanecem mesmo depois de remover o container que os criou.',
       cmd('$ cd ~/labs/11-dados-que-ficam') + '<p style="margin-top:10px;color:var(--muted)"><code>bloco.py</code>: um bloco de notas que acrescenta cada nota a <code>/dados/notas.txt</code> e imprime todas. <code>Dockerfile</code> pronto, com <code>ENTRYPOINT</code> em vez de <code>CMD</code>.</p>')},
-    {h:'Onde os dados moram', eyebrow:'Conceito', body:`
+    {h:'Onde os dados ficam guardados?', eyebrow:'Conceito', body:`
       <div class="stack">
         <div class="cols s2">
           ${kv([
-            ['camada gravável','até o docker rm · arquivos temporários, cache'],
-            ['bind mount  -v /pasta/sua:/x','a pasta é sua · desenvolvimento (desafio 10), configuração'],
-            ['volume  -v nome:/x','até o docker volume rm · dados do programa: banco, uploads, notas'],
-          ], ['Lugar · vida','Para quê'])}
+            ['camada gravável','arquivos próprios do container; são apagados quando ele é removido'],
+            ['bind mount  -v /pasta/sua:/x','arquivos da pasta do Codespace, compartilhados com o container'],
+            ['volume  -v nome:/x','arquivos em um espaço gerenciado pelo Docker, mantido até você removê-lo'],
+          ], ['Local','O que acontece com os arquivos'])}
           <div class="flow">
-            <div class="node dim"><b>container 1</b><small>--rm · escreveu, morreu</small></div>
+            <div class="node dim"><b>container 1</b><small>grava uma nota e é removido por --rm</small></div>
             <div class="arr"><span class="a">→</span></div>
             <div class="node hi"><b>volume notas</b><small>/dados/notas.txt · fica</small></div>
             <div class="arr"><span class="a">←</span></div>
-            <div class="node dim"><b>container 2</b><small>--rm · leu e escreveu, morreu</small></div>
+            <div class="node dim"><b>container 2</b><small>lê as notas, grava outra e é removido por --rm</small></div>
           </div>
         </div>
         <div class="cols">
           <div class="box lift"><h3>Volume</h3><p>Uma pasta que o Docker guarda e administra. Você não precisa saber onde ela fica no disco; só o nome. Independente da imagem: qualquer container pode montá-la.</p></div>
-          <div class="box"><h3>ENTRYPOINT × CMD</h3><p><code>ENTRYPOINT ["python", "/app/bloco.py"]</code> fixa o <strong>programa</strong>. O que vier depois de <code>docker run bloco:1.0</code> vira <strong>argumento</strong> dele: <code>docker run bloco:1.0 "comprar cenouras"</code>. Com <code>CMD</code>, o mesmo texto substituiria o comando inteiro.</p></div>
-          <div class="box"><h3>A diferença é o que vem antes do :</h3><p><code>-v notas:/dados</code> (nome) é volume; <code>-v "$PWD:/dados"</code> (caminho começando com <code>/</code>) é bind mount. O <code>--rm</code> apaga o container; o volume não é do container.</p></div>
+          <div class="box"><h3>O que é um argumento?</h3><p>É uma informação passada ao programa. Aqui, <code>ENTRYPOINT</code> define que o programa será <code>bloco.py</code>, e o texto depois da imagem, como <code>"comprar cenouras"</code>, é a nota a guardar.</p><p>Nos exemplos anteriores, com apenas <code>CMD</code>, um texto depois da imagem substituiria o comando inteiro.</p></div>
+          <div class="box"><h3>Nome de volume ou caminho de pasta?</h3><p><code>-v notas:/dados</code> usa o volume chamado <code>notas</code>. <code>-v "$PWD:/dados"</code> compartilha a pasta atual. Nos dois casos, o programa acessa os arquivos pelo caminho <code>/dados</code> dentro do container.</p></div>
         </div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 5 min · elástico', body:`
+    {h:'O desafio', eyebrow:'Tarefa · 5 min · pode ficar para depois da aula', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Construa e use o bloco duas vezes. A segunda mostra <strong>só</strong> "assar o bolo": a primeira nota morreu com o primeiro container.</div>${cmd('$ docker build -t bloco:1.0 .\n$ docker run --rm bloco:1.0 "comprar cenouras"\n$ docker run --rm bloco:1.0 "assar o bolo"')}`,
+        `<div class="t">Construa a imagem e execute o bloco de notas duas vezes. A segunda execução mostra <strong>apenas</strong> "assar o bolo": a primeira nota estava no container removido por <code>--rm</code>.</div>${cmd('$ docker build -t bloco:1.0 .\n$ docker run --rm bloco:1.0 "comprar cenouras"\n$ docker run --rm bloco:1.0 "assar o bolo"')}`,
         `<div class="t">Crie um volume e ligue-o à pasta <code>/dados</code> do container. Agora as duas notas aparecem: containers diferentes, mesmo volume.</div>${cmd('$ docker volume create notas\n$ docker run --rm -v notas:/dados bloco:1.0 "comprar cenouras"\n$ docker run --rm -v notas:/dados bloco:1.0 "assar o bolo"')}`,
-        `<div class="t">Sem argumento, só lê:</div>${cmd('$ docker run --rm -v notas:/dados bloco:1.0\n$ docker volume ls\n$ docker volume inspect notas')}`,
+        `<div class="t">Execute sem passar uma nova nota para apenas ler as anteriores. Depois, liste os volumes e consulte os detalhes de <code>notas</code>:</div>${cmd('$ docker run --rm -v notas:/dados bloco:1.0\n$ docker volume ls\n$ docker volume inspect notas')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 11')}<p style="margin-top:10px;color:var(--muted)">Lê o volume com outro container e espera pelo menos duas notas.</p></div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker run --rm -v notas:/dados alpine cat /dados/notas.txt')}<p style="margin-top:8px;color:var(--muted)">Outra imagem, mesmos dados. Depois experimente <code>docker volume rm notas</code> e <code>reset.sh 11</code> para refazer.</p></div>
-        <div class="callout warn"><strong>⏱ Elástico</strong> — ponto de corte antes do bloco de vários containers.</div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker run --rm -v notas:/dados alpine cat /dados/notas.txt')}<p style="margin-top:8px;color:var(--muted)">Leia as notas com outra imagem. Depois, <code>docker volume rm notas</code> apaga o volume e seu conteúdo. Para recomeçar, use <code>reset.sh 11</code>, entre novamente na pasta e repita o exercício.</p></div>
+        <div class="callout warn"><strong>Se faltar tempo:</strong> você pode fazer este desafio depois da aula e seguir para o bloco de vários containers.</div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
           ['docker volume create <nome>','cria um volume vazio (o -v também cria, se não existir)'],
           ['docker run -v <nome>:/pasta …','monta o volume na pasta do container'],
-          ['docker volume ls / inspect <nome>','lista; detalhes (inclusive onde fica no disco)'],
+          ['docker volume ls','lista os volumes existentes'],
+          ['docker volume inspect <nome>','mostra detalhes do volume, incluindo seu local no disco'],
           ['docker volume rm <nome>','apaga o volume e os dados; só se nenhum container o usa'],
           ['ENTRYPOINT ["prog"]','o programa fixo; argumentos vêm do docker run'],
         ])}
@@ -1064,49 +1076,48 @@ D.push({n:11, key:'11', title:'Dados que ficam', mod:'Módulo 4 · Dados', time:
 D.push({n:12, key:'12', title:'Site estático', mod:'Módulo 5 · Vários containers', time:5, el:false, cmds:['nginx:alpine','HTML/JS','COPY site/'],
   slides:[
     {h:'Site estático', body: cover({n:12,time:5,el:false,mod:'Módulo 5 · Vários containers',cmds:['FROM nginx:alpine','COPY site/ /usr/share/nginx/html/','docker run -d -p 8080:80','curl localhost:8080/']},
-      'Colocar um site (HTML, CSS e JavaScript) num container com o <strong>nginx</strong>, um servidor web pronto. Mesmo fluxo do Python: <code>FROM</code> de uma imagem oficial, <code>COPY</code> dos seus arquivos, <code>build</code>, <code>run -p</code>.',
-      cmd('$ cd ~/labs/12-site-estatico') + '<p style="margin-top:10px;color:var(--muted)">Uma pasta <code>site/</code> com <code>index.html</code>, <code>app.js</code> (faz <code>fetch("receitas.json")</code> e preenche a lista), <code>receitas.json</code> e <code>style.css</code>. Não há Dockerfile: é você quem escreve.</p>')},
-    {h:'Imagens prontas', eyebrow:'Conceito · leia o Docker Hub', body:`
+      'Executar um site em um container usando o <strong>nginx</strong>, um servidor web que entrega os arquivos da página ao navegador. O site está pronto; você vai criar a imagem e publicar uma porta para acessá-lo.',
+      cmd('$ cd ~/labs/12-site-estatico') + '<p style="margin-top:10px;color:var(--muted)">A pasta <code>site/</code> contém a página, sua aparência, o código que preenche a lista e os dados das receitas. Falta criar o Dockerfile.</p>')},
+    {h:'Quais arquivos formam o site?', eyebrow:'Conceito · site estático e nginx', body:`
       <div class="stack">
         <div class="flow">
           <div class="node"><b>site/</b><small>index.html · app.js · receitas.json · style.css</small></div>
           <div class="arr"><span class="a">→</span>COPY site/ /usr/share/nginx/html/</div>
-          <div class="node hi"><b>nginx:alpine</b><small>serve o que estiver nessa pasta, na porta 80 · já tem o seu CMD</small></div>
+          <div class="node hi"><b>nginx:alpine</b><small>entrega os arquivos da pasta pela porta 80</small></div>
           <div class="arr"><span class="a">→</span>-p 8080:80</div>
-          <div class="node"><b>navegador</b><small>baixa o HTML, o CSS e o JS; o JS busca o JSON</small></div>
+          <div class="node"><b>navegador</b><small>exibe a página e executa o JavaScript que busca as receitas</small></div>
         </div>
         <div class="cols s2">
-          <div class="box lift"><h3>O app.js, em resumo</h3>${cmd(`const resposta = await fetch("receitas.json");
-const receitas = await resposta.json();
-for (const r of receitas) {
-  const item = document.createElement("li");
-  item.textContent = r.nome + " — rende " + r.rende;
-  lista.appendChild(item);
-}`)}<p style="margin-top:10px">Roda no <strong>navegador</strong>, não no container. O nginx só entrega arquivos; se a lista aparece, ele entregou os três.</p></div>
+          <div class="box lift"><h3>O papel de cada arquivo</h3>${kv([
+            ['index.html','HTML: define a estrutura da página, com título e espaço para a lista'],
+            ['style.css','CSS: define cores, fontes e espaçamentos'],
+            ['app.js','JavaScript: busca os dados e preenche a lista no navegador'],
+            ['receitas.json','JSON: guarda os nomes das receitas e suas quantidades'],
+          ], ['Arquivo','Função'])}</div>
           <div class="stack">
-            <div class="callout"><strong>"Onde colocar as coisas"</strong> — cada imagem oficial explica no Docker Hub: o nginx serve <code>/usr/share/nginx/html</code> na porta 80; o postgres guarda dados em <code>/var/lib/postgresql/data</code>. Ler isso é metade do trabalho.</div>
-            <div class="callout"><strong>Sem CMD no seu Dockerfile</strong> — o <code>FROM</code> herda o da imagem-base (iniciar o servidor). Você só acrescenta o que é seu.</div>
+            <div class="callout"><strong>Por que estático?</strong> O nginx entrega arquivos prontos. Neste desafio, as receitas vêm do arquivo <code>receitas.json</code>; no desafio 14, virão da API. O JavaScript é executado no navegador, não no container.</div>
+            <div class="callout"><strong>A imagem já está configurada.</strong> <code>nginx:alpine</code> inicia o servidor e entrega os arquivos de <code>/usr/share/nginx/html</code> pela porta 80. Por isso, basta copiar o site para essa pasta; não precisamos definir outro <code>CMD</code>.</div>
           </div>
         </div>
       </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Crie o <code>Dockerfile</code>:</div>${cmd(`FROM nginx:alpine
+        `<div class="t">Execute <code>code Dockerfile</code>, copie o conteúdo abaixo para o arquivo e salve:</div>${cmd(`FROM nginx:alpine
 
 COPY site/ /usr/share/nginx/html/`)}`,
         `<div class="t">Construa e rode, ligando a 8080 do Codespace à 80 do container:</div>${cmd('$ docker build -t receitas-web:1.0 .\n$ docker run -d --name web -p 8080:80 receitas-web:1.0')}`,
         `<div class="t">Pelo terminal e pelo navegador (aba <strong>PORTS</strong> → 8080 → globo). A lista de receitas na página é preenchida pelo <code>app.js</code>.</div>${cmd('$ curl localhost:8080/\n$ curl localhost:8080/receitas.json')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 12')}<p style="margin-top:10px;color:var(--muted)">Confere o <code>FROM nginx</code>, o <code>web</code> na 8080 e que HTML, <code>app.js</code> e <code>receitas.json</code> respondem.</p></div>
-        <div class="callout warn"><strong>COPY de pasta copia o conteúdo</strong>, não a pasta: <code>site/index.html</code> vira <code>/usr/share/nginx/html/index.html</code>. Se quisesse uma subpasta, teria de dizer no destino (<code>…/html/site/</code>), e aí o nginx não acharia o <code>index.html</code>. <code>docker logs web</code> mostra uma linha por arquivo pedido pelo navegador.</div>
-        <div class="box soft"><h3>Missão extra · editar ao vivo</h3>${cmd('$ docker rm -f web\n$ docker run -d --name web -p 8080:80 -v "$PWD/site:/usr/share/nginx/html" receitas-web:1.0')}<p style="margin-top:8px;color:var(--muted)">Mude o <code>&lt;h1&gt;</code> no <code>index.html</code> e recarregue a página.</p></div>
+        <div class="callout"><strong>Confira o destino do COPY.</strong> O comando copia o conteúdo da pasta: <code>site/index.html</code> deve virar <code>/usr/share/nginx/html/index.html</code>. Se o destino terminar em <code>/html/site/</code>, o site ficará em uma subpasta, e o endereço inicial poderá mostrar a página padrão do nginx.</div>
+        <div class="box soft"><h3>Missão extra · editar ao vivo</h3>${cmd('$ docker rm -f web\n$ docker run -d --name web -p 8080:80 -v "$PWD/site:/usr/share/nginx/html" receitas-web:1.0')}<p style="margin-top:8px;color:var(--muted)">Abra <code>site/index.html</code> no editor. Troque o texto entre <code>&lt;h1&gt;</code> e <code>&lt;/h1&gt;</code> por <code>Livro de receitas da turma</code>, salve e recarregue a página. Mantenha a expressão <code>Livro de receitas</code> para a verificação reconhecer o site.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
-          ['FROM nginx:alpine','servidor web pronto, 20 MB'],
-          ['COPY site/ /usr/share/nginx/html/','o conteúdo da pasta para onde o nginx serve'],
-          ['docker run -d --name web -p 8080:80 …','a 80 é a do nginx; a 8080, a sua escolha'],
+          ['FROM nginx:alpine','usa a imagem que já contém o servidor nginx'],
+          ['COPY site/ /usr/share/nginx/html/','copia os arquivos do site para a pasta usada pelo nginx'],
+          ['docker run -d --name web -p 8080:80 …','liga a porta 8080 do Codespace à porta 80 do nginx'],
           ['docker logs web','o log de acesso: uma linha por requisição'],
           ['docker exec web ls /usr/share/nginx/html','conferir o que chegou lá'],
         ])}
@@ -1120,7 +1131,7 @@ D.push({n:13, key:'13', title:'Containers conversando', mod:'Módulo 5 · Vário
     {h:'Containers conversando', body: cover({n:13,time:6,el:false,mod:'Módulo 5 · Vários containers',cmds:['docker network create cozinha','docker run --network cozinha','http://receitas:8000','docker network inspect']},
       'Fazer um container chamar outro <strong>pelo nome</strong>, numa rede criada por você, sem publicar porta nenhuma para fora.',
       cmd('$ cd ~/labs/13-containers-conversando') + '<p style="margin-top:10px;color:var(--muted)">A API (Dockerfile completo) e um <code>cliente.py</code>, que busca <code>http://receitas:8000/receitas</code> e imprime o resultado. <code>receitas</code> é um <strong>nome</strong>, não um IP.</p>')},
-    {h:'Redes e DNS por nome', eyebrow:'Conceito', body:`
+    {h:'Como um container encontra o outro?', eyebrow:'Conceito · redes e DNS', body:`
       <div class="stack">
         <div class="netbox" data-label="rede cozinha"><div class="flow">
           <div class="node hi"><b>receitas</b><small>a API · escuta na 8000 · <strong>sem -p</strong></small></div>
@@ -1128,8 +1139,8 @@ D.push({n:13, key:'13', title:'Containers conversando', mod:'Módulo 5 · Vário
           <div class="node"><b>cliente</b><small>python:3.12-slim rodando cliente.py</small></div>
         </div></div>
         <div class="cols">
-          <div class="box lift"><h3>O nome vira endereço</h3><p>Numa rede <strong>criada por você</strong>, o Docker inclui um DNS: o <code>--name</code> de cada container é o endereço dele para os outros. Na rede padrão (<code>bridge</code>), só por IP, que muda a cada <code>run</code>.</p></div>
-          <div class="box"><h3>-p é para o mundo de fora</h3><p>Entre containers da mesma rede, não é necessário: o <code>cliente</code> fala direto com a 8000 do <code>receitas</code>. A API nem precisa ficar acessível pelo Codespace.</p></div>
+          <div class="box lift"><h3>O papel do DNS</h3><p>Um endereço <strong>IP</strong> identifica um participante da rede. O <strong>DNS</strong> encontra esse endereço a partir de um nome. Nas redes criadas por você, o Docker oferece esse serviço: o cliente pode usar <code>receitas</code> no endereço.</p><p>Na rede padrão <code>bridge</code>, essa busca automática por nome não está disponível.</p></div>
+          <div class="box"><h3>Quando usar -p?</h3><p>Use <code>-p</code> para publicar uma porta no Codespace. Entre containers da mesma rede, isso não é necessário: o cliente acessa a porta 8000 de <code>receitas</code> diretamente.</p></div>
           <div class="box"><h3>O cliente.py</h3>${cmd(`URL = "http://receitas:8000/receitas"
 with urllib.request.urlopen(URL, timeout=5) as resposta:
     receitas = json.load(resposta)`)}</div>
@@ -1138,20 +1149,21 @@ with urllib.request.urlopen(URL, timeout=5) as resposta:
     {h:'O desafio', eyebrow:'Tarefa · 6 min', body:`
       <div class="cols s2"><div class="stack">${steps([
         `<div class="t">Construa a API e crie a rede:</div>${cmd('$ docker build -t receitas-api:1.6 .\n$ docker network create cozinha\n$ docker network ls')}`,
-        `<div class="t">Suba a API <strong>na rede</strong>, com nome, e <strong>sem <code>-p</code></strong>. De fora ela não responde (é proposital):</div>${cmd('$ docker run -d --name receitas --network cozinha receitas-api:1.6\n$ curl localhost:8000/receitas      # recusa')}`,
-        `<div class="t">O cliente em outro container, na mesma rede. Chama a API pelo nome (o <code>-v</code> só leva o <code>cliente.py</code>, como no desafio 10):</div>${cmd('$ docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py')}`,
-        `<div class="t">Quem está na rede:</div>${cmd('$ docker network inspect cozinha')}`,
+        `<div class="t">Inicie a API com o nome <code>receitas</code> na rede <code>cozinha</code>, sem <code>-p</code>. O teste com <code>localhost:8000</code> deve falhar: não publicamos essa porta no Codespace.</div>${cmd('$ docker run -d --name receitas --network cozinha receitas-api:1.6\n$ curl localhost:8000/receitas      # erro esperado: conexão recusada')}`,
+        `<div class="t">Execute o cliente em outro container da mesma rede. <code>-v</code> compartilha a pasta com o arquivo <code>cliente.py</code>. A saída deve mostrar as receitas recebidas da API:</div>${cmd('$ docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py')}`,
+        `<div class="t">Consulte os containers conectados. O cliente já terminou e foi removido por <code>--rm</code>; a API continua na rede:</div>${cmd('$ docker network inspect cozinha')}`,
       ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 13')}<p style="margin-top:10px;color:var(--muted)">Sobe um container na rede <code>cozinha</code> e chama <code>http://receitas:8000/receitas</code> de lá. Extra: a API sem porta publicada.</p></div>
-        <div class="callout"><strong>Sem nome, sem endereço</strong> — o que resolve é o <code>--name</code>. Sem ele, o Docker inventa um (<code>brave_curie</code>), e é esse que os outros teriam de usar.</div>
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 13')}<p style="margin-top:10px;color:var(--muted)">Inicia um container temporário na rede <code>cozinha</code> e testa o endereço da API. Também identifica se ela está sem porta publicada.</p></div>
+        <div class="callout"><strong>Use o nome esperado pelo cliente.</strong> O endereço em <code>cliente.py</code> usa <code>receitas</code>, então o container da API precisa desse nome. Sem <code>--name</code>, o Docker geraria outro nome automaticamente.</div>
         <div class="box soft"><h3>Missão extra</h3><p>Rode o cliente <strong>sem</strong> <code>--network cozinha</code> e leia o erro: fora da rede, o nome <code>receitas</code> não existe. Compare <code>docker network inspect bridge</code> com <code>docker network inspect cozinha</code>.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
           ['docker network create <nome>','uma rede com DNS por nome de container'],
           ['docker run --network <rede> --name <n> …','entra na rede com esse nome'],
-          ['docker network ls / inspect <rede>','lista; quem está conectado, com IPs'],
+          ['docker network ls','lista as redes existentes'],
+          ['docker network inspect <rede>','mostra os containers conectados e seus endereços IP'],
           ['docker network connect <rede> <container>','um container pode estar em várias redes'],
           ['docker network rm <rede>','apaga (só sem containers conectados)'],
         ])}
@@ -1163,14 +1175,14 @@ with urllib.request.urlopen(URL, timeout=5) as resposta:
 D.push({n:14, key:'14', title:'Docker Compose', mod:'Módulo 5 · Vários containers', time:7, el:false, cmds:['compose.yaml','docker compose up -d','ps','logs','down'],
   slides:[
     {h:'Docker Compose', body: cover({n:14,time:7,el:false,mod:'Módulo 5 · Vários containers',cmds:['compose.yaml','docker compose up -d --build','docker compose ps','docker compose logs','docker compose down']},
-      'Descrever a API (Python) e o site (nginx) num único arquivo, <code>compose.yaml</code>, e subir os dois com <strong>um comando</strong>. O Compose cria a rede, constrói as imagens, dá nome aos containers e liga tudo.',
+      'Configurar o site e a API no arquivo <code>compose.yaml</code> e iniciar os dois com <strong>um comando</strong>. O Docker Compose constrói as imagens, cria a rede e inicia os containers.',
       cmd('$ cd ~/labs/14-docker-compose') + '<p style="margin-top:10px;color:var(--muted)">Duas pastas, cada uma com o seu Dockerfile: <code>api/</code> (a API FastAPI) e <code>web/</code> (o site do desafio 12 mais um <code>nginx.conf</code> que repassa <code>/api/</code> para <code>http://api:8000/</code>; o <code>app.js</code> agora busca <code>/api/receitas</code>).</p>')},
     {h:'Um arquivo, todos os containers', eyebrow:'Conceito', body:`
       <div class="stack">
         <div class="netbox" data-label="rede criada pelo Compose (14-docker-compose_default)"><div class="flow">
-          <div class="node"><b>navegador</b><small>localhost:8090 · aba PORTS</small></div>
+          <div class="node"><b>navegador</b><small>endereço da porta 8090 na aba PORTS</small></div>
           <div class="arr"><span class="a">→</span>ports: "8090:80"</div>
-          <div class="node hi"><b>web</b><small>nginx · serve o site · /api/ → proxy</small></div>
+          <div class="node hi"><b>web</b><small>nginx · entrega o site e encaminha os pedidos /api/</small></div>
           <div class="arr"><span class="a">→</span>http://api:8000/</div>
           <div class="node"><b>api</b><small>FastAPI + uvicorn · sem porta publicada</small></div>
         </div></div>
@@ -1186,36 +1198,39 @@ D.push({n:14, key:'14', title:'Docker Compose', mod:'Módulo 5 · Vários contai
       - "8090:80"
     depends_on:
       - api`)}
-            <p style="color:var(--muted)">Indentação de dois espaços; YAML é sensível a isso. <code>docker compose config</code> valida o arquivo.</p>
+            <p style="color:var(--muted)"><strong>YAML</strong> é um formato de texto para configurações. Os espaços no início das linhas indicam a organização: use dois por nível, como no exemplo, sem Tab. <code>docker compose config</code> verifica se o arquivo é válido.</p>
           </div>
           <div class="stack">
             ${kv([
-              ['services:','cada chave vira um container, e o nome do serviço vira o nome na rede'],
-              ['build: ./api','onde está o Dockerfile (ou image: para uma pronta)'],
-              ['ports:','o -p'],
-              ['depends_on:','ordem de partida (só isso: não espera a API ficar pronta)'],
-              ['environment:','o -e (missão extra)'],
-            ], ['Chave','Equivale a'])}
-            <div class="callout"><strong>No nginx.conf</strong>: tudo o que começa com <code>/api/</code> é repassado (<code>proxy_pass</code>) para <code>http://api:8000</code>. <code>api</code> é o nome do serviço; o Compose garante que ele resolve, exatamente como no desafio 13.</div>
+              ['services:','lista os serviços, as partes da aplicação. Aqui, api e web terão um container cada'],
+              ['build: ./api','indica a pasta que contém o Dockerfile da API'],
+              ['ports:','publica portas, como a opção -p de docker run'],
+              ['depends_on:','inicia api antes de web; não espera a API ficar pronta para responder'],
+              ['environment:','define variáveis de ambiente, como -e (missão extra)'],
+            ], ['Configuração','O que faz'])}
+            <div class="callout"><strong>Use o nome api.</strong> O arquivo <code>nginx.conf</code> já encaminha pedidos que começam com <code>/api/</code> para <code>http://api:8000</code>. O Compose permite encontrar o serviço por esse nome na rede.</div>
           </div>
         </div>
       </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 7 min', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Crie o <code>compose.yaml</code> do slide anterior.</div>`,
-        `<div class="t">Suba tudo. O <code>--build</code> constrói (ou reconstrói) as imagens antes:</div>${cmd('$ docker compose up -d --build\n$ docker compose ps')}`,
-        `<div class="t">O site fala com a API através do nginx. Pelo terminal e pelo navegador (aba <strong>PORTS</strong> → 8090): a página diz que as receitas vieram de <code>/api/receitas</code>.</div>${cmd('$ curl localhost:8090/\n$ curl localhost:8090/api/receitas')}`,
+        `<div class="t">Execute <code>code compose.yaml</code>, copie o conteúdo do slide anterior e salve. Confira os espaços no início de cada linha.</div>`,
+        `<div class="t">Inicie os serviços. <code>--build</code> constrói as imagens antes, e <code>-d</code> deixa o terminal livre. Depois, consulte o estado dos containers:</div>${cmd('$ docker compose up -d --build\n$ docker compose ps')}`,
+        `<div class="t">Teste o site e a API no terminal. Na aba <strong>PORTS</strong>, abra a porta <strong>8090</strong> pelo ícone de globo. A página deve mostrar a lista de receitas e a origem <code>/api/receitas</code>. Se houver erro logo no início, espere alguns segundos e tente novamente.</div>${cmd('$ curl localhost:8090/\n$ curl localhost:8090/api/receitas')}`,
         `<div class="t">Logs de um serviço:</div>${cmd('$ docker compose logs api')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 14')}<p style="margin-top:10px;color:var(--muted)">Confere os serviços <code>api</code> e <code>web</code> rodando e o site e a API respondendo na 8090.</p></div>
-        <div class="callout"><strong>Na pasta do compose.yaml</strong> — os comandos do Compose precisam ser rodados lá. <code>docker ps</code> mostra os containers com o prefixo da pasta (<code>14-docker-compose-api-1</code>). <code>docker compose down</code> para e remove containers e rede; as imagens ficam, e <code>up -d</code> de novo é instantâneo.</div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd(`    environment:
-      COZINHA: "Cozinha do Compose"`)}<p style="margin-top:8px;color:var(--muted)">No serviço <code>api</code>; depois <code>docker compose up -d</code> de novo. Só o <code>api</code> é recriado; <code>curl localhost:8090/api/</code> mostra o novo nome.</p></div>
+        <div class="callout"><strong>Execute os comandos na pasta do compose.yaml.</strong> O Compose cria nomes como <code>14-docker-compose-api-1</code>. Para parar e remover os containers e a rede do projeto, use <code>docker compose down</code>. As imagens ficam disponíveis para a próxima execução.</div>
+        <div class="box soft"><h3>Missão extra</h3><p>Acrescente <code>environment</code> ao serviço <code>api</code>, alinhado com <code>build</code>. O início do arquivo ficará assim; mantenha a seção <code>web</code>:</p>${cmd(`services:
+  api:
+    build: ./api
+    environment:
+      COZINHA: "Cozinha do Compose"`)}<p style="margin-top:8px;color:var(--muted)">Salve e execute <code>docker compose up -d</code> novamente. Consulte <code>curl localhost:8090/api/</code> para conferir o novo nome.</p></div>
       </div></div>`},
-    {h:'Comandos & documentação', eyebrow:'Referência', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
-          ['docker compose up -d --build','constrói e sobe todos os serviços em segundo plano'],
+          ['docker compose up -d --build','constrói as imagens e inicia os serviços em segundo plano'],
           ['docker compose ps','os containers do projeto e o estado de cada um'],
           ['docker compose logs [-f] [serviço]','logs de todos ou de um'],
           ['docker compose exec <serviço> <cmd>','como o docker exec, pelo nome do serviço'],
@@ -1230,14 +1245,14 @@ D.push({n:14, key:'14', title:'Docker Compose', mod:'Módulo 5 · Vários contai
 D.push({n:15, key:'15', title:'Faxina', mod:'Encerramento', time:4, el:true, cmds:['docker system df','prune','próximos passos'],
   slides:[
     {h:'Faxina', body: cover({n:15,time:4,el:true,mod:'Encerramento',cmds:['docker system df','docker stop $(docker ps -q)','docker container prune','docker image prune']},
-      'Descobrir quanto disco o Docker está usando e limpar o que sobrou da aula: containers parados, imagens sem nome, redes e volumes esquecidos. <strong>Por último</strong>: apaga o trabalho dos anteriores.',
+      'Consultar o espaço usado pelo Docker e remover recursos criados durante a aula. <strong>Faça este desafio por último:</strong> a limpeza remove containers e imagens usados nos exercícios anteriores.',
       qualquer)},
-    {h:'Onde o disco vai', eyebrow:'Conceito', body:`
+    {h:'O que está ocupando espaço?', eyebrow:'Conceito', body:`
       <div class="cols s2"><div class="stack">
         ${kv([
-          ['containers parados','cada docker run sem --rm deixou um; a camada gravável e os logs continuam no disco'],
-          ['imagens <none> (dangling)','cada build que substituiu uma tag deixou a versão anterior sem nome'],
-          ['cache de build','as camadas intermediárias que deixam o build rápido (desafio 6)'],
+          ['containers parados','continuam no disco até serem removidos, junto com seus arquivos e logs'],
+          ['imagens <none> (dangling)','versões que podem ficar sem nome ao reconstruir uma imagem com a mesma tag'],
+          ['cache de build','resultados de etapas anteriores, reutilizados na construção (desafio 6)'],
           ['volumes e redes','notas e cozinha continuam existindo até alguém apagar'],
         ], ['O quê','De onde veio'])}
         ${cmd(`$ docker system df
@@ -1247,27 +1262,28 @@ D.push({n:15, key:'15', title:'Faxina', mod:'Encerramento', time:4, el:true, cmd
 > Local Volumes   1       1        4kB      0B (0%)
 > Build Cache     31      0        180MB    180MB`)}
       </div><div class="stack">
-        <div class="box lift"><h3>Os prune</h3>${kv([
+        <div class="box lift"><h3>Comandos de limpeza: prune</h3>${kv([
           ['docker container prune','remove todos os containers parados'],
           ['docker image prune','só as imagens sem nome; -a remove toda imagem sem container'],
-          ['docker volume prune / network prune','volumes e redes que nenhum container usa'],
-          ['docker system prune','os quatro de uma vez; -a --volumes é o botão vermelho'],
+          ['docker volume prune','remove volumes anônimos sem uso; o volume nomeado notas é removido com docker volume rm notas'],
+          ['docker network prune','remove redes sem uso, exceto as redes padrão'],
+          ['docker system prune','remove containers parados, redes sem uso, imagens sem nome não usadas e cache de construção'],
         ], ['','' ])}</div>
-        <div class="callout"><strong>Prune só apaga o que não está em uso.</strong> Uma imagem com um container (mesmo parado) apontando para ela não é removida; por isso a ordem é <em>parar → containers → imagens</em>. Todo prune pede confirmação.</div>
+        <div class="callout"><strong>Como ler docker system df:</strong> SIZE é o espaço ocupado; RECLAIMABLE é o que pode ser liberado. Os números do exemplo variam conforme o uso. Na limpeza, removemos primeiro os containers parados e depois as imagens que eles usavam.</div>
       </div></div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 4 min · elástico', body:`
+    {h:'O desafio', eyebrow:'Tarefa · 4 min · pode ficar para depois da aula', body:`
       <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">A conta:</div>${cmd('$ docker system df\n$ docker ps -a')}`,
-        `<div class="t">Pare tudo o que está rodando e remova os parados (o prune pede <code>y</code>). <code>$(docker ps -q)</code> vira a lista de IDs; se estiver vazia, o <code>stop</code> reclama, e está tudo bem.</div>${cmd('$ docker stop $(docker ps -q)\n$ docker container prune')}`,
+        `<div class="t">Consulte o espaço usado e a lista de containers:</div>${cmd('$ docker system df\n$ docker ps -a')}`,
+        `<div class="t">Pare os containers em execução e remova os parados. <code>$(docker ps -q)</code> insere a lista de IDs no comando <code>stop</code>. Se a lista estiver vazia, ele avisará que falta um argumento; nesse caso, siga para <code>prune</code>. Leia a confirmação e responda <code>y</code> para remover:</div>${cmd('$ docker stop $(docker ps -q)\n$ docker container prune')}`,
         `<div class="t">As imagens sem nome, sobras dos builds:</div>${cmd('$ docker image prune\n$ docker images')}`,
-        `<div class="t">Compare:</div>${cmd('$ docker system df')}`,
+        `<div class="t">Consulte o espaço novamente e compare com a primeira etapa:</div>${cmd('$ docker system df')}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 15')}<p style="margin-top:10px;color:var(--muted)">Aprova sem nenhum container (rodando ou parado) e sem imagens <code>&lt;none&gt;</code>. Extra: nada do curso sobrou (volume, rede, imagens).</p></div>
-        <div class="callout"><strong>Depois disso</strong>, <code>check.sh</code> dos desafios anteriores volta a reprovar: os containers não existem mais. <code>reset.sh NN</code> e o enunciado recriam qualquer um em segundos.</div>
-        <div class="box soft"><h3>Missão extra · o que tem nome</h3>${cmd("$ cd ~/labs/14-docker-compose && docker compose down && cd -\n$ docker volume rm notas\n$ docker network rm cozinha\n$ docker images                 # o que sobrou com nome\n$ docker image rm -f $(docker images -q 'receitas*' | sort -u) bloco:1.0")}<p style="margin-top:8px;color:var(--muted)"><code>docker images -q 'receitas*'</code> lista os IDs de <code>receitas</code>, <code>receitas-api</code> e <code>receitas-web</code>; o <code>-f</code> é para as imagens com duas tags. E o botão vermelho: <code>docker system prune -a --volumes</code> remove <strong>tudo</strong> o que não está em uso, imagens-base inclusive. Leia o aviso antes do <code>y</code>.</p></div>
-        <div class="callout warn"><strong>⏱ Elástico</strong> — último ponto de corte. Encerramento: parar ou excluir o Codespace.</div>
+        <div class="callout"><strong>Para praticar de novo:</strong> use <code>reset.sh NN</code>, substituindo <code>NN</code> pelo número do desafio, e siga o enunciado desde o início. As verificações que dependem dos containers removidos deixam de aprovar até você refazê-los.</div>
+        <div class="box soft"><h3>Missão extra · volume, rede e imagens</h3>${cmd("$ cd ~/labs/14-docker-compose && docker compose down && cd -\n$ docker volume rm notas\n$ docker network rm cozinha\n$ docker images                 # confira as imagens restantes\n$ docker image rm -f $(docker images -q 'receitas*' | sort -u) bloco:1.0")}<p style="margin-top:8px;color:var(--muted)">A primeira linha remove os recursos do Compose e volta à pasta anterior. Na última, <code>sort -u</code> retira IDs repetidos, e <code>-f</code> permite remover imagens com mais de uma tag. A remoção do volume também apaga as notas.</p></div>
+        <div class="callout warn"><strong>Ao terminar:</strong> pare ou exclua o Codespace. Parado, ele ainda ocupa armazenamento. Excluído, perde os arquivos e alterações; o instalador recria apenas o material inicial do curso.</div>
       </div></div>`},
-    {h:'Comandos, documentação & próximos passos', eyebrow:'Referência', body:`
+    {h:'Comandos e próximos estudos', eyebrow:'Referência', body:`
       <div class="cols s2">
         <div class="stack">
           ${kv([
@@ -1275,10 +1291,10 @@ D.push({n:15, key:'15', title:'Faxina', mod:'Encerramento', time:4, el:true, cmd
             ['docker stop $(docker ps -q)','para todos os que estão rodando'],
             ['docker container prune','remove os parados'],
             ['docker image prune [-a]','imagens sem nome [ou todas sem container]'],
-            ['docker system prune [-a --volumes]','tudo o que não está em uso'],
-            ['docker compose down [-v]','o jeito certo de desmontar um projeto Compose'],
+            ['docker system prune -a --volumes','amplia a limpeza para imagens sem uso e volumes anônimos sem uso; pode incluir as imagens-base'],
+            ['docker compose down [-v]','para e remove os recursos do projeto; -v inclui os volumes gerenciados pelo Compose'],
           ])}
-          <div class="box lift"><h3>Para onde ir depois</h3><ul class="plain"><li><strong>Publicar a imagem</strong> num registro (Docker Hub, GitHub Container Registry): <code>docker tag</code> + <code>docker push</code>. É o que um pipeline de CI faz a cada commit.</li><li><strong>Imagens menores</strong>: <em>multi-stage builds</em>, <code>-alpine</code>, usuário sem root.</li><li><strong>Muitas máquinas</strong>: Kubernetes, que roda as mesmas imagens que você construiu hoje.</li></ul></div>
+          <div class="box lift"><h3>O que estudar depois</h3><ul class="plain"><li><strong>Compartilhar imagens:</strong> publicar no Docker Hub ou no GitHub Container Registry com <code>docker push</code>.</li><li><strong>Reduzir o tamanho das imagens:</strong> estudar imagens-base menores e construções em múltiplas etapas, chamadas de <em>multi-stage builds</em>.</li><li><strong>Definir permissões:</strong> executar o programa com um usuário sem privilégios de administrador, em vez de <code>root</code>.</li><li><strong>Usar várias máquinas:</strong> conhecer o Kubernetes, que gerencia a execução de containers em vários computadores.</li></ul></div>
         </div>
         <div class="box soft"><h3>Documentação</h3>${docs([L.sdf, L.sprune, L.r_cprune, L.r_iprune, L.c_down, L.c_reg, L.livro, L.repo])}</div>
       </div>`},
@@ -1294,7 +1310,7 @@ function renderHome(){
   const total = D.reduce((a,d)=>a+d.time,0);
   const tiles = ALL.map(d => {
     const isIntro = d.key === 'intro';
-    return `<a class="tile ${d.el?'el':''}" href="#/d/${d.key}/1" ${d.el?'title="Desafio elástico: vira tarefa para depois se a aula atrasar"':''}>
+    return `<a class="tile ${d.el?'el':''}" href="#/d/${d.key}/1" ${d.el?'title="Este desafio pode ficar para depois da aula, se faltar tempo"':''}>
       <div class="row"><div class="num">${isIntro?'∅':pad(d.n)}</div><div class="mod">${d.mod}</div></div>
       <div><h3>${isIntro? d.short : d.title}</h3><div class="cmds" style="margin-top:8px">${d.cmds.map(esc).join(' · ')}</div></div>
       <div class="foot"><span>${d.slides.length} slides</span><span>⏱ ${d.time} min</span></div>
@@ -1303,13 +1319,13 @@ function renderHome(){
   document.getElementById('home').innerHTML = `
     <header class="hero">
       <div><h1>Docker<span>no Codespaces</span></h1>
-        <p class="sub">Curso síncrono de 3 horas, do zero. Aula via Zoom, prática no Codespace de cada pessoa; nada para instalar. Escolha um desafio para abrir os slides.</p></div>
+        <p class="sub">Aprenda Docker em uma aula ao vivo de 3 horas, com exercícios no navegador. Não é preciso saber programar. Abra a introdução para conhecer o ambiente e, depois, siga os desafios na ordem.</p></div>
       <div class="meta"><div><b>16</b>desafios</div><div><b>${total}</b>min de prática</div><div><b>3h</b>de aula</div></div>
     </header>
-    <div class="legend"><span><span class="sw"></span>desafio</span><span><span class="sw el"></span>⏱ elástico — vira tarefa de casa se a aula atrasar</span><span>teclado: <kbd>→</kbd> <kbd>←</kbd> navegar · <kbd>Esc</kbd> voltar aqui · <kbd>F</kbd> tela cheia</span></div>
+    <div class="legend"><span><span class="sw"></span>desafio</span><span><span class="sw el"></span>pode ficar para depois da aula, se faltar tempo</span><span>teclado: <kbd>→</kbd> <kbd>←</kbd> mudar de slide · <kbd>Esc</kbd> voltar ao início · <kbd>F</kbd> tela cheia</span></div>
     <div class="grid">${tiles}</div>
     <footer class="homefoot">
-      <span>Ordem da aula: 0 → 15, com intervalo depois do 7.</span>
+      <span>Prepare o ambiente e faça o desafio 0 antes da aula. Na aula, siga do 1 ao 15, com intervalo depois do 7.</span>
       <span>Enunciados, gabarito e guia do professor: <a href="https://github.com/fsilva-alt/devops-docker" target="_blank" rel="noopener">github.com/fsilva-alt/devops-docker</a></span>
       <span>Leitura sugerida: <a href="https://livro.descomplicandodocker.com.br/" target="_blank" rel="noopener">Descomplicando Docker (livro gratuito, pt-br)</a></span>
     </footer>`;

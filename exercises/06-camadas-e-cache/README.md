@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Entender por que a **ordem** das instruções importa: cada uma vira uma camada, e o Docker reaproveita camadas até a primeira que mudou. Bem ordenado, mudar o código não reinstala as dependências.
+Organizar o `Dockerfile` para que uma alteração no código não obrigue o Docker a reinstalar as dependências. Você vai observar como ele reutiliza resultados de etapas anteriores para construir a imagem mais rápido.
 
 ## Onde
 
@@ -18,7 +18,9 @@ cd ~/labs/06-camadas-e-cache
 
 ## Como o cache funciona
 
-O build vai de cima para baixo. Para cada instrução, o Docker pergunta: "já construí esta camada, com esta instrução, sobre a mesma camada anterior, com os mesmos arquivos?" Se sim, `CACHED`, custo zero. Se não, executa, **e todas as instruções seguintes também**, porque partem de uma base diferente.
+A imagem é formada por **camadas**, que guardam alterações nos arquivos. Durante a construção, o Docker pode reaproveitar o resultado de uma etapa quando a instrução, sua base e os arquivos usados continuam iguais. Esse reaproveitamento é chamado de **cache** e aparece na saída como `CACHED`.
+
+Quando uma etapa muda, as etapas seguintes que dependem dela também precisam ser refeitas. Algumas instruções, como `CMD`, guardam configurações, em vez de acrescentar arquivos.
 
 Com `COPY . .` antes do `pip install`, qualquer edição em `app.py` muda a camada do `COPY`, e o `pip install` roda de novo, embora `requirements.txt` não tenha mudado.
 
@@ -30,13 +32,19 @@ Com `COPY . .` antes do `pip install`, qualquer edição em `app.py` muda a cama
    docker build -t receitas-api:1.1 .
    ```
 
-2. Mude o código: abra `app.py` e acrescente uma receita à lista `RECEITAS`, por exemplo `{"nome": "Mousse de maracujá", "rende": "6 porções"}`. Construa de novo e repare: o `pip install` **rodou outra vez**, demorado, por uma mudança que não tinha nada a ver com ele.
+2. Abra `app.py` com `code app.py`. Procure a lista que começa com `RECEITAS = [` e acrescente esta linha antes do `]` que fecha a lista, mantendo o alinhamento das receitas anteriores:
+
+   ```python
+   {"nome": "Mousse de maracujá", "rende": "6 porções"},
+   ```
+
+   Mantenha as aspas, as chaves e a vírgula final, como nas outras receitas. Salve e construa de novo. Observe que `pip install` **é executado outra vez**, mesmo sem mudanças na lista de dependências:
 
    ```bash
    docker build -t receitas-api:1.1 .
    ```
 
-3. Reordene o `Dockerfile`: primeiro só o `requirements.txt`, depois o pip, e só então o resto:
+3. Abra o `Dockerfile` e substitua o conteúdo pelo exemplo abaixo. Ele copia primeiro `requirements.txt`, instala as dependências e só depois copia o restante do projeto. Salve o arquivo:
 
    ```dockerfile
    FROM python:3.12-slim
@@ -51,7 +59,7 @@ Com `COPY . .` antes do `pip install`, qualquer edição em `app.py` muda a cama
    CMD ["python", "app.py"]
    ```
 
-4. Construa (o pip roda uma última vez, porque a sequência de camadas é nova). Depois mude `app.py` de novo (outra receita, ou um texto) e construa mais uma vez: agora o pip aparece como `CACHED` e o build leva segundos.
+4. Construa a imagem com a nova ordem. Nessa primeira construção, o pip pode executar novamente ou usar o cache preparado pelo instalador. Depois, em `app.py`, troque `Mousse de maracujá` por `Mousse de limão`, salve e construa mais uma vez. Agora, a etapa do pip deve aparecer como `CACHED`:
 
    ```bash
    docker build -t receitas-api:1.1 .
@@ -59,7 +67,7 @@ Com `COPY . .` antes do `pip install`, qualquer edição em `app.py` muda a cama
    docker build -t receitas-api:1.1 .
    ```
 
-5. Veja as camadas da imagem, uma por instrução, com o tamanho de cada uma:
+5. Consulte o histórico de construção da imagem, com as instruções e o tamanho associado a cada etapa:
 
    ```bash
    docker history receitas-api:1.1
@@ -79,4 +87,9 @@ A regra geral: **o que muda menos vai primeiro** (sistema, dependências), **o q
 
 ## Missão extra
 
-`docker build --no-cache -t receitas-api:1.1 .` ignora o cache e refaz tudo. Cronometre com `time` na frente e compare com um build normal.
+Compare uma construção sem cache com uma construção normal. `time` mede a duração do comando; compare o valor de `real` nas duas saídas:
+
+```bash
+time docker build --no-cache -t receitas-api:1.1 .
+time docker build -t receitas-api:1.1 .
+```

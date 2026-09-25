@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Desenvolver dentro do container **sem reconstruir a imagem a cada mudança**: montar a pasta do projeto dentro do container com um *bind mount*, editar no VS Code e ver a API mudar na hora.
+Alterar o programa no VS Code e ver a mudança na API **sem reconstruir a imagem**. Para isso, você vai compartilhar a pasta do projeto com o container usando um **bind mount**.
 
 ## Onde
 
@@ -18,13 +18,13 @@ A API completa (`Dockerfile` com `ENV` e `EXPOSE`). Uma diferença no `app.py`: 
 
 ## Bind mount
 
-`-v "$PWD:/app"` diz: "dentro do container, a pasta `/app` **é** a minha pasta atual". Não é cópia: é a mesma pasta, vista dos dois lados. O que a imagem tinha em `/app` fica escondido enquanto o mount existe.
+Um **bind mount** torna uma pasta do Codespace acessível dentro do container. Em `-v "$PWD:/app"`, `$PWD` representa o caminho completo da pasta atual, e `/app` é o caminho pelo qual o container acessa essa pasta. Os dois acessam os mesmos arquivos, sem criar uma cópia. Enquanto essa montagem estiver ativa, os arquivos originais da imagem em `/app` ficam ocultos.
 
 ```
 Codespace: ~/labs/10-editando-ao-vivo/app.py  ◀──── mesma coisa ────▶  container: /app/app.py
 ```
 
-O caminho de fora precisa ser **absoluto**, por isso `$PWD`.
+O caminho do Codespace precisa ser **absoluto**, isto é, começar na raiz `/`. `$PWD` já fornece esse caminho; por isso, entre na pasta do desafio antes de executar o comando.
 
 ## Tarefa
 
@@ -36,21 +36,21 @@ O caminho de fora precisa ser **absoluto**, por isso `$PWD`.
    curl localhost:8003/receitas
    ```
 
-2. Abra `app.py` no VS Code e acrescente à lista `RECEITAS`:
+2. Execute `code app.py`. Procure a lista que começa com `RECEITAS = [` e acrescente a linha abaixo antes do `]` que fecha a lista. Mantenha o alinhamento das outras receitas e a vírgula final:
 
    ```python
    {"nome": "Pudim", "rende": "8 porções"},
    ```
 
-   Salve. Veja o uvicorn perceber a mudança:
+   Salve com **Ctrl+S** ou **Cmd+S** no Mac. Depois, consulte os logs:
 
    ```bash
    docker logs dev
    ```
 
-   (procure por *detected changes in 'app.py'. Reloading...*).
+   Procure uma mensagem como *detected changes in 'app.py'. Reloading...*, que indica que o uvicorn detectou a alteração e está recarregando o programa.
 
-3. Sem build, sem restart:
+3. Consulte a API novamente. Você não precisa reconstruir a imagem nem reiniciar o container manualmente:
 
    ```bash
    curl localhost:8003/receitas
@@ -67,8 +67,8 @@ check.sh 10
 ## Dicas
 
 - A imagem `receitas-api:1.5` **não mudou**: `docker run --rm receitas-api:1.5 cat app.py` ainda não tem o Pudim. O container `dev` lê a sua pasta, não a imagem.
-- Em produção não se faz isso: a imagem deve ser autossuficiente. Bind mount é ferramenta de **desenvolvimento**.
-- Bind mount também serve para o contrário: dar ao container um arquivo de configuração que fica de fora da imagem.
+- Compartilhar o código dessa forma é útil durante o desenvolvimento, quando você está editando e testando o programa. Para distribuir essa versão a outras pessoas, construa uma nova imagem com o código atualizado.
+- Um bind mount também pode disponibilizar um arquivo de configuração que está fora da imagem.
 
 ## Missão extra
 
@@ -79,4 +79,4 @@ docker exec dev sh -c 'echo "escrito de dentro" > /app/de-dentro.txt'
 cat de-dentro.txt
 ```
 
-Depois apague-o (`rm de-dentro.txt`), para não sujar os próximos builds.
+Depois, remova o arquivo de teste com `rm de-dentro.txt`, para que ele não seja incluído em futuras construções da imagem.

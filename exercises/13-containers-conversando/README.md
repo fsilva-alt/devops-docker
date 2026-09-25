@@ -18,7 +18,9 @@ A API (`app.py`, `requirements.txt`, `Dockerfile` completo) e um `cliente.py`, q
 
 ## Redes
 
-Todo container nasce na rede padrão (`bridge`), onde os outros só são alcançáveis por IP. Numa rede **criada por você**, o Docker inclui um DNS: o nome de cada container vira o endereço dele.
+Quando você não escolhe outra rede, o Docker usa a rede padrão, chamada `bridge`. Nela, a comunicação entre containers usa endereços **IP**, números que identificam cada participante da rede.
+
+Em uma rede **criada por você**, o Docker também oferece **DNS**, um serviço que encontra o endereço IP a partir de um nome. Assim, o programa pode usar `receitas` no endereço, sem precisar saber o IP do container.
 
 ```
 rede "cozinha"
@@ -28,7 +30,7 @@ rede "cozinha"
         (nenhuma porta publicada para fora)
 ```
 
-`-p` é para o mundo de fora; entre containers na mesma rede, não é necessário.
+`-p` publica uma porta no Codespace. Entre containers da mesma rede, isso não é necessário: o cliente acessa diretamente a porta 8000 do container `receitas`.
 
 ## Tarefa
 
@@ -40,25 +42,27 @@ rede "cozinha"
    docker network ls
    ```
 
-2. Suba a API **na rede**, com nome, e **sem `-p`**:
+2. Inicie a API na rede `cozinha`, com o nome `receitas` e **sem `-p`**:
 
    ```bash
    docker run -d --name receitas --network cozinha receitas-api:1.6
    ```
 
-   De fora ela não responde (é proposital):
+   Agora tente o endereço abaixo no terminal do Codespace. A conexão deve ser recusada, pois não publicamos a porta 8000 no Codespace. Esse erro é esperado:
 
    ```bash
    curl localhost:8000/receitas
    ```
 
-3. Rode o cliente em outro container, na mesma rede. Ele chama a API pelo nome (o `-v` só serve para levar o `cliente.py`, como no desafio 10):
+3. Execute `cliente.py` em outro container, conectado à mesma rede. Esse programa faz um pedido à API pelo nome `receitas`. A opção `-v` compartilha a pasta que contém `cliente.py`, como no desafio 10:
 
    ```bash
    docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py
    ```
 
-4. Veja quem está na rede:
+   A saída deve mostrar a lista de receitas recebida da API.
+
+4. Consulte os containers conectados à rede. Como o cliente termina e é removido por `--rm`, ele já não deve aparecer; a API continua conectada:
 
    ```bash
    docker network inspect cozinha
@@ -70,11 +74,11 @@ rede "cozinha"
 check.sh 13
 ```
 
-A verificação sobe um container na rede `cozinha` e chama `http://receitas:8000/receitas` de lá.
+A verificação inicia um container temporário na rede `cozinha` e testa o endereço `http://receitas:8000/receitas` a partir dele.
 
 ## Dicas
 
-- O nome que resolve é o `--name` do container. Sem nome, o Docker inventa um (`brave_curie`), e é esse que os outros teriam de usar.
+- O nome usado no endereço é o que você definiu com `--name`. Se não informar um nome, o Docker gera um automaticamente, como `brave_curie`.
 - Um container pode estar em várias redes (`docker network connect`).
 
 ## Missão extra

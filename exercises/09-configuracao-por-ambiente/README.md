@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Configurar um container **sem reconstruir a imagem**: a mesma imagem, com valores diferentes, via variáveis de ambiente (`ENV` no Dockerfile, `-e` e `--env-file` no `docker run`).
+Mudar o nome da cozinha exibido pela API **sem reconstruir a imagem**. Vamos usar uma **variável de ambiente**, uma configuração com nome e valor que o programa lê ao iniciar. Neste exercício, o nome é `COZINHA`, e o valor pode ser `Cozinha da Ana`.
 
 ## Onde
 
@@ -20,21 +20,21 @@ O `app.py` agora lê uma variável de ambiente:
 COZINHA = os.environ.get("COZINHA", "Cozinha sem nome")
 ```
 
-e a rota `/` responde `{"mensagem": "Livro de receitas da <COZINHA>", ...}`. O `Dockerfile` está completo, mas não define a variável. Há também um `cozinha.env` para a missão extra.
+Essa linha procura o valor de `COZINHA`. Se ele não estiver definido, usa `Cozinha sem nome`. A rota `/` inclui o nome escolhido na mensagem do livro de receitas. O `Dockerfile` já está pronto, mas ainda não define essa variável. Há também um arquivo `cozinha.env` para a missão extra.
 
-## Três lugares para o mesmo valor
+## Qual valor o programa usa?
 
-| Onde | Quando vale | Ganha de |
+| Onde definir | Quando é usado | Substitui |
 |---|---|---|
-| Código: `os.environ.get("COZINHA", "Cozinha sem nome")` | Se ninguém definiu | — |
-| `ENV COZINHA="..."` no Dockerfile | Padrão gravado na imagem | do código |
-| `-e COZINHA="..."` ou `--env-file` no `docker run` | Só naquele container | da imagem |
+| Código: `os.environ.get("COZINHA", "Cozinha sem nome")` | Quando a variável não está definida | — |
+| `ENV COZINHA="..."` no Dockerfile | Como valor padrão da imagem | O valor de reserva do código |
+| `-e COZINHA="..."` ou `--env-file` no `docker run` | No container que você está criando | O padrão da imagem |
 
-A regra: **a imagem é a mesma em todo lugar; o que muda entre ambientes (nome, senha de banco, endereço de outro serviço) vem de fora.**
+Isso permite usar a mesma imagem com configurações diferentes. Por exemplo, você pode mudar o nome da cozinha ou o endereço de outro serviço ao criar um container.
 
 ## Tarefa
 
-1. Dê um padrão à imagem. No `Dockerfile`, antes do `EXPOSE`:
+1. Abra o `Dockerfile`, acrescente a linha abaixo antes de `EXPOSE` e salve. Ela define o valor padrão da imagem:
 
    ```dockerfile
    ENV COZINHA="Cozinha do Curso"
@@ -45,14 +45,16 @@ A regra: **a imagem é a mesma em todo lugar; o que muda entre ambientes (nome, 
    docker run --rm receitas-api:1.4 env | grep COZINHA
    ```
 
-2. Sobrescreva na hora de rodar, sem mexer na imagem:
+   `env` lista as variáveis de ambiente. O símbolo `|` passa essa lista ao comando `grep COZINHA`, que mostra apenas as linhas que contêm `COZINHA`.
+
+2. Crie o container com outro valor, usando `-e`. Depois, consulte a API; a resposta deve incluir `Cozinha da Ana`:
 
    ```bash
    docker run -d --name cozinha -p 8002:8000 -e COZINHA="Cozinha da Ana" receitas-api:1.4
    curl localhost:8002/
    ```
 
-3. Veja o que o container recebeu (o `exec` roda um comando dentro de um container que já está rodando):
+3. Confira o valor recebido pelo container. `docker exec` executa um comando dentro de um container que já está em execução:
 
    ```bash
    docker exec cozinha env | grep COZINHA
@@ -72,7 +74,7 @@ Não coloque segredos em `ENV` no Dockerfile: eles ficam gravados na imagem (lem
 
 ## Missão extra
 
-Muitas variáveis cabem num arquivo. Veja o `cozinha.env` e use-o:
+Você também pode reunir as variáveis em um arquivo, com uma linha no formato `NOME=valor` para cada uma. Leia `cozinha.env` com `cat cozinha.env`. Depois, recrie o container usando esse arquivo:
 
 ```bash
 docker rm -f cozinha
@@ -80,4 +82,4 @@ docker run -d --name cozinha -p 8002:8000 --env-file cozinha.env receitas-api:1.
 curl localhost:8002/
 ```
 
-A verificação reconhece a extra quando o container roda com a cozinha do arquivo.
+A verificação marca a missão extra como concluída quando o container usa o nome de cozinha definido no arquivo.

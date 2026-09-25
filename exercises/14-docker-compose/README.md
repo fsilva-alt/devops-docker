@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Descrever a API (Python) e o site (nginx) num único arquivo, `compose.yaml`, e subir os dois com **um comando**. O Compose cria a rede, constrói as imagens, dá nome aos containers e liga tudo.
+Usar o **Docker Compose** para configurar e iniciar o site e a API juntos. O arquivo `compose.yaml` descreve cada **serviço**, uma parte da aplicação: neste caso, `api` fornece os dados e `web` entrega o site. Com um comando, o Compose constrói as imagens, cria a rede e inicia os containers.
 
 ## Onde
 
@@ -19,11 +19,11 @@ Duas pastas, cada uma com o seu `Dockerfile`:
 - `api/`: a API FastAPI, como no desafio 13.
 - `web/`: o site do desafio 12, mais um `nginx.conf` que repassa tudo o que começa com `/api/` para `http://api:8000/`. O `app.js` agora busca `/api/receitas` em vez de um arquivo local.
 
-Repare no `nginx.conf`: `api` é o nome que o **serviço** vai ter no Compose. Nome de serviço é nome na rede, como no desafio anterior.
+O `nginx.conf` já está configurado para procurar a API pelo nome `api`. Por isso, use exatamente esse nome no Compose. Os serviços podem se encontrar pelo nome na rede, como os containers do desafio anterior.
 
 ## Tarefa
 
-1. Crie o arquivo `compose.yaml` (a indentação são dois espaços; YAML é sensível a isso):
+1. Execute `code compose.yaml`, copie o conteúdo abaixo e salve. **YAML** é um formato de texto usado para configurações. Os espaços no início das linhas, chamados de **indentação**, indicam quais configurações pertencem a cada serviço. Mantenha os dois espaços por nível do exemplo e não use a tecla Tab:
 
    ```yaml
    services:
@@ -38,16 +38,16 @@ Repare no `nginx.conf`: `api` é o nome que o **serviço** vai ter no Compose. N
          - api
    ```
 
-   Cada chave em `services` vira um container. `build` diz onde está o Dockerfile; `ports` é o `-p`; `depends_on` só define a ordem de partida.
+   Neste exemplo, `api` e `web` são os dois serviços dentro de `services`. `build` indica a pasta do `Dockerfile`; `ports` publica portas, como `-p`; e `depends_on` faz o Compose iniciar `api` antes de `web`. Essa ordem não garante que a API já esteja pronta para responder.
 
-2. Suba tudo. O `--build` constrói (ou reconstrói) as imagens antes:
+2. Inicie os serviços. A opção `--build` constrói ou atualiza as imagens antes de iniciar os containers; `-d` mantém o terminal livre. O segundo comando mostra o estado dos serviços:
 
    ```bash
    docker compose up -d --build
    docker compose ps
    ```
 
-3. O site fala com a API através do nginx. Pelo terminal e pelo navegador (aba **PORTS** → 8090). Na página, o texto diz de onde vieram as receitas: `/api/receitas`.
+3. Teste o site e a API com os comandos abaixo. Depois, na aba **PORTS**, localize a porta **8090** e clique no ícone de globo. O navegador busca as receitas em `/api/receitas`, e o nginx encaminha esse pedido à API. A página mostra esse caminho junto da lista de receitas. Se houver erro logo no início, espere alguns segundos e tente novamente.
 
    ```bash
    curl localhost:8090/
@@ -71,15 +71,18 @@ check.sh 14
 - Os comandos do Compose precisam ser rodados **na pasta do `compose.yaml`**.
 - `docker ps` mostra os containers com o prefixo da pasta (`14-docker-compose-api-1`): o Compose nomeia por você.
 - Erro de YAML? `docker compose config` valida o arquivo e mostra a linha do problema.
-- `docker compose down` para e remove containers e rede. As imagens ficam; `up -d` de novo é instantâneo.
+- `docker compose down` para e remove os containers e a rede do projeto. As imagens ficam disponíveis; `docker compose up -d` cria e inicia os containers novamente usando essas imagens.
 
 ## Missão extra
 
-Configure a API pelo Compose, sem tocar em Dockerfile nenhum. No serviço `api`, acrescente:
+Configure o nome da cozinha pelo Compose. No arquivo `compose.yaml`, acrescente `environment` abaixo de `build: ./api`, com o mesmo alinhamento. O início do arquivo ficará assim; mantenha a seção `web` como está:
 
 ```yaml
+services:
+  api:
+    build: ./api
     environment:
       COZINHA: "Cozinha do Compose"
 ```
 
-e rode `docker compose up -d` de novo. Só o `api` é recriado; `curl localhost:8090/api/` mostra o novo nome.
+Salve e execute `docker compose up -d` novamente. O container da API será recriado com a nova configuração. Consulte `curl localhost:8090/api/` para conferir o nome da cozinha.

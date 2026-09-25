@@ -1,12 +1,12 @@
 # Guia do professor
 
-Tudo o que não está nos enunciados: logística, como o ambiente funciona por dentro e o que fazer quando algo dá errado.
+Orientações para preparar e conduzir a aula, entender os scripts do curso e ajudar a turma quando surgir um problema.
 
 ## Antes do evento
 
 - [ ] Garantir que o repositório `fsilva-alt/devops-docker` está público, com o `install.sh` na branch `main` (é dele que o `curl` do instalador lê).
 - [ ] Testar num Codespace em branco novo: rodar a linha do instalador, o `check.sh 00`, cronometrar os 16 desafios e, principalmente, conferir a aba **PORTS** (desafios 8, 12 e 14): o botão de globo abre o endereço `https://<codespace>-8001.app.github.dev`.
-- [ ] Pedir aos alunos que façam a seção "Antes da aula" do README **pelo menos um dia antes** e parem o Codespace. O instalador baixa ~150 MB de imagens; melhor que isso aconteça em casa.
+- [ ] Pedir aos alunos que sigam a seção "Antes da aula" do README **pelo menos um dia antes** e parem o Codespace ao terminar. O instalador baixa cerca de 150 MB de imagens; fazer isso com antecedência evita esperar pelos downloads durante a aula.
 - [ ] Combinar com os monitores: sugestão de 1 monitor para cada 25 pessoas.
 - [ ] Preparar o Zoom: chat liberado, um monitor de olho no chat, salas simultâneas opcionais para atendimento individual.
 
@@ -42,24 +42,33 @@ Cada desafio usa uma porta de fora diferente, para que os containers dos desafio
 
 ## Condução da aula
 
+### Para uma turma sem experiência prévia
+
+- Comece pelo slide **Como acompanhar a aula**. Mostre onde ficam o terminal e o editor, como executar uma linha e como salvar um arquivo.
+- Explique `cd`, `pwd`, `ls` e `cat` quando aparecerem. Ao usar `$` nos slides, avise que o símbolo marca um comando e não deve ser copiado.
+- Diga onde cada ação acontece: no terminal do Codespace, dentro do container, no editor ou no navegador. No desafio 2, mostre a mudança do prompt e a volta ao Codespace após `exit`.
+- Nos desafios 6 e 10, mostre onde começa e termina a lista `RECEITAS`. Acrescente a linha com a turma, mantendo aspas, vírgula e alinhamento. O objetivo é aprender Docker, sem exigir que a pessoa já saiba Python.
+- Explique o resultado esperado antes de executar. Quando um erro fizer parte do exercício, como a ausência de `/marca.txt` em outro container, avise que ele é esperado e o que demonstra.
+- Evite descrever uma etapa como “óbvia”, “mágica” ou “só fazer isso”. Mostre a ação e reserve tempo para quem ainda está se orientando na tela.
+
 ### Ritmo
 
 - Anuncie cada desafio com o número e o horário de término. Peça que sinalizem no chat com ✅ quando `check.sh NN` aprovar.
-- Quando cerca de 70% sinalizarem, avise que falta 1 minuto e siga. Quem não terminou recebe ajuda de um monitor enquanto a aula continua; a missão extra segura quem terminou cedo.
+- Quando cerca de 70% sinalizarem, avise que falta 1 minuto e siga. Quem não terminou recebe ajuda de um monitor enquanto a aula continua; quem terminou pode fazer a missão extra, que é opcional.
 - Pontos de corte: o **Desafio 7** (antes do intervalo), o **Desafio 11** (fim do módulo de dados) e o **Desafio 15** (fim). Todos viram tarefa de casa sem prejudicar os seguintes.
 - **O desafio 15 apaga tudo.** Só anuncie depois do 14 e avise que `check.sh` dos anteriores vai voltar a reprovar.
 
 ### Compartilhamento de tela
 
-Mostre o seu próprio Codespace, não slides, sempre que possível. Deixe um segundo terminal com `watch docker ps` (ou rode `docker ps` a cada passo): ver os containers aparecerem e sumirem conta a história sozinho. Nos desafios 8, 12 e 14, mostre a aba **PORTS** e o botão de globo com calma; é o passo em que mais gente se perde.
+Use os slides para apresentar o conceito e demonstre a tarefa no seu Codespace. Mantenha o texto do terminal legível e mostre o comando antes de executá-lo. Um segundo terminal com `watch docker ps`, ou uma consulta a `docker ps` após cada ação, ajuda a turma a acompanhar as mudanças. Nos desafios 8, 12 e 14, mostre com calma a aba **PORTS**, o número da porta e o ícone de globo que abre o navegador.
 
 ### O que dizer antes de cada bloco
 
 - **Desafio 1:** "`docker run` sempre cria um container novo. Vamos acumular vários parados de propósito; no fim da aula a gente limpa."
 - **Desafio 3:** avise que o `docker stop` do relógio demora 10 segundos e por quê (o `sh` ignora o SIGTERM). Não é travamento.
-- **Desafio 5:** o primeiro build de cada pessoa pode levar 20–30 s se o cache de aquecimento não pegou. Aproveite para explicar que o `pip install` está rodando *dentro* do build.
-- **Desafio 10:** mostre o `docker logs dev` com a linha *Reloading...* Sem isso, parece mágica.
-- **Desafio 14:** YAML é indentação. Diga em voz alta: "dois espaços, nunca tab".
+- **Desafio 5:** a primeira construção pode levar 20–30 s se o cache preparado pelo instalador não estiver disponível. Explique que `pip install` instala as dependências na imagem, não diretamente no Codespace.
+- **Desafio 10:** depois de salvar `app.py`, mostre a mensagem *Reloading...* em `docker logs dev`. Relacione a alteração do arquivo, a recarga do programa e a nova resposta da API.
+- **Desafio 14:** explique que os espaços no início das linhas organizam o YAML. Use dois espaços por nível, nunca Tab, e mostre o alinhamento de `build` e `environment` na missão extra.
 
 ## Problemas comuns
 
@@ -72,15 +81,15 @@ Mostre o seu próprio Codespace, não slides, sempre que possível. Deixe um seg
 | `The container name "/api" is already in use` | Rodou o `docker run` duas vezes com o mesmo `--name` | `docker rm -f api` e rodar de novo |
 | `port is already allocated` | Outra coisa na mesma porta de fora (um container antigo, outro desafio) | `docker ps` para achar quem; ou trocar a porta de fora |
 | `curl: (56) Recv failure` ou `Empty reply` | O programa escuta em `127.0.0.1` dentro do container | Tem de ser `0.0.0.0` (os `app.py` do curso já são) |
-| Container `Exited (1)` logo depois do `run -d` | O programa quebrou ao subir | `docker logs <nome>` mostra o traceback; `docker rm -f` e corrigir |
-| Build "não pega" a mudança | Editou depois do build | Construir de novo com a mesma tag; a verificação compara o arquivo da pasta com o de dentro da imagem |
+| Container `Exited (1)` logo depois do `run -d` | O programa encontrou um erro ao iniciar | Consultar `docker logs <nome>` para ler o erro, corrigir o arquivo, reconstruir a imagem se necessário e recriar o container |
+| A imagem não contém a alteração | O arquivo foi editado depois da construção | Salvar e construir de novo com a mesma tag; a verificação compara o arquivo da pasta com o de dentro da imagem |
 | `docker build` pede `.` | Faltou o contexto | O ponto no final é obrigatório: `docker build -t nome .` |
 | `-v "$PWD:/app"` monta pasta vazia | Rodou de outra pasta | `cd ~/labs/10-editando-ao-vivo` antes; `$PWD` precisa ser a pasta do desafio |
 | Uvicorn não recarrega no desafio 10 | O bind mount está certo, mas o arquivo não foi salvo | Salvar no VS Code (`Ctrl+S`); conferir `docker logs dev` |
 | `compose.yaml` inválido | Tabs ou indentação errada | `docker compose config` aponta a linha; usar dois espaços |
 | `502 Bad Gateway` em `localhost:8090/api/receitas` | O serviço da API não se chama `api`, ou ainda está subindo | O `nginx.conf` repassa para `http://api:8000`; conferir o nome do serviço no `compose.yaml` e `docker compose logs api` |
 | Aba PORTS não mostra a porta | O container ainda não subiu, ou subiu sem `-p` | `docker ps` mostra a coluna PORTS; se vazia, faltou o `-p` |
-| Aluno perdido no meio de um desafio | Estado inconsistente | `reset.sh NN` e recomeçar; remove containers e imagens do desafio e recria a pasta |
+| A pessoa não sabe em qual etapa está | Arquivos e containers podem estar em etapas diferentes | Conferir o resultado de `check.sh NN`. Se for necessário recomeçar, explicar que `reset.sh NN` apaga as alterações do desafio, remove seus recursos e recria a pasta |
 | Pasta do lab sumiu / `No such file or directory` | Rodou `reset.sh` de dentro da pasta | `cd` de novo para a pasta |
 | Codespace lento ou sem disco | Muitas imagens e containers acumulados | `docker system df`; `docker container prune` e `docker image prune` (é o desafio 15) |
 | Tudo sumiu depois de reabrir | Codespace foi **excluído** (não só parado) | Criar de novo e rodar o instalador; imagens e labs são recriados |
@@ -95,6 +104,6 @@ Mostre o seu próprio Codespace, não slides, sempre que possível. Deixe um seg
 ## Encerramento
 
 1. `check.sh 15` (ou, se o 15 virou tarefa de casa, `docker ps` para mostrar o que ficou).
-2. Parar ou excluir o Codespace. Reforce: **parado ainda consome armazenamento**; excluído não. Imagens e labs são descartáveis: o instalador recria tudo.
+2. Parar ou excluir o Codespace. Reforce: **parado ainda consome armazenamento**; excluído perde os arquivos e as alterações. O instalador recria o material inicial, mas não recupera o trabalho feito pela pessoa.
 3. O que não vimos e vale citar: registries (`docker push` para o Docker Hub ou o GitHub Container Registry), *multi-stage builds* para imagens menores, usuário não-root no container, e orquestração (Kubernetes) quando são muitos containers em muitas máquinas.
 4. Próximos passos sugeridos: [Descomplicando Docker](https://livro.descomplicandodocker.com.br/) (livro gratuito, em português), os guias [Docker concepts](https://docs.docker.com/get-started/docker-concepts/) da documentação oficial (em inglês, curtos e práticos) e colocar em container um projeto próprio.

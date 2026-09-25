@@ -8,36 +8,36 @@ Confirmar que o seu Codespace consegue rodar containers. Se algo estiver errado 
 
 ## Onde
 
-Em qualquer pasta. Containers e imagens não moram em pasta nenhuma: eles ficam com o Docker.
+No terminal do Codespace, em qualquer pasta. O Docker gerencia os containers e as imagens; estes comandos não dependem da pasta em que o terminal está.
 
-## O Docker que já está aí
+## Como o Docker funciona
 
-Um Codespace criado do template **Blank** vem com o Docker instalado. São duas peças:
+Um Codespace criado com o modelo **Blank** vem com o Docker instalado. Um **container** é um ambiente isolado para executar um programa. Ele é criado a partir de uma **imagem**, que reúne o programa e os arquivos necessários para executá-lo. Para isso, o Docker usa duas partes:
 
 | Peça | O que é |
 |---|---|
 | `docker` | O **cliente**: o comando que você digita no terminal |
-| `dockerd` | O **daemon** (serviço): quem de fato baixa imagens, cria e roda containers. O cliente só manda pedidos para ele |
+| `dockerd` | O **daemon**, um serviço que permanece em execução e recebe os pedidos do cliente para baixar imagens, criar e executar containers |
 
-Quando `docker` reclama de *Cannot connect to the Docker daemon*, o cliente está lá, mas o serviço ainda não subiu. Num Codespace recém-aberto, espere um minuto e tente de novo.
+Se aparecer *Cannot connect to the Docker daemon* (não foi possível conectar ao serviço do Docker), o cliente está instalado, mas não conseguiu acessar o serviço. Em um Codespace recém-aberto, espere um minuto e tente de novo.
 
 ## Tarefa
 
-1. Veja as versões do cliente e do servidor. Se as duas aparecem, eles estão conversando:
+1. Execute o comando abaixo no terminal e pressione Enter. Ele mostra as versões do cliente (**Client**) e do serviço (**Server**). Se as duas aparecerem, a comunicação está funcionando:
 
    ```bash
    docker version
    ```
 
-2. Rode o seu primeiro container. A imagem `hello-world` é minúscula e só existe para isso:
+2. Execute seu primeiro container. A imagem `hello-world` contém um pequeno programa de teste:
 
    ```bash
    docker run hello-world
    ```
 
-   Leia a mensagem: ela conta, em quatro passos, o que acabou de acontecer (o cliente pediu, o daemon baixou a imagem, criou um container a partir dela e mostrou a saída para você).
+   Procure a mensagem **Hello from Docker!**. O texto em inglês explica o processo: o cliente envia o pedido, o serviço obtém a imagem, cria um container e mostra a mensagem no terminal. Se a imagem já estiver disponível, não é preciso baixá-la novamente.
 
-3. Confira que o Compose, usado no desafio 14, também está disponível:
+3. Confira se o Docker Compose também está disponível. Essa ferramenta será usada no desafio 14 para iniciar mais de um serviço com um comando:
 
    ```bash
    docker compose version
@@ -57,4 +57,4 @@ Depois de conferir, **pare o Codespace** em [github.com/codespaces](https://gith
 
 ## Missão extra
 
-`docker info` mostra um resumo do daemon: quantos containers e imagens existem, qual o *storage driver*, onde ficam os dados (`Docker Root Dir`). Ache a linha `Containers:` e confira que o `hello-world` está contado.
+Execute `docker info` para consultar um resumo do serviço Docker. Procure a linha `Containers:`, que mostra o total de containers, incluindo os parados. O container de teste `hello-world` deve estar nessa contagem.
