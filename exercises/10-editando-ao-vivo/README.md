@@ -1,6 +1,8 @@
 # Desafio 10 — Editando ao vivo
 
-⏱ 5 minutos · Módulo 4: Dados
+⏱ 5 minutos · Módulo 4: Dados · **Opcional**
+
+Pode ser feito depois da aula. Para seguir a trilha principal, vá ao desafio 12; ele já tem os arquivos do site.
 
 ## Objetivo
 

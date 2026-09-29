@@ -1,6 +1,8 @@
 # Desafio 6 — Camadas e cache
 
-⏱ 5 minutos · Módulo 2: Dockerfile
+⏱ 5 minutos · Módulo 2: Dockerfile · **Opcional**
+
+Pode ser feito depois da aula. O desafio 8 já traz um Dockerfile com a ordem ajustada e não depende desta prática.
 
 ## Objetivo
 

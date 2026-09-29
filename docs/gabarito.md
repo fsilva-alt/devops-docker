@@ -102,7 +102,7 @@ docker build -t receitas-api:1.0 .
 docker run --rm receitas-api:1.0 pip list
 ```
 
-## Desafio 6 — Camadas e cache
+## Desafio 6 — Camadas e cache · opcional
 
 1. Construa com `docker build -t receitas-api:1.1 .`.
 2. Em `app.py`, acrescente `{"nome": "Mousse de maracujá", "rende": "6 porções"},` antes do `]` que fecha a lista `RECEITAS`. Mantenha o alinhamento das outras receitas, salve e repita a construção. O pip será executado novamente.
@@ -121,7 +121,7 @@ CMD ["python", "app.py"]
 
 A verificação exige o `app.py` diferente do original **e** igual ao que está dentro da imagem.
 
-## Desafio 7 — O que não entra na imagem
+## Desafio 7 — O que não entra na imagem · opcional
 
 Crie o arquivo `.dockerignore` no editor, com um nome por linha, e salve:
 
@@ -170,7 +170,7 @@ docker run -d --name cozinha -p 8002:8000 --env-file cozinha.env receitas-api:1.
 curl localhost:8002/
 ```
 
-## Desafio 10 — Editando ao vivo
+## Desafio 10 — Editando ao vivo · opcional
 
 ```bash
 docker build -t receitas-api:1.5 .
@@ -189,7 +189,7 @@ Salve o arquivo e consulte a API no terminal:
 curl localhost:8003/receitas
 ```
 
-## Desafio 11 — Dados que ficam
+## Desafio 11 — Dados que ficam · opcional
 
 ```bash
 docker build -t bloco:1.0 .
@@ -251,7 +251,7 @@ docker compose ps
 curl localhost:8090/api/receitas
 ```
 
-## Desafio 15 — Faxina
+## Desafio 15 — Faxina · opcional
 
 ```bash
 docker system df

@@ -56,8 +56,7 @@ strong{font-weight:600;color:var(--ink)}
 .tile h3{font-size:clamp(18px,1.4vw,21px);font-weight:600;line-height:1.25}
 .tile .cmds{font-family:var(--mono);font-size:.76em;color:var(--muted);line-height:1.6}
 .tile .foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:12px;font-family:var(--mono);font-size:.72em;color:var(--muted)}
-.tile.el::after{content:"";position:absolute;top:22px;right:20px;width:8px;height:8px;border-radius:50%;background:var(--amber)}
-.tile.el .mod{padding-right:16px}
+.tile .optional{color:var(--amber)}
 .homefoot{margin-top:40px;display:flex;flex-wrap:wrap;gap:10px 32px;font-family:var(--mono);font-size:.76em;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}
 .homefoot a{color:var(--ink-2)}
 kbd{display:inline-block;border:1px solid var(--line-2);border-radius:4px;padding:0 6px;font-size:.9em;color:var(--ink-2);line-height:1.6;margin:0 2px;background:var(--panel)}
@@ -174,17 +173,14 @@ details[open] summary{margin-bottom:10px}
 .layers .base{font-family:var(--mono);font-size:.7em;color:var(--muted);text-align:center;margin-top:6px;letter-spacing:.06em}
 
 /* Linha do tempo (introdução) */
-svg.tl{width:100%;height:auto;display:block;max-width:100%;font-family:var(--mono)}
-svg.tl line{stroke:var(--line-2);stroke-width:2}
-svg.tl circle{fill:var(--panel-2);stroke:var(--ink-2);stroke-width:2}
-svg.tl .hi circle{fill:var(--accent);stroke:var(--accent)}
-svg.tl .hi text{fill:var(--accent-ink)}
-svg.tl .end circle{fill:var(--blue);stroke:var(--blue)}
-svg.tl .end text{fill:var(--bg)}
-svg.tl text{fill:var(--ink);font-size:11px;text-anchor:middle;font-weight:500}
-svg.tl text.cap{fill:var(--muted);font-size:12px;font-weight:400}
-svg.tl text.title{fill:var(--accent);font-size:15px;font-weight:600}
-.gwrap{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:12px 14px}
+.timeline{list-style:none;margin:clamp(28px,5vh,48px) 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.timeline li{border-top:2px solid var(--line-2);padding-top:20px;min-width:0}
+.timeline .date{display:block;font-family:var(--mono);font-size:.8em;color:var(--muted);margin-bottom:20px}
+.timeline h3{font-size:clamp(20px,2vw,26px);margin-bottom:12px}
+.timeline p{color:var(--ink-2);max-width:32ch}
+.timeline .hi{border-color:var(--accent)}
+.timeline .hi .date{color:var(--accent)}
+@media (max-width:700px){.timeline{grid-template-columns:1fr;gap:24px}.timeline li{border-top:0;border-left:2px solid var(--line-2);padding:0 0 0 20px}.timeline .date{margin-bottom:8px}.timeline p{max-width:none}}
 </style>
 </head>
 <body>
@@ -272,7 +268,7 @@ function cover(d, objetivo, onde, extra=''){
     ${extra}
   </div><div class="stack">
     <div class="box lift"><h3>Onde fazer</h3>${onde}</div>
-    <div class="box soft"><h3>Para este desafio</h3>${kv([['⏱ tempo', `${d.time} min${d.el?' · pode ficar para depois da aula':''}`],['módulo', d.mod],['verificação', `<code>check.sh ${String(d.n).padStart(2,'0')}</code>`]], ['',''])}</div>
+    <div class="box soft"><h3>Para este desafio</h3>${kv([['⏱ tempo', `${d.time} min${d.el?' · opcional':''}`],['módulo', d.mod],['verificação', `<code>check.sh ${String(d.n).padStart(2,'0')}</code>`]], ['',''])}${d.el?'<p style="margin-top:12px">Pode ser feito depois da aula.</p>':''}</div>
   </div></div>`;
 }
 const qualquer = '<p>No terminal do Codespace, em <strong>qualquer pasta</strong>. Estes comandos usam recursos gerenciados pelo Docker e não dependem de arquivos da pasta atual.</p>';
@@ -356,7 +352,7 @@ const INTRO = {
         <div class="cols">
           <div class="box"><h3>Seu ambiente no navegador</h3><p>O <strong>Codespace</strong> é um computador Linux acessado pela internet. Nele, o <strong>VS Code</strong> é o editor de arquivos, e o <strong>terminal</strong> é a área onde você digita comandos.</p><p>Abra o terminal em <strong>Terminal → New Terminal</strong>. A preparação completa está no <a href="https://github.com/fsilva-alt/devops-docker#antes-da-aula" target="_blank" rel="noopener">README do curso</a>.</p></div>
           <div class="box lift"><h3>Comando ou conteúdo de arquivo?</h3><p>Nos slides, <code>$</code> marca uma linha para executar no terminal. Copie o comando sem esse símbolo e pressione <strong>Enter</strong>. Execute uma linha por vez.</p><p>Quando a instrução pedir um arquivo, copie o conteúdo no editor e salve com <strong>Ctrl+S</strong> ou <strong>Cmd+S</strong> no Mac. Linhas com <code>#</code> são comentários.</p></div>
-          <div class="box"><h3>Como fazer os desafios</h3><p>Leia o objetivo, entre na pasta indicada e siga a tarefa. Ao terminar, execute <code>check.sh</code> com o número do desafio: ele confirma o resultado ou mostra o que ajustar.</p><p>A <strong>Missão extra</strong> é opcional. Para executar os comandos, use os exemplos completos da tarefa. Nas tabelas de consulta, <code>&lt;nome&gt;</code> indica um valor a substituir, <code>[opção]</code> indica algo opcional, e <code>…</code> indica um exemplo abreviado.</p></div>
+          <div class="box"><h3>Como fazer os desafios</h3><p>Leia o objetivo, consulte os comandos e siga a tarefa na pasta indicada. Ao terminar, execute <code>check.sh</code> com o número do desafio: ele confirma o resultado ou mostra o que ajustar.</p><p>Os desafios marcados como <strong>opcionais</strong> e a <strong>Missão extra</strong> podem ficar para depois. Para executar os comandos, use os exemplos completos da tarefa. Nas tabelas de consulta, <code>&lt;nome&gt;</code> indica um valor a substituir, <code>[opção]</code> indica algo opcional, e <code>…</code> indica um exemplo abreviado.</p></div>
         </div>
         <div class="callout"><strong>Comandos para se localizar:</strong> <code>pwd</code> mostra a pasta atual; <code>ls</code> lista seu conteúdo; <code>cd caminho</code> entra em outra pasta. O símbolo <code>~</code> representa sua pasta pessoal. Para abrir um arquivo no editor, use <code>code nome-do-arquivo</code>.</div>
       </div>`},
@@ -375,31 +371,12 @@ const INTRO = {
         <div class="callout"><strong>Uma imagem, vários containers.</strong> Você pode usar a mesma imagem em ambientes compatíveis, levando junto as versões do programa e de suas dependências. Isso reduz diferenças entre o ambiente de quem desenvolve e o de quem executa.</div>
       </div></div>`},
     {h:'De onde veio o Docker?', eyebrow:'Introdução · 3 de 6', body:`
-      <div class="gwrap" style="margin-bottom:22px"><svg class="tl" viewBox="0 0 1000 150" role="img" aria-label="Linha do tempo: 1979 chroot; 2006-2008 cgroups e namespaces no kernel Linux; 2008 LXC; 2013 nasce o Docker; 2015 OCI; hoje Compose e Kubernetes">
-        <line x1="40" y1="80" x2="960" y2="80"/>
-        <g><circle cx="100" cy="80" r="14"/><text x="100" y="85">79</text></g>
-        <text class="cap" x="100" y="118">chroot</text><text class="cap" x="100" y="134">um processo "preso" numa pasta</text>
-        <g><circle cx="300" cy="80" r="14"/><text x="300" y="85">06</text></g>
-        <text class="cap" x="300" y="118">cgroups + namespaces</text><text class="cap" x="300" y="134">isolamento e limites de recursos</text>
-        <g><circle cx="450" cy="80" r="14"/><text x="450" y="85">08</text></g>
-        <text class="cap" x="450" y="118">LXC</text><text class="cap" x="450" y="134">ferramentas para containers Linux</text>
-        <g class="hi"><circle cx="620" cy="80" r="18"/><text x="620" y="85" style="font-size:12px">13</text></g>
-        <text class="title" x="620" y="40">março de 2013 · nasce o Docker</text>
-        <text class="cap" x="620" y="120">Solomon Hykes mostra o Docker</text><text class="cap" x="620" y="136">numa palestra de 5 min na PyCon</text>
-        <g><circle cx="790" cy="80" r="14"/><text x="790" y="85">15</text></g>
-        <text class="cap" x="790" y="118">OCI</text><text class="cap" x="790" y="134">o formato vira padrão aberto</text>
-        <g class="end"><circle cx="930" cy="80" r="14"/><text x="930" y="85" style="font-size:10px">hoje</text></g>
-        <text class="cap" x="930" y="118">Compose · Kubernetes</text><text class="cap" x="930" y="134">gerenciamento de containers</text>
-      </svg></div>
-      <div class="cols">
-        <div class="box"><div class="up">antes de 2013</div><h3>O Linux já oferecia isolamento</h3><p>O <strong>kernel</strong>, núcleo do Linux, já tinha recursos para separar programas em execução e limitar seu uso de memória e processador. São os <em>namespaces</em> e <em>cgroups</em> da linha do tempo.</p></div>
-        <div class="box lift"><div class="up">março de 2013</div><h3>O Docker facilita o uso</h3><p>A empresa de hospedagem dotCloud publica o código do Docker. A ferramenta reúne a construção e a distribuição de imagens com comandos como <code>docker run</code> para executar containers.</p></div>
-        <div class="box"><div class="up">2015 em diante</div><h3>Formatos compartilhados</h3><p>A <strong>OCI</strong> (Open Container Initiative) define padrões abertos para imagens e execução de containers. Esses padrões permitem usar imagens com diferentes ferramentas compatíveis.</p></div>
-      </div>
-      <div class="cols" style="margin-top:22px">
-        <div class="callout"><strong>Sobre os nomes da linha do tempo:</strong> você não precisa memorizá-los para fazer os exercícios. O ponto principal é que o Docker tornou mais fácil construir, compartilhar e executar ambientes com containers.</div>
-        <div class="callout"><strong>E a máquina virtual?</strong> Ela executa um sistema operacional próprio. Um container compartilha o kernel da máquina que o executa; por isso, normalmente exige menos recursos para iniciar.</div>
-      </div>`},
+      <p class="lead">Containers já existiam. O Docker tornou mais simples <strong>construir, compartilhar e executar</strong> esses ambientes.</p>
+      <ol class="timeline" aria-label="Três marcos da história do Docker">
+        <li><span class="date">Antes de 2013</span><h3>Isolamento no Linux</h3><p>O Linux já permitia separar programas e limitar seu uso de recursos.</p></li>
+        <li class="hi"><span class="date">Março de 2013</span><h3>Nasce o Docker</h3><p>Solomon Hykes apresenta o Docker na PyCon: uma forma mais acessível de usar containers.</p></li>
+        <li><span class="date">2015 em diante</span><h3>Padrões abertos</h3><p>Surge a OCI, iniciativa para padronizar imagens e sua execução entre ferramentas compatíveis.</p></li>
+      </ol>`},
     {h:'Para que vamos usar o Docker?', eyebrow:'Introdução · 4 de 6', body:`
       <div class="cols w2">
         <div class="box lift"><h3>Reutilizar um ambiente preparado</h3><p>A imagem guarda o programa, as bibliotecas que ele usa e a versão do Python. Podemos usar essa mesma imagem ao desenvolver, testar e disponibilizar o programa para outras pessoas.</p></div>
@@ -411,10 +388,10 @@ const INTRO = {
     {h:'O que ainda precisa de cuidado?', eyebrow:'Introdução · 5 de 6', body:`
       <div class="cols w2">
         <div class="box"><h3>Compatibilidade do sistema</h3><p>Os containers desta aula usam o kernel Linux do Codespace. A imagem precisa ser compatível com o sistema e a arquitetura que vão executá-la; ela não simula um computador completo.</p></div>
-        <div class="box"><h3>Armazenamento dos dados</h3><p>Remover um container apaga os arquivos guardados apenas na camada própria dele. No desafio 11, usaremos <strong>volumes</strong> para manter dados fora dessa camada. Um volume não substitui uma cópia de segurança.</p></div>
+        <div class="box"><h3>Armazenamento dos dados</h3><p>Remover um container apaga os arquivos guardados apenas na camada própria dele. O desafio opcional 11 usa <strong>volumes</strong> para manter dados fora dessa camada. Um volume não substitui uma cópia de segurança.</p></div>
         <div class="box"><h3>Várias máquinas</h3><p>Nesta aula, os containers rodam em um único Codespace. Distribuí-los entre várias máquinas exige outras ferramentas, como Kubernetes. Esse gerenciamento é chamado de <strong>orquestração</strong>.</p></div>
         <div class="box"><h3>Funcionamento do programa</h3><p>A imagem reúne o que o programa precisa para executar, mas não corrige erros no código. Ainda é necessário testar se o programa produz o resultado esperado.</p></div>
-        <div class="box"><h3>Arquivos incluídos na imagem</h3><p>Arquivos desnecessários aumentam o tamanho da imagem e o tempo de transferência. No desafio 7, vamos escolher o que fica de fora usando <code>.dockerignore</code>.</p></div>
+        <div class="box"><h3>Arquivos incluídos na imagem</h3><p>Arquivos desnecessários aumentam o tamanho da imagem e o tempo de transferência. O desafio opcional 7 mostra como escolher o que fica de fora usando <code>.dockerignore</code>.</p></div>
         <div class="box"><h3>Senhas e outras informações privadas</h3><p>Quem tem acesso à imagem pode ler os arquivos que ela contém. Senhas devem ser fornecidas na execução, nunca durante a construção da imagem. Veremos configurações de execução no desafio 9.</p></div>
       </div>`},
     {h:'Docker, Docker Hub e Docker Desktop', eyebrow:'Introdução · 6 de 6', body:`
@@ -469,16 +446,6 @@ D.push({n:0, key:'00', title:'Docker funciona?', mod:'Abertura', time:3, el:fals
         <div class="box lift"><h3>Como saber se está funcionando</h3><p><code>docker version</code> mostra as seções <strong>Client</strong> (cliente) e <strong>Server</strong> (serviço). Se aparecer <em>Cannot connect to the Docker daemon</em>, o cliente não conseguiu acessar o serviço.</p><p>Em um Codespace recém-aberto, espere um minuto e tente novamente.</p></div>
         <div class="callout"><strong>No modelo Blank</strong>, o Docker e o Compose já vêm instalados. O instalador do curso confere o ambiente, baixa as imagens e prepara os arquivos dos exercícios.</div>
       </div></div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 3 min', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Confira se aparecem as versões de <strong>Client</strong> e <strong>Server</strong>. Isso indica que o comando conseguiu acessar o serviço:</div>${cmd('$ docker version')}`,
-        `<div class="t">Execute o container de teste e procure a mensagem <strong>Hello from Docker!</strong>:</div>${cmd('$ docker run hello-world')}`,
-        `<div class="t">Confira a versão do Compose, a ferramenta que usaremos no desafio 14 para iniciar o site e a API juntos:</div>${cmd('$ docker compose version')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 00')}<p style="margin-top:10px;color:var(--muted)">Confere também que o instalador baixou as quatro imagens-base da aula (<code>hello-world</code>, <code>alpine</code>, <code>python:3.12-slim</code>, <code>nginx:alpine</code>). Faltou alguma? <code>setup.sh</code>.</p></div>
-        <div class="callout warn"><strong>Depois, pare o Codespace</strong> — em github.com/codespaces, ⋯ → <em>Stop codespace</em>, para não gastar a franquia. No dia da aula é só abrir de novo: imagens e laboratórios continuam lá.</div>
-        <div class="box soft"><h3>Missão extra · opcional</h3><p>Execute <code>docker info</code> para consultar um resumo do serviço Docker. Procure a linha <code>Containers:</code>: ela mostra o total de containers, incluindo os parados. O <code>hello-world</code> deve estar nessa contagem.</p></div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -489,6 +456,16 @@ D.push({n:0, key:'00', title:'Docker funciona?', mod:'Abertura', time:3, el:fals
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.ov, L.h_hello, L.r_run, L.repo])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 3 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Confira se aparecem as versões de <strong>Client</strong> e <strong>Server</strong>. Isso indica que o comando conseguiu acessar o serviço:</div>${cmd('$ docker version')}`,
+        `<div class="t">Execute o container de teste e procure a mensagem <strong>Hello from Docker!</strong>:</div>${cmd('$ docker run hello-world')}`,
+        `<div class="t">Confira a versão do Compose, a ferramenta que usaremos no desafio 14 para iniciar o site e a API juntos:</div>${cmd('$ docker compose version')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 00')}<p style="margin-top:10px;color:var(--muted)">Confere também que o instalador baixou as quatro imagens-base da aula (<code>hello-world</code>, <code>alpine</code>, <code>python:3.12-slim</code>, <code>nginx:alpine</code>). Faltou alguma? <code>setup.sh</code>.</p></div>
+        <div class="callout warn"><strong>Depois, pare o Codespace</strong> — em github.com/codespaces, ⋯ → <em>Stop codespace</em>, para não gastar a franquia. No dia da aula é só abrir de novo: imagens e laboratórios continuam lá.</div>
+        <div class="box soft"><h3>Missão extra · opcional</h3><p>Execute <code>docker info</code> para consultar um resumo do serviço Docker. Procure a linha <code>Containers:</code>: ela mostra o total de containers, incluindo os parados. O <code>hello-world</code> deve estar nessa contagem.</p></div>
+      </div></div>`},
   ]});
 
 /* 1 */
@@ -512,17 +489,6 @@ D.push({n:1, key:'01', title:'Olá, container', mod:'Módulo 1 · Fundamentos', 
           </div>
         </div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Execute o teste novamente. Como a imagem já está disponível, não devem aparecer mensagens de download, como <em>Pulling</em>. O Docker cria um novo container:</div>${cmd('$ docker run hello-world')}`,
-        `<div class="t">Um container com Python dentro. O que vem depois da imagem é o comando a executar lá:</div>${cmd('$ docker run python:3.12-slim python -c "print(\'Olá, Docker!\')"')}`,
-        `<div class="t">Liste os containers em execução e, depois, todos os containers. Os dois programas já terminaram, mas seus containers aparecem na segunda lista:</div>${cmd('$ docker ps\n$ docker ps -a')}`,
-        `<div class="t">Agora liste as imagens disponíveis:</div>${cmd('$ docker images')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 01')}<p style="margin-top:10px;color:var(--muted)">Aprova com um container do <code>hello-world</code> e um do <code>python:3.12-slim</code> rodando um <code>print</code>.</p></div>
-        <div class="callout"><strong>Como ler a lista:</strong> IMAGE é a imagem; COMMAND, o comando; STATUS, o estado; e NAMES, o nome. <code>Exited (0)</code> significa que o programa terminou sem erro. Cada <code>docker run</code> acrescenta um container.</div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker run python:3.12-slim cat /etc/os-release\n$ cat /etc/os-release')}<p style="margin-top:8px;color:var(--muted)"><code>cat</code> mostra o conteúdo do arquivo. Compare as distribuições Linux do container e do Codespace: seus arquivos podem ser diferentes, mesmo compartilhando o kernel.</p></div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -535,6 +501,17 @@ D.push({n:1, key:'01', title:'Olá, container', mod:'Módulo 1 · Fundamentos', 
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.c_img, L.c_cont, L.c_reg, L.r_run, L.r_ps, L.r_images, L.h_python])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Execute o teste novamente. Como a imagem já está disponível, não devem aparecer mensagens de download, como <em>Pulling</em>. O Docker cria um novo container:</div>${cmd('$ docker run hello-world')}`,
+        `<div class="t">Um container com Python dentro. O que vem depois da imagem é o comando a executar lá:</div>${cmd('$ docker run python:3.12-slim python -c "print(\'Olá, Docker!\')"')}`,
+        `<div class="t">Liste os containers em execução e, depois, todos os containers. Os dois programas já terminaram, mas seus containers aparecem na segunda lista:</div>${cmd('$ docker ps\n$ docker ps -a')}`,
+        `<div class="t">Agora liste as imagens disponíveis:</div>${cmd('$ docker images')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 01')}<p style="margin-top:10px;color:var(--muted)">Aprova com um container do <code>hello-world</code> e um do <code>python:3.12-slim</code> rodando um <code>print</code>.</p></div>
+        <div class="callout"><strong>Como ler a lista:</strong> IMAGE é a imagem; COMMAND, o comando; STATUS, o estado; e NAMES, o nome. <code>Exited (0)</code> significa que o programa terminou sem erro. Cada <code>docker run</code> acrescenta um container.</div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker run python:3.12-slim cat /etc/os-release\n$ cat /etc/os-release')}<p style="margin-top:8px;color:var(--muted)"><code>cat</code> mostra o conteúdo do arquivo. Compare as distribuições Linux do container e do Codespace: seus arquivos podem ser diferentes, mesmo compartilhando o kernel.</p></div>
+      </div></div>`},
   ]});
 
 /* 2 */
@@ -568,16 +545,6 @@ D.push({n:2, key:'02', title:'Dentro do container', mod:'Módulo 1 · Fundamento
           </div>
         </div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Abra o Python interativo. Quando aparecer <code>&gt;&gt;&gt;</code>, digite <code>import platform; platform.platform()</code> para ver informações do sistema. Saia com <code>exit()</code>. De volta ao Codespace, <code>docker ps -a</code> confirma que <code>--rm</code> removeu esse container.</div>${cmd('$ docker run -it --rm python:3.12-slim')}`,
-        `<div class="t">Abra o <strong>Bash</strong>, um interpretador de comandos, também chamado de <em>shell</em>. Depois da primeira linha, os comandos serão executados <strong>dentro do container</strong>:</div>${cmd('$ docker run -it --name explorador python:3.12-slim bash\n$ cat /etc/os-release\n$ ls /\n$ hostname\n$ python --version')}`,
-        `<div class="t">Ainda dentro do container, crie um arquivo e saia. O símbolo <code>&gt;</code> grava o texto produzido por <code>echo</code> no arquivo indicado:</div>${cmd('$ echo "eu estive aqui" > /marca.txt\n$ exit')}`,
-        `<div class="t">De volta ao Codespace, tente ler o arquivo em <strong>outro</strong> container. O erro <em>No such file or directory</em> é esperado: o arquivo existe apenas no <code>explorador</code>.</div>${cmd('$ docker run --rm python:3.12-slim cat /marca.txt')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 02')}<p style="margin-top:10px;color:var(--muted)">Execute no terminal do Codespace. A verificação procura o arquivo no <code>explorador</code> e avisa se faltou remover o container do Python interativo.</p></div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker start -ai explorador\n$ cat /marca.txt\n$ exit')}<p style="margin-top:8px;color:var(--muted)">O arquivo continua lá. Parar o container preserva sua camada de arquivos; removê-lo com <code>docker rm</code> apaga essa camada.</p></div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -589,6 +556,16 @@ D.push({n:2, key:'02', title:'Dentro do container', mod:'Módulo 1 · Fundamento
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.c_cont, L.r_run, L.r_start, L.r_exec, L.r_cp])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Abra o Python interativo. Quando aparecer <code>&gt;&gt;&gt;</code>, digite <code>import platform; platform.platform()</code> para ver informações do sistema. Saia com <code>exit()</code>. De volta ao Codespace, <code>docker ps -a</code> confirma que <code>--rm</code> removeu esse container.</div>${cmd('$ docker run -it --rm python:3.12-slim')}`,
+        `<div class="t">Abra o <strong>Bash</strong>, um interpretador de comandos, também chamado de <em>shell</em>. Depois da primeira linha, os comandos serão executados <strong>dentro do container</strong>:</div>${cmd('$ docker run -it --name explorador python:3.12-slim bash\n$ cat /etc/os-release\n$ ls /\n$ hostname\n$ python --version')}`,
+        `<div class="t">Ainda dentro do container, crie um arquivo e saia. O símbolo <code>&gt;</code> grava o texto produzido por <code>echo</code> no arquivo indicado:</div>${cmd('$ echo "eu estive aqui" > /marca.txt\n$ exit')}`,
+        `<div class="t">De volta ao Codespace, tente ler o arquivo em <strong>outro</strong> container. O erro <em>No such file or directory</em> é esperado: o arquivo existe apenas no <code>explorador</code>.</div>${cmd('$ docker run --rm python:3.12-slim cat /marca.txt')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 02')}<p style="margin-top:10px;color:var(--muted)">Execute no terminal do Codespace. A verificação procura o arquivo no <code>explorador</code> e avisa se faltou remover o container do Python interativo.</p></div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker start -ai explorador\n$ cat /marca.txt\n$ exit')}<p style="margin-top:8px;color:var(--muted)">O arquivo continua lá. Parar o container preserva sua camada de arquivos; removê-lo com <code>docker rm</code> apaga essa camada.</p></div>
+      </div></div>`},
   ]});
 </script>
 <script>
@@ -616,18 +593,6 @@ D.push({n:3, key:'03', title:'Ciclo de vida', mod:'Módulo 1 · Fundamentos', ti
         </div>
         <div class="callout"><strong>-d: execução em segundo plano.</strong> O comando mostra o ID, uma sequência que identifica o container, e libera o terminal. Use <code>docker logs</code> para ler as mensagens ou <code>docker logs -f</code> para acompanhá-las. <kbd>Ctrl+C</kbd> encerra esse acompanhamento, mas mantém o container rodando.</div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Crie um relógio que mostra a hora a cada segundo. O trecho entre aspas repete <code>date</code> (data e hora) e <code>sleep 1</code> (espera de um segundo). Você pode copiá-lo como está:</div>${cmd("$ docker run -d --name relogio alpine sh -c 'while true; do date; sleep 1; done'")}`,
-        `<div class="t">Rodando (<code>Up … seconds</code>) e escrevendo nos logs:</div>${cmd('$ docker ps\n$ docker logs relogio\n$ docker logs -f relogio      # Ctrl+C sai do logs, não do container')}`,
-        `<div class="t">Pare o relógio e compare as duas listas. Neste exemplo, a parada pode demorar cerca de 10 segundos; aguarde o terminal ficar disponível:</div>${cmd('$ docker stop relogio\n$ docker ps                   # só os containers em execução\n$ docker ps -a                # inclui o relogio parado: Exited')}`,
-        `<div class="t">Inicie de novo. Os logs antigos continuam, e novos vão aparecendo:</div>${cmd('$ docker start relogio\n$ docker logs --tail 3 relogio')}`,
-        `<div class="t">Crie outro container e tente removê-lo. O erro da segunda linha é esperado. Na terceira, <code>&amp;&amp;</code> executa a remoção apenas se a parada funcionar:</div>${cmd('$ docker run -d --name descartavel alpine sleep 600\n$ docker rm descartavel                 # erro: está rodando\n$ docker stop descartavel && docker rm descartavel')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 03')}<p style="margin-top:10px;color:var(--muted)">Aprova com o <code>relogio</code> rodando (e já parado e iniciado ao menos uma vez) e o <code>descartavel</code> removido.</p></div>
-        <div class="callout"><strong>Nome ou ID:</strong> os comandos que recebem um container aceitam seu nome ou um início de ID que o identifique sem ambiguidade. Aqui, use <code>relogio</code> e <code>descartavel</code>.</div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker top relogio\n$ docker stats --no-stream relogio\n$ docker inspect relogio      # procure "State"')}<p style="margin-top:8px;color:var(--muted)">Consulte os programas em execução, o uso de processador e memória e os detalhes do container. <code>inspect</code> usa JSON, um formato de texto com nomes e valores.</p></div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -642,6 +607,18 @@ D.push({n:3, key:'03', title:'Ciclo de vida', mod:'Módulo 1 · Fundamentos', ti
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.run_guide, L.r_logs, L.r_stop, L.r_start, L.r_rm, L.r_ps, L.h_alpine])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Crie um relógio que mostra a hora a cada segundo. O trecho entre aspas repete <code>date</code> (data e hora) e <code>sleep 1</code> (espera de um segundo). Você pode copiá-lo como está:</div>${cmd("$ docker run -d --name relogio alpine sh -c 'while true; do date; sleep 1; done'")}`,
+        `<div class="t">Rodando (<code>Up … seconds</code>) e escrevendo nos logs:</div>${cmd('$ docker ps\n$ docker logs relogio\n$ docker logs -f relogio      # Ctrl+C sai do logs, não do container')}`,
+        `<div class="t">Pare o relógio e compare as duas listas. Neste exemplo, a parada pode demorar cerca de 10 segundos; aguarde o terminal ficar disponível:</div>${cmd('$ docker stop relogio\n$ docker ps                   # só os containers em execução\n$ docker ps -a                # inclui o relogio parado: Exited')}`,
+        `<div class="t">Inicie de novo. Os logs antigos continuam, e novos vão aparecendo:</div>${cmd('$ docker start relogio\n$ docker logs --tail 3 relogio')}`,
+        `<div class="t">Crie outro container e tente removê-lo. O erro da segunda linha é esperado. Na terceira, <code>&amp;&amp;</code> executa a remoção apenas se a parada funcionar:</div>${cmd('$ docker run -d --name descartavel alpine sleep 600\n$ docker rm descartavel                 # erro: está rodando\n$ docker stop descartavel && docker rm descartavel')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 03')}<p style="margin-top:10px;color:var(--muted)">Aprova com o <code>relogio</code> rodando (e já parado e iniciado ao menos uma vez) e o <code>descartavel</code> removido.</p></div>
+        <div class="callout"><strong>Nome ou ID:</strong> os comandos que recebem um container aceitam seu nome ou um início de ID que o identifique sem ambiguidade. Aqui, use <code>relogio</code> e <code>descartavel</code>.</div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker top relogio\n$ docker stats --no-stream relogio\n$ docker inspect relogio      # procure "State"')}<p style="margin-top:8px;color:var(--muted)">Consulte os programas em execução, o uso de processador e memória e os detalhes do container. <code>inspect</code> usa JSON, um formato de texto com nomes e valores.</p></div>
+      </div></div>`},
   ]});
 
 /* 4 */
@@ -682,17 +659,6 @@ CMD ["python", "/app/receitas.py"]`)}
           </div>
         </div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 6 min', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Execute <code>code Dockerfile</code>. No editor, copie as três instruções do slide anterior e salve. Use D maiúsculo e não acrescente <code>.txt</code> ao nome do arquivo.</div>`,
-        `<div class="t">Volte ao terminal e construa a imagem. <code>-t</code> define o nome <code>receitas</code> e a tag <code>1.0</code>; o ponto indica a pasta atual:</div>${cmd('$ docker build -t receitas:1.0 .')}`,
-        `<div class="t">Confira se a imagem aparece na lista:</div>${cmd('$ docker images receitas')}`,
-        `<div class="t">Execute um container. O comando Python já está definido em <code>CMD</code>, por isso você só precisa informar a imagem:</div>${cmd('$ docker run --rm receitas:1.0')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 04')}<p style="margin-top:10px;color:var(--muted)">Roda a sua imagem e confere que o livro de receitas aparece.</p></div>
-        <div class="callout"><strong>Se precisar corrigir:</strong> salve o Dockerfile e repita o <code>docker build</code>. A tag passará a apontar para a imagem atualizada. Para executar outro comando no lugar de <code>CMD</code>, use, por exemplo, <code>docker run --rm receitas:1.0 python --version</code>.</div>
-        <div class="box soft"><h3>Missão extra · tags</h3>${cmd('$ docker tag receitas:1.0 receitas:latest\n$ docker images receitas      # mesmo IMAGE ID, dois nomes\n$ docker run --rm receitas    # sem tag = latest')}</div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -704,6 +670,17 @@ CMD ["python", "/app/receitas.py"]`)}
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.c_df, L.df_from, L.df_copy, L.df_cmd, L.r_build, L.r_tag, L.r_images])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 6 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Execute <code>code Dockerfile</code>. No editor, copie as três instruções do slide <a href="#/d/04/2">Dockerfile → imagem → container</a> e salve. Use D maiúsculo e não acrescente <code>.txt</code> ao nome do arquivo.</div>`,
+        `<div class="t">Volte ao terminal e construa a imagem. <code>-t</code> define o nome <code>receitas</code> e a tag <code>1.0</code>; o ponto indica a pasta atual:</div>${cmd('$ docker build -t receitas:1.0 .')}`,
+        `<div class="t">Confira se a imagem aparece na lista:</div>${cmd('$ docker images receitas')}`,
+        `<div class="t">Execute um container. O comando Python já está definido em <code>CMD</code>, por isso você só precisa informar a imagem:</div>${cmd('$ docker run --rm receitas:1.0')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 04')}<p style="margin-top:10px;color:var(--muted)">Roda a sua imagem e confere que o livro de receitas aparece.</p></div>
+        <div class="callout"><strong>Se precisar corrigir:</strong> salve o Dockerfile e repita o <code>docker build</code>. A tag passará a apontar para a imagem atualizada. Para executar outro comando no lugar de <code>CMD</code>, use, por exemplo, <code>docker run --rm receitas:1.0 python --version</code>.</div>
+        <div class="box soft"><h3>Missão extra · tags</h3>${cmd('$ docker tag receitas:1.0 receitas:latest\n$ docker images receitas      # mesmo IMAGE ID, dois nomes\n$ docker run --rm receitas    # sem tag = latest')}</div>
+      </div></div>`},
   ]});
 
 /* 5 */
@@ -745,17 +722,6 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)`)}<p style="margin-top:10px">Este trecho é apenas para consulta. O FastAPI define as <strong>rotas</strong>, caminhos como <code>/receitas</code>. O uvicorn recebe os pedidos e envia as respostas. A porta <code>8000</code> identifica onde ele recebe conexões; veremos o acesso no desafio 8.</p></div>
         <div class="callout"><strong>Como ler pip install:</strong> <code>pip</code> instala pacotes Python; <code>-r requirements.txt</code> indica a lista de pacotes; <code>--no-cache-dir</code> evita guardar os arquivos de download na imagem. Se a instalação falhar, a construção para e mostra o erro.</div>
       </div></div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 6 min', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Execute <code>code Dockerfile</code>, copie as cinco instruções do slide anterior e salve. Mantenha a ordem do exemplo; no próximo desafio, vamos melhorá-la.</div>`,
-        `<div class="t">Construa e acompanhe o <code>pip install</code> rodando <strong>dentro</strong> do build:</div>${cmd('$ docker build -t receitas-api:1.0 .')}`,
-        `<div class="t">As bibliotecas ficaram na imagem:</div>${cmd('$ docker run --rm receitas-api:1.0 pip list')}`,
-        `<div class="t">Execute a API e observe as mensagens. Ela continuará aguardando pedidos. Pressione <kbd>Ctrl+C</kbd> para encerrar antes de verificar o desafio. O acesso pelo navegador será configurado no desafio 8.</div>${cmd('$ docker run --rm receitas-api:1.0')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 05')}<p style="margin-top:10px;color:var(--muted)">Confere WORKDIR, o pip no Dockerfile, o FastAPI dentro da imagem e o CMD rodando o app.py.</p></div>
-        <div class="callout"><strong>Nome e tag:</strong> em <code>receitas-api:1.0</code>, o nome é <code>receitas-api</code>, e a tag é <code>1.0</code>. Isso distingue a API do programa anterior, <code>receitas:1.0</code>. Use os nomes do enunciado para que a verificação encontre as imagens.</div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker images\n$ docker run --rm receitas-api:1.0 python -c "import fastapi; print(fastapi.__version__)"')}<p style="margin-top:8px;color:var(--muted)">A diferença de tamanho entre <code>python:3.12-slim</code> e <code>receitas-api:1.0</code> é o FastAPI, o uvicorn e o seu código.</p></div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -767,12 +733,23 @@ if __name__ == "__main__":
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.df_wd, L.df_run, L.df_cmd, L.c_df, L.h_python])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 6 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Execute <code>code Dockerfile</code>, copie as cinco instruções do slide <a href="#/d/05/2">Construir a imagem e executar o programa</a> e salve. Mantenha a ordem do exemplo; o desafio opcional 6 mostra como melhorá-la.</div>`,
+        `<div class="t">Construa e acompanhe o <code>pip install</code> rodando <strong>dentro</strong> do build:</div>${cmd('$ docker build -t receitas-api:1.0 .')}`,
+        `<div class="t">As bibliotecas ficaram na imagem:</div>${cmd('$ docker run --rm receitas-api:1.0 pip list')}`,
+        `<div class="t">Execute a API e observe as mensagens. Ela continuará aguardando pedidos. Pressione <kbd>Ctrl+C</kbd> para encerrar antes de verificar o desafio. O acesso pelo navegador será configurado no desafio 8.</div>${cmd('$ docker run --rm receitas-api:1.0')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 05')}<p style="margin-top:10px;color:var(--muted)">Confere WORKDIR, o pip no Dockerfile, o FastAPI dentro da imagem e o CMD rodando o app.py.</p></div>
+        <div class="callout"><strong>Nome e tag:</strong> em <code>receitas-api:1.0</code>, o nome é <code>receitas-api</code>, e a tag é <code>1.0</code>. Isso distingue a API do programa anterior, <code>receitas:1.0</code>. Use os nomes do enunciado para que a verificação encontre as imagens.</div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker images\n$ docker run --rm receitas-api:1.0 python -c "import fastapi; print(fastapi.__version__)"')}<p style="margin-top:8px;color:var(--muted)">A diferença de tamanho entre <code>python:3.12-slim</code> e <code>receitas-api:1.0</code> é o FastAPI, o uvicorn e o seu código.</p></div>
+      </div></div>`},
   ]});
 
 /* 6 */
-D.push({n:6, key:'06', title:'Camadas e cache', mod:'Módulo 2 · Dockerfile', time:5, el:false, cmds:['ordem das instruções','docker history','CACHED'],
+D.push({n:6, key:'06', title:'Camadas e cache', mod:'Módulo 2 · Dockerfile', time:5, el:true, cmds:['ordem das instruções','docker history','CACHED'],
   slides:[
-    {h:'Camadas e cache', body: cover({n:6,time:5,el:false,mod:'Módulo 2 · Dockerfile',cmds:['COPY requirements.txt .','RUN pip install','COPY . .','docker history']},
+    {h:'Camadas e cache', body: cover({n:6,time:5,el:true,mod:'Módulo 2 · Dockerfile',cmds:['COPY requirements.txt .','RUN pip install','COPY . .','docker history']},
       'Organizar o Dockerfile para <strong>reaproveitar a instalação das dependências</strong> quando você alterar apenas o código. Esse reaproveitamento de resultados anteriores é chamado de <strong>cache</strong>.',
       cmd('$ cd ~/labs/06-camadas-e-cache') + '<p style="margin-top:10px;color:var(--muted)"><code>app.py</code>, <code>requirements.txt</code> e um <code>Dockerfile</code> igual ao do desafio 5: <code>COPY . .</code> <strong>antes</strong> do <code>pip install</code>.</p>')},
     {h:'O que precisa ser construído de novo?', eyebrow:'Conceito · camadas e cache', body:`
@@ -799,6 +776,17 @@ D.push({n:6, key:'06', title:'Camadas e cache', mod:'Módulo 2 · Dockerfile', t
           <div class="box"><h3>Como organizar o Dockerfile</h3><p>Copie primeiro <code>requirements.txt</code> e instale as dependências. Depois, copie o código. Assim, editar uma receita em <code>app.py</code> não obriga o Docker a repetir a instalação.</p><p>Nem toda instrução acrescenta arquivos: <code>CMD</code>, por exemplo, guarda uma configuração.</p></div>
         </div>
       </div>`},
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
+      <div class="cols s2">
+        ${kv([
+          ['docker history <imagem>','as camadas, com instrução e tamanho'],
+          ['docker build --no-cache …','ignora o cache e refaz tudo'],
+          ['docker build --progress=plain …','saída completa, sem redesenhar a tela'],
+          ['COPY requirements.txt .','copie primeiro o que muda menos'],
+          ['docker system df','quanto disco o cache de build ocupa (desafio 15)'],
+        ])}
+        <div class="box soft"><h3>Documentação</h3>${docs([L.c_layers, L.c_cache, L.cache, L.best, L.r_hist])}</div>
+      </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
       <div class="cols s2"><div class="stack">${steps([
         `<div class="t">Construa uma vez:</div>${cmd('$ docker build -t receitas-api:1.1 .')}`,
@@ -814,17 +802,6 @@ COPY . .`)}`,
         <div class="callout"><strong>O que observar:</strong> procure <code>CACHED</code> na etapa <code>RUN pip install</code>. O instalador já preparou parte do cache, então essa indicação também pode aparecer na primeira construção com a nova ordem.</div>
         <div class="box soft"><h3>Missão extra</h3>${cmd('$ time docker build --no-cache -t receitas-api:1.1 .\n$ time docker build -t receitas-api:1.1 .')}<p style="margin-top:8px;color:var(--muted)"><code>time</code> mede a duração. Compare o valor de <code>real</code> na construção sem cache e na seguinte.</p></div>
       </div></div>`},
-    {h:'Comandos e documentação', eyebrow:'Referência', body:`
-      <div class="cols s2">
-        ${kv([
-          ['docker history <imagem>','as camadas, com instrução e tamanho'],
-          ['docker build --no-cache …','ignora o cache e refaz tudo'],
-          ['docker build --progress=plain …','saída completa, sem redesenhar a tela'],
-          ['COPY requirements.txt .','copie primeiro o que muda menos'],
-          ['docker system df','quanto disco o cache de build ocupa (desafio 15)'],
-        ])}
-        <div class="box soft"><h3>Documentação</h3>${docs([L.c_layers, L.c_cache, L.cache, L.best, L.r_hist])}</div>
-      </div>`},
   ]});
 </script>
 <script>
@@ -857,7 +834,17 @@ D.push({n:7, key:'07', title:'O que não entra na imagem', mod:'Módulo 2 · Doc
           </div>
         </div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 4 min · pode ficar para depois da aula', body:`
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
+      <div class="cols s2">
+        ${kv([
+          ['.dockerignore','arquivo na pasta do projeto; lista os itens que devem ficar fora da imagem'],
+          ['docker run --rm <img> ls -A /app','lista os arquivos copiados para /app, inclusive os que começam com ponto'],
+          ['docker images <nome>','tamanhos de cada tag'],
+          ['docker build --progress=plain .','mostra "transferring context: X MB": quanto foi enviado ao daemon'],
+        ])}
+        <div class="box soft"><h3>Documentação</h3>${docs([L.ctx, L.best, L.c_df])}</div>
+      </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 4 min', body:`
       <div class="cols s2"><div class="stack">${steps([
         `<div class="t">Construa a imagem e liste os arquivos em <code>/app</code>. Sem o filtro, a senha fictícia também é copiada:</div>${cmd('$ docker build -t receitas-api:1.2 .\n$ docker run --rm receitas-api:1.2 ls -A /app\n$ docker run --rm receitas-api:1.2 cat /app/.env')}`,
         `<div class="t">Execute <code>code .dockerignore</code>, copie a lista abaixo para o arquivo e salve:</div>${cmd(`.venv
@@ -869,18 +856,8 @@ fotos`)}`,
       ])}</div><div class="stack">
         <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 07')}<p style="margin-top:10px;color:var(--muted)">Lista <code>/app</code> dentro da imagem e reprova se algum dos cinco estiver lá.</p></div>
         <div class="box soft"><h3>Missão extra</h3><p>Inclua também <code>Dockerfile</code> e <code>.dockerignore</code> no <code>.dockerignore</code>: servem para construir a imagem, não precisam estar dentro dela. Compare os tamanhos com <code>docker images receitas-api</code>.</p></div>
-        <div class="callout warn"><strong>Se faltar tempo:</strong> este desafio pode ser feito depois da aula. O intervalo está previsto para o fim deste bloco.</div>
+        <div class="callout warn"><strong>Desafio opcional:</strong> pode ser feito depois da aula. O intervalo está previsto para o fim deste bloco.</div>
       </div></div>`},
-    {h:'Comandos e documentação', eyebrow:'Referência', body:`
-      <div class="cols s2">
-        ${kv([
-          ['.dockerignore','arquivo na pasta do projeto; lista os itens que devem ficar fora da imagem'],
-          ['docker run --rm <img> ls -A /app','lista os arquivos copiados para /app, inclusive os que começam com ponto'],
-          ['docker images <nome>','tamanhos de cada tag'],
-          ['docker build --progress=plain .','mostra "transferring context: X MB": quanto foi enviado ao daemon'],
-        ])}
-        <div class="box soft"><h3>Documentação</h3>${docs([L.ctx, L.best, L.c_df])}</div>
-      </div>`},
   ]});
 
 /* 8 */
@@ -899,18 +876,6 @@ D.push({n:8, key:'08', title:'Abrindo portas', mod:'Módulo 3 · Portas e config
         </div>
         <div class="callout"><strong>Terminal e navegador usam endereços diferentes.</strong> No terminal do Codespace, <code>localhost</code> aponta para o Codespace. No navegador do seu computador, use o endereço fornecido pela aba <strong>PORTS</strong>: passe o mouse sobre a porta e clique no globo, <em>Open in Browser</em>. O acesso depende da configuração de visibilidade da porta.</div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Abra o <code>Dockerfile</code>, acrescente <code>EXPOSE 8000</code> antes de <code>CMD</code> e salve. No terminal, construa a imagem:</div>${cmd('$ docker build -t receitas-api:1.3 .')}`,
-        `<div class="t">Rode em segundo plano, publicando a porta:</div>${cmd('$ docker run -d --name api -p 8001:8000 receitas-api:1.3')}`,
-        `<div class="t">Teste com <code>curl</code>, que acessa o endereço e mostra a resposta no terminal. Depois, consulte a ligação entre as portas:</div>${cmd('$ curl localhost:8001/receitas\n$ docker port api')}`,
-        `<div class="t">Na aba <strong>PORTS</strong>, abra a porta <strong>8001</strong> pelo ícone de globo. Acrescente <code>/docs</code> ao endereço. Nessa página, expanda <strong>GET /receitas</strong>, clique em <strong>Try it out</strong> e depois em <strong>Execute</strong> para testar a API.</div>`,
-        `<div class="t">Cada pedido à API, chamado de <strong>requisição</strong>, aparece nos logs:</div>${cmd('$ docker logs api')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 08')}<p style="margin-top:10px;color:var(--muted)">Confere o <code>EXPOSE</code>, o container <code>api</code> na 8001 e a resposta de <code>/receitas</code>.</p></div>
-        <div class="callout warn"><strong>Se a conexão falhar logo no início:</strong> espere alguns segundos e tente novamente. Já <em>port is already allocated</em> significa que a porta está ocupada. Consulte <code>docker ps</code> para identificar o container que a usa; a verificação deste desafio espera a porta 8001.</div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker run -d --name api2 -p 8005:8000 receitas-api:1.3\n$ curl localhost:8005/receitas\n$ docker rm -f api2')}<p style="margin-top:8px;color:var(--muted)">Duas cópias da mesma imagem, lado a lado, em portas diferentes.</p></div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -923,6 +888,18 @@ D.push({n:8, key:'08', title:'Abrindo portas', mod:'Módulo 3 · Portas e config
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.c_ports, L.df_expose, L.r_port, L.gh_ports, L.r_run])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Abra o <code>Dockerfile</code>, acrescente <code>EXPOSE 8000</code> antes de <code>CMD</code> e salve. No terminal, construa a imagem:</div>${cmd('$ docker build -t receitas-api:1.3 .')}`,
+        `<div class="t">Rode em segundo plano, publicando a porta:</div>${cmd('$ docker run -d --name api -p 8001:8000 receitas-api:1.3')}`,
+        `<div class="t">Teste com <code>curl</code>, que acessa o endereço e mostra a resposta no terminal. Depois, consulte a ligação entre as portas:</div>${cmd('$ curl localhost:8001/receitas\n$ docker port api')}`,
+        `<div class="t">Na aba <strong>PORTS</strong>, abra a porta <strong>8001</strong> pelo ícone de globo. Acrescente <code>/docs</code> ao endereço. Nessa página, expanda <strong>GET /receitas</strong>, clique em <strong>Try it out</strong> e depois em <strong>Execute</strong> para testar a API.</div>`,
+        `<div class="t">Cada pedido à API, chamado de <strong>requisição</strong>, aparece nos logs:</div>${cmd('$ docker logs api')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 08')}<p style="margin-top:10px;color:var(--muted)">Confere o <code>EXPOSE</code>, o container <code>api</code> na 8001 e a resposta de <code>/receitas</code>.</p></div>
+        <div class="callout warn"><strong>Se a conexão falhar logo no início:</strong> espere alguns segundos e tente novamente. Já <em>port is already allocated</em> significa que a porta está ocupada. Consulte <code>docker ps</code> para identificar o container que a usa; a verificação deste desafio espera a porta 8001.</div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker run -d --name api2 -p 8005:8000 receitas-api:1.3\n$ curl localhost:8005/receitas\n$ docker rm -f api2')}<p style="margin-top:8px;color:var(--muted)">Duas cópias da mesma imagem, lado a lado, em portas diferentes.</p></div>
+      </div></div>`},
   ]});
 
 /* 9 */
@@ -949,16 +926,6 @@ COZINHA = os.environ.get("COZINHA", "Cozinha sem nome")`)}<p style="margin-top:1
           </div>
         </div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">No Dockerfile, acrescente <code>ENV COZINHA="Cozinha do Curso"</code> antes de <code>EXPOSE</code> e salve. Construa e consulte o valor padrão:</div>${cmd('$ docker build -t receitas-api:1.4 .\n$ docker run --rm receitas-api:1.4 env | grep COZINHA')}`,
-        `<div class="t">Crie o container com outro valor, usando <code>-e</code>. A resposta da API deve incluir <code>Cozinha da Ana</code>:</div>${cmd('$ docker run -d --name cozinha -p 8002:8000 -e COZINHA="Cozinha da Ana" receitas-api:1.4\n$ curl localhost:8002/')}`,
-        `<div class="t">Confira o valor configurado nesse container:</div>${cmd('$ docker exec cozinha env | grep COZINHA')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 09')}<p style="margin-top:10px;color:var(--muted)">Aprova quando a imagem tem um padrão e o <code>cozinha</code> roda com um valor <strong>diferente</strong>, respondendo em <code>localhost:8002</code>.</p></div>
-        <div class="callout"><strong>O que faz o símbolo |?</strong> Ele passa a saída de um comando para o seguinte. Aqui, <code>env</code> lista as variáveis, e <code>grep COZINHA</code> seleciona as linhas que contêm esse nome.</div>
-        <div class="box soft"><h3>Missão extra · usar um arquivo</h3>${cmd('$ cat cozinha.env\n$ docker rm -f cozinha\n$ docker run -d --name cozinha -p 8002:8000 --env-file cozinha.env receitas-api:1.4\n$ curl localhost:8002/')}<p style="margin-top:8px;color:var(--muted)">O arquivo usa uma linha <code>NOME=valor</code> por variável. A verificação reconhece a missão extra quando o container usa o nome de cozinha desse arquivo.</p></div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -970,12 +937,22 @@ COZINHA = os.environ.get("COZINHA", "Cozinha sem nome")`)}<p style="margin-top:1
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.c_over, L.df_env, L.r_run, L.r_exec])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">No Dockerfile, acrescente <code>ENV COZINHA="Cozinha do Curso"</code> antes de <code>EXPOSE</code> e salve. Construa e consulte o valor padrão:</div>${cmd('$ docker build -t receitas-api:1.4 .\n$ docker run --rm receitas-api:1.4 env | grep COZINHA')}`,
+        `<div class="t">Crie o container com outro valor, usando <code>-e</code>. A resposta da API deve incluir <code>Cozinha da Ana</code>:</div>${cmd('$ docker run -d --name cozinha -p 8002:8000 -e COZINHA="Cozinha da Ana" receitas-api:1.4\n$ curl localhost:8002/')}`,
+        `<div class="t">Confira o valor configurado nesse container:</div>${cmd('$ docker exec cozinha env | grep COZINHA')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 09')}<p style="margin-top:10px;color:var(--muted)">Aprova quando a imagem tem um padrão e o <code>cozinha</code> roda com um valor <strong>diferente</strong>, respondendo em <code>localhost:8002</code>.</p></div>
+        <div class="callout"><strong>O que faz o símbolo |?</strong> Ele passa a saída de um comando para o seguinte. Aqui, <code>env</code> lista as variáveis, e <code>grep COZINHA</code> seleciona as linhas que contêm esse nome.</div>
+        <div class="box soft"><h3>Missão extra · usar um arquivo</h3>${cmd('$ cat cozinha.env\n$ docker rm -f cozinha\n$ docker run -d --name cozinha -p 8002:8000 --env-file cozinha.env receitas-api:1.4\n$ curl localhost:8002/')}<p style="margin-top:8px;color:var(--muted)">O arquivo usa uma linha <code>NOME=valor</code> por variável. A verificação reconhece a missão extra quando o container usa o nome de cozinha desse arquivo.</p></div>
+      </div></div>`},
   ]});
 
 /* 10 */
-D.push({n:10, key:'10', title:'Editando ao vivo', mod:'Módulo 4 · Dados', time:5, el:false, cmds:['bind mount','-v "$PWD:/app"'],
+D.push({n:10, key:'10', title:'Editando ao vivo', mod:'Módulo 4 · Dados', time:5, el:true, cmds:['bind mount','-v "$PWD:/app"'],
   slides:[
-    {h:'Editando ao vivo', body: cover({n:10,time:5,el:false,mod:'Módulo 4 · Dados',cmds:['docker run -v "$PWD:/app"','reload=True','docker logs','docker exec']},
+    {h:'Editando ao vivo', body: cover({n:10,time:5,el:true,mod:'Módulo 4 · Dados',cmds:['docker run -v "$PWD:/app"','reload=True','docker logs','docker exec']},
       'Editar o programa no VS Code e ver a alteração na API <strong>sem reconstruir a imagem</strong>. Você vai compartilhar a pasta do projeto com o container usando um <strong>bind mount</strong>.',
       cmd('$ cd ~/labs/10-editando-ao-vivo') + '<p style="margin-top:10px;color:var(--muted)">A API completa. Uma diferença no <code>app.py</code>: <code>uvicorn.run("app:app", ..., reload=True)</code>, que faz o servidor reiniciar sozinho quando o arquivo muda.</p>')},
     {h:'Bind mount', eyebrow:'Conceito · a mesma pasta, vista dos dois lados', body:`
@@ -998,16 +975,6 @@ D.push({n:10, key:'10', title:'Editando ao vivo', mod:'Módulo 4 · Dados', time
           </div>
         </div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Construa e rode com a pasta montada:</div>${cmd('$ docker build -t receitas-api:1.5 .\n$ docker run -d --name dev -p 8003:8000 -v "$PWD:/app" receitas-api:1.5\n$ curl localhost:8003/receitas')}`,
-        `<div class="t">Execute <code>code app.py</code>. Acrescente a linha abaixo à lista <code>RECEITAS</code>, antes do <code>]</code> final, com o mesmo alinhamento das outras receitas:</div>${cmd('{"nome": "Pudim", "rende": "8 porções"},')}<p>Salve e consulte os logs. Uma mensagem com <em>Reloading</em> indica que o programa está recarregando:</p>${cmd('$ docker logs dev')}`,
-        `<div class="t">Consulte a API novamente. O Pudim deve aparecer sem você reconstruir a imagem nem reiniciar o container manualmente:</div>${cmd('$ curl localhost:8003/receitas')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 10')}<p style="margin-top:10px;color:var(--muted)">Confere o mount desta pasta em <code>/app</code>, o Pudim no <code>app.py</code> e na resposta da API.</p></div>
-        <div class="callout"><strong>Compare com a imagem:</strong> <code>docker run --rm receitas-api:1.5 cat app.py</code> mostra o arquivo original, sem Pudim. Já o container <code>dev</code> acessa o arquivo atualizado da pasta compartilhada.</div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker exec dev sh -c \'echo "escrito de dentro" > /app/de-dentro.txt\'\n$ cat de-dentro.txt\n$ rm de-dentro.txt')}<p style="margin-top:8px;color:var(--muted)">Escrito de dentro, aparece fora. É a mesma pasta.</p></div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -1019,6 +986,16 @@ D.push({n:10, key:'10', title:'Editando ao vivo', mod:'Módulo 4 · Dados', time
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.c_share, L.binds, L.r_run, L.r_exec])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Construa e rode com a pasta montada:</div>${cmd('$ docker build -t receitas-api:1.5 .\n$ docker run -d --name dev -p 8003:8000 -v "$PWD:/app" receitas-api:1.5\n$ curl localhost:8003/receitas')}`,
+        `<div class="t">Execute <code>code app.py</code>. Acrescente a linha abaixo à lista <code>RECEITAS</code>, antes do <code>]</code> final, com o mesmo alinhamento das outras receitas:</div>${cmd('{"nome": "Pudim", "rende": "8 porções"},')}<p>Salve e consulte os logs. Uma mensagem com <em>Reloading</em> indica que o programa está recarregando:</p>${cmd('$ docker logs dev')}`,
+        `<div class="t">Consulte a API novamente. O Pudim deve aparecer sem você reconstruir a imagem nem reiniciar o container manualmente:</div>${cmd('$ curl localhost:8003/receitas')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 10')}<p style="margin-top:10px;color:var(--muted)">Confere o mount desta pasta em <code>/app</code>, o Pudim no <code>app.py</code> e na resposta da API.</p></div>
+        <div class="callout"><strong>Compare com a imagem:</strong> <code>docker run --rm receitas-api:1.5 cat app.py</code> mostra o arquivo original, sem Pudim. Já o container <code>dev</code> acessa o arquivo atualizado da pasta compartilhada.</div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker exec dev sh -c \'echo "escrito de dentro" > /app/de-dentro.txt\'\n$ cat de-dentro.txt\n$ rm de-dentro.txt')}<p style="margin-top:8px;color:var(--muted)">Escrito de dentro, aparece fora. É a mesma pasta.</p></div>
+      </div></div>`},
   ]});
 </script>
 <script>
@@ -1050,16 +1027,6 @@ D.push({n:11, key:'11', title:'Dados que ficam', mod:'Módulo 4 · Dados', time:
           <div class="box"><h3>Nome de volume ou caminho de pasta?</h3><p><code>-v notas:/dados</code> usa o volume chamado <code>notas</code>. <code>-v "$PWD:/dados"</code> compartilha a pasta atual. Nos dois casos, o programa acessa os arquivos pelo caminho <code>/dados</code> dentro do container.</p></div>
         </div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 5 min · pode ficar para depois da aula', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Construa a imagem e execute o bloco de notas duas vezes. A segunda execução mostra <strong>apenas</strong> "assar o bolo": a primeira nota estava no container removido por <code>--rm</code>.</div>${cmd('$ docker build -t bloco:1.0 .\n$ docker run --rm bloco:1.0 "comprar cenouras"\n$ docker run --rm bloco:1.0 "assar o bolo"')}`,
-        `<div class="t">Crie um volume e ligue-o à pasta <code>/dados</code> do container. Agora as duas notas aparecem: containers diferentes, mesmo volume.</div>${cmd('$ docker volume create notas\n$ docker run --rm -v notas:/dados bloco:1.0 "comprar cenouras"\n$ docker run --rm -v notas:/dados bloco:1.0 "assar o bolo"')}`,
-        `<div class="t">Execute sem passar uma nova nota para apenas ler as anteriores. Depois, liste os volumes e consulte os detalhes de <code>notas</code>:</div>${cmd('$ docker run --rm -v notas:/dados bloco:1.0\n$ docker volume ls\n$ docker volume inspect notas')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 11')}<p style="margin-top:10px;color:var(--muted)">Lê o volume com outro container e espera pelo menos duas notas.</p></div>
-        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker run --rm -v notas:/dados alpine cat /dados/notas.txt')}<p style="margin-top:8px;color:var(--muted)">Leia as notas com outra imagem. Depois, <code>docker volume rm notas</code> apaga o volume e seu conteúdo. Para recomeçar, use <code>reset.sh 11</code>, entre novamente na pasta e repita o exercício.</p></div>
-        <div class="callout warn"><strong>Se faltar tempo:</strong> você pode fazer este desafio depois da aula e seguir para o bloco de vários containers.</div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -1072,6 +1039,16 @@ D.push({n:11, key:'11', title:'Dados que ficam', mod:'Módulo 4 · Dados', time:
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.c_persist, L.vols, L.r_vol, L.df_entry])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Construa a imagem e execute o bloco de notas duas vezes. A segunda execução mostra <strong>apenas</strong> "assar o bolo": a primeira nota estava no container removido por <code>--rm</code>.</div>${cmd('$ docker build -t bloco:1.0 .\n$ docker run --rm bloco:1.0 "comprar cenouras"\n$ docker run --rm bloco:1.0 "assar o bolo"')}`,
+        `<div class="t">Crie um volume e ligue-o à pasta <code>/dados</code> do container. Agora as duas notas aparecem: containers diferentes, mesmo volume.</div>${cmd('$ docker volume create notas\n$ docker run --rm -v notas:/dados bloco:1.0 "comprar cenouras"\n$ docker run --rm -v notas:/dados bloco:1.0 "assar o bolo"')}`,
+        `<div class="t">Execute sem passar uma nova nota para apenas ler as anteriores. Depois, liste os volumes e consulte os detalhes de <code>notas</code>:</div>${cmd('$ docker run --rm -v notas:/dados bloco:1.0\n$ docker volume ls\n$ docker volume inspect notas')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 11')}<p style="margin-top:10px;color:var(--muted)">Lê o volume com outro container e espera pelo menos duas notas.</p></div>
+        <div class="box soft"><h3>Missão extra</h3>${cmd('$ docker run --rm -v notas:/dados alpine cat /dados/notas.txt')}<p style="margin-top:8px;color:var(--muted)">Leia as notas com outra imagem. Depois, <code>docker volume rm notas</code> apaga o volume e seu conteúdo. Para recomeçar, use <code>reset.sh 11</code>, entre novamente na pasta e repita o exercício.</p></div>
+        <div class="callout warn"><strong>Desafio opcional:</strong> pode ser feito depois da aula. Para continuar agora, siga para o bloco de vários containers.</div>
+      </div></div>`},
   ]});
 
 /* 12 */
@@ -1102,6 +1079,17 @@ D.push({n:12, key:'12', title:'Site estático', mod:'Módulo 5 · Vários contai
           </div>
         </div>
       </div>`},
+    {h:'Comandos e documentação', eyebrow:'Referência', body:`
+      <div class="cols s2">
+        ${kv([
+          ['FROM nginx:alpine','usa a imagem que já contém o servidor nginx'],
+          ['COPY site/ /usr/share/nginx/html/','copia os arquivos do site para a pasta usada pelo nginx'],
+          ['docker run -d --name web -p 8080:80 …','liga a porta 8080 do Codespace à porta 80 do nginx'],
+          ['docker logs web','o log de acesso: uma linha por requisição'],
+          ['docker exec web ls /usr/share/nginx/html','conferir o que chegou lá'],
+        ])}
+        <div class="box soft"><h3>Documentação</h3>${docs([L.h_nginx, L.c_reg, L.df_copy, L.r_logs, L.gh_ports])}</div>
+      </div>`},
     {h:'O desafio', eyebrow:'Tarefa · 5 min', body:`
       <div class="cols s2"><div class="stack">${steps([
         `<div class="t">Execute <code>code Dockerfile</code>, copie o conteúdo abaixo para o arquivo e salve:</div>${cmd(`FROM nginx:alpine
@@ -1114,17 +1102,6 @@ COPY site/ /usr/share/nginx/html/`)}`,
         <div class="callout"><strong>Confira o destino do COPY.</strong> O comando copia o conteúdo da pasta: <code>site/index.html</code> deve virar <code>/usr/share/nginx/html/index.html</code>. Se o destino terminar em <code>/html/site/</code>, o site ficará em uma subpasta, e o endereço inicial poderá mostrar a página padrão do nginx.</div>
         <div class="box soft"><h3>Missão extra · editar ao vivo</h3>${cmd('$ docker rm -f web\n$ docker run -d --name web -p 8080:80 -v "$PWD/site:/usr/share/nginx/html" receitas-web:1.0')}<p style="margin-top:8px;color:var(--muted)">Abra <code>site/index.html</code> no editor. Troque o texto entre <code>&lt;h1&gt;</code> e <code>&lt;/h1&gt;</code> por <code>Livro de receitas da turma</code>, salve e recarregue a página. Mantenha a expressão <code>Livro de receitas</code> para a verificação reconhecer o site.</p></div>
       </div></div>`},
-    {h:'Comandos e documentação', eyebrow:'Referência', body:`
-      <div class="cols s2">
-        ${kv([
-          ['FROM nginx:alpine','usa a imagem que já contém o servidor nginx'],
-          ['COPY site/ /usr/share/nginx/html/','copia os arquivos do site para a pasta usada pelo nginx'],
-          ['docker run -d --name web -p 8080:80 …','liga a porta 8080 do Codespace à porta 80 do nginx'],
-          ['docker logs web','o log de acesso: uma linha por requisição'],
-          ['docker exec web ls /usr/share/nginx/html','conferir o que chegou lá'],
-        ])}
-        <div class="box soft"><h3>Documentação</h3>${docs([L.h_nginx, L.c_reg, L.df_copy, L.r_logs, L.gh_ports])}</div>
-      </div>`},
   ]});
 
 /* 13 */
@@ -1148,17 +1125,6 @@ with urllib.request.urlopen(URL, timeout=5) as resposta:
     receitas = json.load(resposta)`)}</div>
         </div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 6 min', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Construa a API e crie a rede:</div>${cmd('$ docker build -t receitas-api:1.6 .\n$ docker network create cozinha\n$ docker network ls')}`,
-        `<div class="t">Inicie a API com o nome <code>receitas</code> na rede <code>cozinha</code>, sem <code>-p</code>. O teste com <code>localhost:8000</code> deve falhar: não publicamos essa porta no Codespace.</div>${cmd('$ docker run -d --name receitas --network cozinha receitas-api:1.6\n$ curl localhost:8000/receitas      # erro esperado: conexão recusada')}`,
-        `<div class="t">Execute o cliente em outro container da mesma rede. <code>-v</code> compartilha a pasta com o arquivo <code>cliente.py</code>. A saída deve mostrar as receitas recebidas da API:</div>${cmd('$ docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py')}`,
-        `<div class="t">Consulte os containers conectados. O cliente já terminou e foi removido por <code>--rm</code>; a API continua na rede:</div>${cmd('$ docker network inspect cozinha')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 13')}<p style="margin-top:10px;color:var(--muted)">Inicia um container temporário na rede <code>cozinha</code> e testa o endereço da API. Também identifica se ela está sem porta publicada.</p></div>
-        <div class="callout"><strong>Use o nome esperado pelo cliente.</strong> O endereço em <code>cliente.py</code> usa <code>receitas</code>, então o container da API precisa desse nome. Sem <code>--name</code>, o Docker geraria outro nome automaticamente.</div>
-        <div class="box soft"><h3>Missão extra</h3><p>Rode o cliente <strong>sem</strong> <code>--network cozinha</code> e leia o erro: fora da rede, o nome <code>receitas</code> não existe. Compare <code>docker network inspect bridge</code> com <code>docker network inspect cozinha</code>.</p></div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -1171,6 +1137,17 @@ with urllib.request.urlopen(URL, timeout=5) as resposta:
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.net, L.bridge, L.r_net, L.c_multi, L.r_run])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 6 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Construa a API e crie a rede:</div>${cmd('$ docker build -t receitas-api:1.6 .\n$ docker network create cozinha\n$ docker network ls')}`,
+        `<div class="t">Inicie a API com o nome <code>receitas</code> na rede <code>cozinha</code>, sem <code>-p</code>. O teste com <code>localhost:8000</code> deve falhar: não publicamos essa porta no Codespace.</div>${cmd('$ docker run -d --name receitas --network cozinha receitas-api:1.6\n$ curl localhost:8000/receitas      # erro esperado: conexão recusada')}`,
+        `<div class="t">Execute o cliente em outro container da mesma rede. <code>-v</code> compartilha a pasta com o arquivo <code>cliente.py</code>. A saída deve mostrar as receitas recebidas da API:</div>${cmd('$ docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py')}`,
+        `<div class="t">Consulte os containers conectados. O cliente já terminou e foi removido por <code>--rm</code>; a API continua na rede:</div>${cmd('$ docker network inspect cozinha')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 13')}<p style="margin-top:10px;color:var(--muted)">Inicia um container temporário na rede <code>cozinha</code> e testa o endereço da API. Também identifica se ela está sem porta publicada.</p></div>
+        <div class="callout"><strong>Use o nome esperado pelo cliente.</strong> O endereço em <code>cliente.py</code> usa <code>receitas</code>, então o container da API precisa desse nome. Sem <code>--name</code>, o Docker geraria outro nome automaticamente.</div>
+        <div class="box soft"><h3>Missão extra</h3><p>Rode o cliente <strong>sem</strong> <code>--network cozinha</code> e leia o erro: fora da rede, o nome <code>receitas</code> não existe. Compare <code>docker network inspect bridge</code> com <code>docker network inspect cozinha</code>.</p></div>
+      </div></div>`},
   ]});
 
 /* 14 */
@@ -1214,21 +1191,6 @@ D.push({n:14, key:'14', title:'Docker Compose', mod:'Módulo 5 · Vários contai
           </div>
         </div>
       </div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 7 min', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Execute <code>code compose.yaml</code>, copie o conteúdo do slide anterior e salve. Confira os espaços no início de cada linha.</div>`,
-        `<div class="t">Inicie os serviços. <code>--build</code> constrói as imagens antes, e <code>-d</code> deixa o terminal livre. Depois, consulte o estado dos containers:</div>${cmd('$ docker compose up -d --build\n$ docker compose ps')}`,
-        `<div class="t">Teste o site e a API no terminal. Na aba <strong>PORTS</strong>, abra a porta <strong>8090</strong> pelo ícone de globo. A página deve mostrar a lista de receitas e a origem <code>/api/receitas</code>. Se houver erro logo no início, espere alguns segundos e tente novamente.</div>${cmd('$ curl localhost:8090/\n$ curl localhost:8090/api/receitas')}`,
-        `<div class="t">Logs de um serviço:</div>${cmd('$ docker compose logs api')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 14')}<p style="margin-top:10px;color:var(--muted)">Confere os serviços <code>api</code> e <code>web</code> rodando e o site e a API respondendo na 8090.</p></div>
-        <div class="callout"><strong>Execute os comandos na pasta do compose.yaml.</strong> O Compose cria nomes como <code>14-docker-compose-api-1</code>. Para parar e remover os containers e a rede do projeto, use <code>docker compose down</code>. As imagens ficam disponíveis para a próxima execução.</div>
-        <div class="box soft"><h3>Missão extra</h3><p>Acrescente <code>environment</code> ao serviço <code>api</code>, alinhado com <code>build</code>. O início do arquivo ficará assim; mantenha a seção <code>web</code>:</p>${cmd(`services:
-  api:
-    build: ./api
-    environment:
-      COZINHA: "Cozinha do Compose"`)}<p style="margin-top:8px;color:var(--muted)">Salve e execute <code>docker compose up -d</code> novamente. Consulte <code>curl localhost:8090/api/</code> para conferir o novo nome.</p></div>
-      </div></div>`},
     {h:'Comandos e documentação', eyebrow:'Referência', body:`
       <div class="cols s2">
         ${kv([
@@ -1241,6 +1203,21 @@ D.push({n:14, key:'14', title:'Docker Compose', mod:'Módulo 5 · Vários contai
         ])}
         <div class="box soft"><h3>Documentação</h3>${docs([L.compose, L.cfile, L.c_up, L.c_ps, L.c_logs, L.c_down, L.c_multi])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 7 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Execute <code>code compose.yaml</code>, copie o conteúdo do slide <a href="#/d/14/2">Um arquivo, todos os containers</a> e salve. Confira os espaços no início de cada linha.</div>`,
+        `<div class="t">Inicie os serviços. <code>--build</code> constrói as imagens antes, e <code>-d</code> deixa o terminal livre. Depois, consulte o estado dos containers:</div>${cmd('$ docker compose up -d --build\n$ docker compose ps')}`,
+        `<div class="t">Teste o site e a API no terminal. Na aba <strong>PORTS</strong>, abra a porta <strong>8090</strong> pelo ícone de globo. A página deve mostrar a lista de receitas e a origem <code>/api/receitas</code>. Se houver erro logo no início, espere alguns segundos e tente novamente.</div>${cmd('$ curl localhost:8090/\n$ curl localhost:8090/api/receitas')}`,
+        `<div class="t">Logs de um serviço:</div>${cmd('$ docker compose logs api')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 14')}<p style="margin-top:10px;color:var(--muted)">Confere os serviços <code>api</code> e <code>web</code> rodando e o site e a API respondendo na 8090.</p></div>
+        <div class="callout"><strong>Execute os comandos na pasta do compose.yaml.</strong> O Compose cria nomes como <code>14-docker-compose-api-1</code>. Para parar e remover os containers e a rede do projeto, use <code>docker compose down</code>. As imagens ficam disponíveis para a próxima execução.</div>
+        <div class="box soft"><h3>Missão extra</h3><p>Acrescente <code>environment</code> ao serviço <code>api</code>, alinhado com <code>build</code>. O início do arquivo ficará assim; mantenha a seção <code>web</code>:</p>${cmd(`services:
+  api:
+    build: ./api
+    environment:
+      COZINHA: "Cozinha do Compose"`)}<p style="margin-top:8px;color:var(--muted)">Salve e execute <code>docker compose up -d</code> novamente. Consulte <code>curl localhost:8090/api/</code> para conferir o novo nome.</p></div>
+      </div></div>`},
   ]});
 
 /* 15 */
@@ -1273,18 +1250,6 @@ D.push({n:15, key:'15', title:'Faxina', mod:'Encerramento', time:4, el:true, cmd
         ], ['','' ])}</div>
         <div class="callout"><strong>Como ler docker system df:</strong> SIZE é o espaço ocupado; RECLAIMABLE é o que pode ser liberado. Os números do exemplo variam conforme o uso. Na limpeza, removemos primeiro os containers parados e depois as imagens que eles usavam.</div>
       </div></div>`},
-    {h:'O desafio', eyebrow:'Tarefa · 4 min · pode ficar para depois da aula', body:`
-      <div class="cols s2"><div class="stack">${steps([
-        `<div class="t">Consulte o espaço usado e a lista de containers:</div>${cmd('$ docker system df\n$ docker ps -a')}`,
-        `<div class="t">Pare os containers em execução e remova os parados. <code>$(docker ps -q)</code> insere a lista de IDs no comando <code>stop</code>. Se a lista estiver vazia, ele avisará que falta um argumento; nesse caso, siga para <code>prune</code>. Leia a confirmação e responda <code>y</code> para remover:</div>${cmd('$ docker stop $(docker ps -q)\n$ docker container prune')}`,
-        `<div class="t">As imagens sem nome, sobras dos builds:</div>${cmd('$ docker image prune\n$ docker images')}`,
-        `<div class="t">Consulte o espaço novamente e compare com a primeira etapa:</div>${cmd('$ docker system df')}`,
-      ])}</div><div class="stack">
-        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 15')}<p style="margin-top:10px;color:var(--muted)">Aprova sem nenhum container (rodando ou parado) e sem imagens <code>&lt;none&gt;</code>. Extra: nada do curso sobrou (volume, rede, imagens).</p></div>
-        <div class="callout"><strong>Para praticar de novo:</strong> use <code>reset.sh NN</code>, substituindo <code>NN</code> pelo número do desafio, e siga o enunciado desde o início. As verificações que dependem dos containers removidos deixam de aprovar até você refazê-los.</div>
-        <div class="box soft"><h3>Missão extra · volume, rede e imagens</h3>${cmd("$ cd ~/labs/14-docker-compose && docker compose down && cd -\n$ docker volume rm notas\n$ docker network rm cozinha\n$ docker images                 # confira as imagens restantes\n$ docker image rm -f $(docker images -q 'receitas*' | sort -u) bloco:1.0")}<p style="margin-top:8px;color:var(--muted)">A primeira linha remove os recursos do Compose e volta à pasta anterior. Na última, <code>sort -u</code> retira IDs repetidos, e <code>-f</code> permite remover imagens com mais de uma tag. A remoção do volume também apaga as notas.</p></div>
-        <div class="callout warn"><strong>Ao terminar:</strong> pare ou exclua o Codespace. Parado, ele ainda ocupa armazenamento. Excluído, perde os arquivos e alterações; o instalador recria apenas o material inicial do curso.</div>
-      </div></div>`},
     {h:'Comandos e próximos estudos', eyebrow:'Referência', body:`
       <div class="cols s2">
         <div class="stack">
@@ -1300,6 +1265,18 @@ D.push({n:15, key:'15', title:'Faxina', mod:'Encerramento', time:4, el:true, cmd
         </div>
         <div class="box soft"><h3>Documentação</h3>${docs([L.sdf, L.sprune, L.r_cprune, L.r_iprune, L.c_down, L.c_reg, L.livro, L.repo])}</div>
       </div>`},
+    {h:'O desafio', eyebrow:'Tarefa · 4 min', body:`
+      <div class="cols s2"><div class="stack">${steps([
+        `<div class="t">Consulte o espaço usado e a lista de containers:</div>${cmd('$ docker system df\n$ docker ps -a')}`,
+        `<div class="t">Pare os containers em execução e remova os parados. <code>$(docker ps -q)</code> insere a lista de IDs no comando <code>stop</code>. Se a lista estiver vazia, ele avisará que falta um argumento; nesse caso, siga para <code>prune</code>. Leia a confirmação e responda <code>y</code> para remover:</div>${cmd('$ docker stop $(docker ps -q)\n$ docker container prune')}`,
+        `<div class="t">As imagens sem nome, sobras dos builds:</div>${cmd('$ docker image prune\n$ docker images')}`,
+        `<div class="t">Consulte o espaço novamente e compare com a primeira etapa:</div>${cmd('$ docker system df')}`,
+      ])}</div><div class="stack">
+        <div class="box"><h3>Verificação</h3>${cmd('$ check.sh 15')}<p style="margin-top:10px;color:var(--muted)">Aprova sem nenhum container (rodando ou parado) e sem imagens <code>&lt;none&gt;</code>. Extra: nada do curso sobrou (volume, rede, imagens).</p></div>
+        <div class="callout"><strong>Para praticar de novo:</strong> use <code>reset.sh NN</code>, substituindo <code>NN</code> pelo número do desafio, e siga o enunciado desde o início. As verificações que dependem dos containers removidos deixam de aprovar até você refazê-los.</div>
+        <div class="box soft"><h3>Missão extra · volume, rede e imagens</h3>${cmd("$ cd ~/labs/14-docker-compose && docker compose down && cd -\n$ docker volume rm notas\n$ docker network rm cozinha\n$ docker images                 # confira as imagens restantes\n$ docker image rm -f $(docker images -q 'receitas*' | sort -u) bloco:1.0")}<p style="margin-top:8px;color:var(--muted)">A primeira linha remove os recursos do Compose e volta à pasta anterior. Na última, <code>sort -u</code> retira IDs repetidos, e <code>-f</code> permite remover imagens com mais de uma tag. A remoção do volume também apaga as notas.</p></div>
+        <div class="callout warn"><strong>Ao terminar:</strong> pare ou exclua o Codespace. Parado, ele ainda ocupa armazenamento. Excluído, perde os arquivos e alterações; o instalador recria apenas o material inicial do curso.</div>
+      </div></div>`},
   ]});
 </script>
 <script>
@@ -1312,22 +1289,22 @@ function renderHome(){
   const total = D.reduce((a,d)=>a+d.time,0);
   const tiles = ALL.map(d => {
     const isIntro = d.key === 'intro';
-    return `<a class="tile ${d.el?'el':''}" href="#/d/${d.key}/1" ${d.el?'title="Este desafio pode ficar para depois da aula, se faltar tempo"':''}>
+    return `<a class="tile ${d.el?'el':''}" href="#/d/${d.key}/1" ${d.el?'title="Desafio opcional · pode ser feito depois da aula"':''}>
       <div class="row"><div class="num">${isIntro?'∅':pad(d.n)}</div><div class="mod">${d.mod}</div></div>
       <div><h3>${isIntro? d.short : d.title}</h3><div class="cmds" style="margin-top:8px">${d.cmds.map(esc).join(' · ')}</div></div>
-      <div class="foot"><span>${d.slides.length} slides</span><span>⏱ ${d.time} min</span></div>
+      <div class="foot"><span${d.el?' class="optional"':''}>${d.el?'Opcional':d.slides.length+' slides'}</span><span>⏱ ${d.time} min</span></div>
     </a>`;
   }).join('');
   document.getElementById('home').innerHTML = `
     <header class="hero">
       <div><h1>Docker<span>no Codespaces</span></h1>
-        <p class="sub">Aprenda Docker em uma aula ao vivo de 3 horas, com exercícios no navegador. Não é preciso saber programar. Abra a introdução para conhecer o ambiente e, depois, siga os desafios na ordem.</p></div>
+        <p class="sub">Curso de Docker para iniciantes</p></div>
       <div class="meta"><div><b>16</b>desafios</div><div><b>${total}</b>min de prática</div><div><b>3h</b>de aula</div></div>
     </header>
-    <div class="legend"><span><span class="sw"></span>desafio</span><span><span class="sw el"></span>pode ficar para depois da aula, se faltar tempo</span><span>teclado: <kbd>→</kbd> <kbd>←</kbd> mudar de slide · <kbd>Esc</kbd> voltar ao início · <kbd>F</kbd> tela cheia</span></div>
+    <div class="legend"><span><span class="sw"></span>desafio</span><span><span class="sw el"></span>${D.filter(d=>d.el).length} opcionais · para praticar depois da aula</span><span>teclado: <kbd>→</kbd> <kbd>←</kbd> mudar de slide · <kbd>Esc</kbd> voltar ao início · <kbd>F</kbd> tela cheia</span></div>
     <div class="grid">${tiles}</div>
     <footer class="homefoot">
-      <span>Prepare o ambiente e faça o desafio 0 antes da aula. Na aula, siga do 1 ao 15, com intervalo depois do 7.</span>
+      <span>Faça o desafio 0 antes da aula. Na aula, siga a ordem; os desafios 6, 7, 10, 11 e 15 são opcionais. Intervalo depois do bloco de Dockerfile.</span>
       <span>Enunciados, gabarito e guia do professor: <a href="https://github.com/fsilva-alt/devops-docker" target="_blank" rel="noopener">github.com/fsilva-alt/devops-docker</a></span>
       <span>Leitura sugerida: <a href="https://livro.descomplicandodocker.com.br/" target="_blank" rel="noopener">Descomplicando Docker (livro gratuito, pt-br)</a></span>
     </footer>`;
@@ -1342,7 +1319,7 @@ function renderSlide(d, i){
   document.getElementById('counter').textContent = `${i+1} / ${n}`;
   document.getElementById('dots').innerHTML = d.slides.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');
   const el = document.getElementById('slide');
-  el.innerHTML = `<div class="eyebrow">${esc(s.eyebrow || (isIntro? 'Introdução' : `Desafio ${pad(d.n)} · ${d.mod}`))}</div><h2>${s.h}</h2>${s.body}`;
+  el.innerHTML = `<div class="eyebrow">${esc(s.eyebrow || (isIntro? 'Introdução' : `Desafio ${pad(d.n)} · ${d.mod}`))}${d.el?' · Opcional':''}</div><h2>${s.h}</h2>${s.body}`;
   el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
   const prev = document.getElementById('btnPrev'), next = document.getElementById('btnNext');
   prev.toggleAttribute('disabled', i === 0);

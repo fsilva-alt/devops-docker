@@ -1,6 +1,8 @@
 # Desafio 7 — O que não entra na imagem
 
-⏱ 4 minutos · Módulo 2: Dockerfile · pode ficar para depois da aula
+⏱ 4 minutos · Módulo 2: Dockerfile · **Opcional**
+
+Pode ser feito depois da aula. O desafio 8 já traz seu próprio `.dockerignore` para continuar.
 
 ## Objetivo
 

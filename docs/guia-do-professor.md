@@ -55,12 +55,13 @@ Cada desafio usa uma porta de fora diferente, para que os containers dos desafio
 
 - Anuncie cada desafio com o número e o horário de término. Peça que sinalizem no chat com ✅ quando `check.sh NN` aprovar.
 - Quando cerca de 70% sinalizarem, avise que falta 1 minuto e siga. Quem não terminou recebe ajuda de um monitor enquanto a aula continua; quem terminou pode fazer a missão extra, que é opcional.
-- Pontos de corte: o **Desafio 7** (antes do intervalo), o **Desafio 11** (fim do módulo de dados) e o **Desafio 15** (fim). Todos viram tarefa de casa sem prejudicar os seguintes.
+- Os desafios **6, 7, 10, 11 e 15 são opcionais**: cache, `.dockerignore`, edição ao vivo, volumes e limpeza. Seus 23 minutos podem virar apoio à turma, deixando essa prática para depois da aula. Apresente os conceitos mesmo quando pular a tarefa; os labs seguintes já incluem seus próprios arquivos de partida.
+- Trilha principal: **0 → 1 → 2 → 3 → 4 → 5 → 8 → 9 → 12 → 13 → 14**. Ela mantém a progressão até site e API juntos com Compose. No desafio 13, relembre que `-v "$PWD:/app"` compartilha a pasta atual com o cliente, caso a turma tenha pulado a prática do 10.
 - **O desafio 15 apaga tudo.** Só anuncie depois do 14 e avise que `check.sh` dos anteriores vai voltar a reprovar.
 
 ### Compartilhamento de tela
 
-Use os slides para apresentar o conceito e demonstre a tarefa no seu Codespace. Mantenha o texto do terminal legível e mostre o comando antes de executá-lo. Um segundo terminal com `watch docker ps`, ou uma consulta a `docker ps` após cada ação, ajuda a turma a acompanhar as mudanças. Nos desafios 8, 12 e 14, mostre com calma a aba **PORTS**, o número da porta e o ícone de globo que abre o navegador.
+Siga a ordem dos slides: objetivo → conceito → comandos e documentação → desafio. Apresente os comandos antes de demonstrar a tarefa no seu Codespace. Mantenha o texto do terminal legível e mostre o comando antes de executá-lo. Um segundo terminal com `watch docker ps`, ou uma consulta a `docker ps` após cada ação, ajuda a turma a acompanhar as mudanças. Nos desafios 8, 12 e 14, mostre com calma a aba **PORTS**, o número da porta e o ícone de globo que abre o navegador.
 
 ### O que dizer antes de cada bloco
 

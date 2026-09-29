@@ -1,6 +1,8 @@
 # Desafio 11 — Dados que ficam
 
-⏱ 5 minutos · Módulo 4: Dados · pode ficar para depois da aula
+⏱ 5 minutos · Módulo 4: Dados · **Opcional**
+
+Pode ser feito depois da aula. Os desafios de site, redes e Compose não dependem deste volume; siga para o desafio 12.
 
 ## Objetivo
 

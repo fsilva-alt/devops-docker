@@ -88,18 +88,20 @@ Dentro da pasta de um laboratório, `check.sh` e `reset.sh` funcionam sem o núm
 | [3](exercises/03-ciclo-de-vida/README.md) | Ciclo de vida | `-d`, `logs`, `stop`, `start`, `rm` |
 | [4](exercises/04-meu-primeiro-dockerfile/README.md) | Meu primeiro Dockerfile | `FROM`, `COPY`, `CMD`, `build -t`, `tag` |
 | [5](exercises/05-instalando-dependencias/README.md) | Instalando dependências | `WORKDIR`, `RUN pip install`, `requirements.txt` |
-| [6](exercises/06-camadas-e-cache/README.md) | Camadas e cache | ordem das instruções, `history` |
-| [7](exercises/07-o-que-nao-entra/README.md) | O que não entra na imagem ⏱ | `.dockerignore` |
+| [6](exercises/06-camadas-e-cache/README.md) | Camadas e cache · **opcional** | ordem das instruções, `history` |
+| [7](exercises/07-o-que-nao-entra/README.md) | O que não entra na imagem · **opcional** | `.dockerignore` |
 | [8](exercises/08-abrindo-portas/README.md) | Abrindo portas | `-p`, `EXPOSE`, aba PORTS, `/docs` |
 | [9](exercises/09-configuracao-por-ambiente/README.md) | Configuração por ambiente | `ENV`, `-e`, `--env-file`, `exec` |
-| [10](exercises/10-editando-ao-vivo/README.md) | Editando ao vivo | bind mount `-v "$PWD:/app"` |
-| [11](exercises/11-dados-que-ficam/README.md) | Dados que ficam ⏱ | `docker volume`, `ENTRYPOINT` |
+| [10](exercises/10-editando-ao-vivo/README.md) | Editando ao vivo · **opcional** | bind mount `-v "$PWD:/app"` |
+| [11](exercises/11-dados-que-ficam/README.md) | Dados que ficam · **opcional** | `docker volume`, `ENTRYPOINT` |
 | [12](exercises/12-site-estatico/README.md) | Site estático | `nginx:alpine` + HTML/JS |
 | [13](exercises/13-containers-conversando/README.md) | Containers conversando | `network create`, DNS por nome |
 | [14](exercises/14-docker-compose/README.md) | Docker Compose | `compose.yaml`, `up -d`, `ps`, `logs`, `down` |
-| [15](exercises/15-faxina/README.md) | Faxina ⏱ | `system df`, `prune` |
+| [15](exercises/15-faxina/README.md) | Faxina · **opcional** | `system df`, `prune` |
 
-Os desafios 7, 11 e 15 têm a marca ⏱ porque podem ficar para depois da aula, se faltar tempo. A seção **Missão extra** de cada enunciado é opcional: use-a para praticar mais quando terminar a tarefa principal.
+Os cinco desafios **opcionais são 6, 7, 10, 11 e 15**: aprofundam otimização de imagens, edição ao vivo, persistência e limpeza. Podem ser feitos depois da aula, liberando 23 minutos para acompanhar a turma. Os laboratórios seguintes já têm seus próprios arquivos de partida, então você pode continuar sem concluir os opcionais.
+
+A trilha principal é **0 → 1 → 2 → 3 → 4 → 5 → 8 → 9 → 12 → 13 → 14**: dos primeiros containers ao site e à API juntos com Compose. A seção **Missão extra** de cada enunciado também é opcional.
 
 Você vai trabalhar com um **livro de receitas**. Primeiro, um programa Python mostra as receitas no terminal. Depois, uma API fornece esses dados pela rede. Por fim, um site exibe a lista no navegador, e o Docker Compose inicia os containers do site e da API juntos.
 

@@ -1,6 +1,8 @@
 # Desafio 15 — Faxina
 
-⏱ 4 minutos · Encerramento · pode ficar para depois da aula
+⏱ 4 minutos · Encerramento · **Opcional**
+
+Pode ser feito depois da aula, quando terminar os desafios que quiser praticar. Ao encerrar a sessão, pare ou exclua o Codespace mesmo se deixar esta limpeza para depois.
 
 ## Objetivo
 
