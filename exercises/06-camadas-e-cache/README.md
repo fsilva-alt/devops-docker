@@ -1,12 +1,12 @@
-# Desafio 6 — Camadas e cache
+# Exercício 6 — Camadas e cache
 
 ⏱ 5 minutos · Módulo 2: Dockerfile · **Opcional**
 
-Pode ser feito depois da aula. O desafio 8 já traz um Dockerfile com a ordem ajustada e não depende desta prática.
+Pode ser feito depois da aula. O exercício 8 não depende deste, porque já traz um Dockerfile com a ordem ajustada.
 
 ## Objetivo
 
-Você vai organizar o `Dockerfile` para que uma alteração no código não obrigue o Docker a reinstalar as dependências e observar como ele reutiliza resultados de etapas anteriores para construir a imagem mais rápido.
+Organizar o `Dockerfile` para que uma alteração no código não obrigue o Docker a reinstalar as dependências, e observar como ele reaproveita resultados de etapas anteriores para construir a imagem mais rápido.
 
 ## Onde
 
@@ -16,7 +16,7 @@ cd ~/labs/06-camadas-e-cache
 
 ## Estado inicial
 
-`app.py`, `requirements.txt` e um `Dockerfile` igual ao do desafio 5: `COPY . .` **antes** do `pip install`.
+`app.py`, `requirements.txt` e um `Dockerfile` igual ao do exercício 5, com `COPY . .` **antes** do `pip install`.
 
 ## Como o cache funciona
 
@@ -28,7 +28,7 @@ Com `COPY . .` antes do `pip install`, qualquer edição em `app.py` muda a cama
 
 ## Tarefa
 
-1. Construa uma vez:
+1. Construa a imagem uma primeira vez:
 
    ```bash
    docker build -t receitas-api:1.1 .
@@ -40,7 +40,7 @@ Com `COPY . .` antes do `pip install`, qualquer edição em `app.py` muda a cama
    {"nome": "Mousse de maracujá", "rende": "6 porções"},
    ```
 
-   Mantenha as aspas, as chaves e a vírgula final, como nas outras receitas. Salve e construa de novo. Observe que `pip install` **é executado outra vez**, mesmo sem mudanças na lista de dependências:
+   Copie a linha inteira, com as aspas, as chaves e a vírgula final, como nas outras receitas. Salve e construa de novo. Repare que o `pip install` roda outra vez, mesmo sem nenhuma mudança na lista de dependências:
 
    ```bash
    docker build -t receitas-api:1.1 .
@@ -61,7 +61,7 @@ Com `COPY . .` antes do `pip install`, qualquer edição em `app.py` muda a cama
    CMD ["python", "app.py"]
    ```
 
-4. Construa a imagem com a nova ordem. Nessa primeira construção, o pip pode executar novamente ou usar o cache preparado pelo instalador. Depois, em `app.py`, troque `Mousse de maracujá` por `Mousse de limão`, salve e construa mais uma vez. Agora, a etapa do pip deve aparecer como `CACHED`:
+4. Construa a imagem com a nova ordem. Nessa primeira construção, o pip pode rodar de novo ou aproveitar o cache preparado pelo instalador. Depois, em `app.py`, troque `Mousse de maracujá` por `Mousse de limão`, salve e construa mais uma vez. Agora, a etapa do pip deve aparecer como `CACHED`:
 
    ```bash
    docker build -t receitas-api:1.1 .
@@ -81,15 +81,15 @@ Com `COPY . .` antes do `pip install`, qualquer edição em `app.py` muda a cama
 check.sh 06
 ```
 
-Aprova quando o `Dockerfile` está na ordem certa, o `app.py` foi alterado e a imagem contém a versão atual dele.
+A verificação passa quando o `Dockerfile` está na ordem certa, o `app.py` foi alterado e a imagem contém a versão atual dele.
 
 ## Dica
 
-A regra geral: **o que muda menos vai primeiro** (sistema, dependências), **o que muda mais vai por último** (o seu código).
+A regra geral é colocar primeiro o que muda menos (sistema, dependências) e por último o que muda mais (o seu código).
 
 ## Missão extra
 
-Compare uma construção sem cache com uma construção normal. `time` mede a duração do comando; compare o valor de `real` nas duas saídas:
+Veja quanto tempo o cache economiza. `time` mede a duração de um comando; compare o valor de `real` na construção sem cache e na construção normal:
 
 ```bash
 time docker build --no-cache -t receitas-api:1.1 .

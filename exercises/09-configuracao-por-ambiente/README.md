@@ -1,10 +1,10 @@
-# Desafio 9 — Configuração por ambiente
+# Exercício 9 — Configuração por ambiente
 
 ⏱ 5 minutos · Módulo 3: Portas e configuração
 
 ## Objetivo
 
-Você vai mudar o nome da cozinha exibido pela API **sem reconstruir a imagem**, usando uma **variável de ambiente**: uma configuração com nome e valor que o programa lê ao iniciar. Neste exercício, o nome é `COZINHA`, e o valor pode ser `Cozinha da Ana`.
+Mudar o nome da cozinha exibido pela API sem reconstruir a imagem. Para isso, você usa uma **variável de ambiente**, uma configuração com nome e valor que o programa lê ao iniciar. Aqui, a variável se chama `COZINHA`, e o valor pode ser `Cozinha da Ana`.
 
 ## Onde
 
@@ -30,7 +30,7 @@ Essa linha procura o valor de `COZINHA`. Se ele não estiver definido, usa `Cozi
 | `ENV COZINHA="..."` no Dockerfile | Como valor padrão da imagem | O valor de reserva do código |
 | `-e COZINHA="..."` ou `--env-file` no `docker run` | No container que você está criando | O padrão da imagem |
 
-Isso permite usar a mesma imagem com configurações diferentes. Por exemplo, você pode mudar o nome da cozinha ou o endereço de outro serviço ao criar um container.
+Assim, a mesma imagem serve para configurações diferentes. Ao criar um container, você pode mudar o nome da cozinha ou o endereço de outro serviço, por exemplo.
 
 ## Tarefa
 
@@ -70,7 +70,7 @@ Aprova quando a imagem tem um padrão e o container `cozinha` roda com um valor 
 
 ## Dica
 
-Não coloque segredos em `ENV` no Dockerfile: eles ficam gravados na imagem (lembra do `.env` no desafio 7?). Senhas entram por `-e` ou `--env-file`, na hora de rodar.
+Não coloque segredos em `ENV` no Dockerfile: eles ficam gravados na imagem (lembra do `.env` no exercício 7?). Senhas entram por `-e` ou `--env-file`, na hora de rodar.
 
 ## Missão extra
 

@@ -11,7 +11,7 @@ CURSO_DIR="$(cd "$SCRIPTS_DIR/.." && pwd)"
 # sobrescrito com a variável LABS_DIR.
 LABS_DIR="${LABS_DIR:-$HOME/labs}"
 
-# Nome de cada desafio, indexado pelo número.
+# Nome de cada exercício, indexado pelo número.
 LAB_NOMES=(
   "docker-funciona"
   "ola-container"
@@ -29,23 +29,25 @@ LAB_NOMES=(
   "containers-conversando"
   "docker-compose"
   "faxina"
+  "compose-desenvolvimento"
+  "compose-persistencia"
 )
 
-# Só os desafios 4 a 14 têm pasta em $LABS_DIR (os outros acontecem "no Docker
+# Os exercícios 4 a 14, 16 e 17 têm pasta em $LABS_DIR (os outros acontecem "no Docker
 # inteiro": containers, imagens e volumes não moram em pasta nenhuma).
 PRIMEIRO_LAB_COM_PASTA=4
-ULTIMO_LAB_COM_PASTA=14
+ULTIMO_LAB_COM_PASTA=17
 
 # Imagens-base usadas na aula. O setup.sh baixa todas antes, para a primeira
-# execução de cada desafio não depender da rede.
+# execução de cada exercício não depender da rede.
 IMAGENS_BASE=(hello-world alpine python:3.12-slim nginx:alpine)
 
-# Tudo o que o curso cria no Docker, para o reset.sh e o desafio 15 saberem
+# Tudo o que o curso cria no Docker, para o reset.sh e o exercício 15 saberem
 # o que é "nosso".
 CONTAINERS_DO_CURSO=(explorador relogio descartavel api cozinha dev web receitas)
-IMAGENS_DO_CURSO=(receitas receitas-api receitas-web bloco)
-VOLUMES_DO_CURSO=(notas)
-REDES_DO_CURSO=(cozinha)
+IMAGENS_DO_CURSO=(receitas receitas-api receitas-web receitas-notas bloco)
+VOLUMES_DO_CURSO=(notas 17-compose-persistencia_notas)
+REDES_DO_CURSO=(cozinha 14-docker-compose_default 16-compose-desenvolvimento_default 17-compose-persistencia_default)
 
 # ---------------------------------------------------------------------------
 # Saída
@@ -63,7 +65,7 @@ aviso() { printf '%s\n' "${C_AMAR}⚠️ ${C_FIM} $*"; }
 erro()  { printf '%s\n' "${C_VERM}❌${C_FIM} $*" >&2; }
 
 # ---------------------------------------------------------------------------
-# Números e caminhos dos desafios
+# Números e caminhos dos exercícios
 # ---------------------------------------------------------------------------
 
 # normalizar_num "5" | "05" | "05-nome"  ->  "05"
@@ -78,10 +80,10 @@ lab_dir()  { printf '%s/%s-%s' "$LABS_DIR" "$1" "$(lab_nome "$1")"; }
 
 lab_tem_pasta() {
   local n=$((10#$1))
-  (( n >= PRIMEIRO_LAB_COM_PASTA && n <= ULTIMO_LAB_COM_PASTA ))
+  (( n >= PRIMEIRO_LAB_COM_PASTA && n <= ULTIMO_LAB_COM_PASTA && n != 15 ))
 }
 
-# Descobre o desafio a partir do diretório atual (LABS_DIR/NN-nome/...).
+# Descobre o exercício a partir do diretório atual (LABS_DIR/NN-nome/...).
 detectar_lab() {
   # O atalho labs pode dar um PWD lógico diferente do caminho dos laboratórios.
   local atual raiz rel
@@ -99,16 +101,16 @@ detectar_lab() {
 resolver_lab() {
   local nn
   if [[ -n "${1:-}" ]]; then
-    nn="$(normalizar_num "$1")" || { erro "Número de desafio inválido: '$1'. Use algo como 05."; return 1; }
+    nn="$(normalizar_num "$1")" || { erro "Número de exercício inválido: '$1'. Use algo como 05."; return 1; }
   else
     nn="$(detectar_lab)" || {
-      erro "Informe o número do desafio. Exemplo: $(basename "$0") 05"
+      erro "Informe o número do exercício. Exemplo: $(basename "$0") 05"
       return 1
     }
   fi
   local n=$((10#$nn))
-  if (( n < 0 || n > 15 )); then
-    erro "O desafio $nn não existe. Use um número de 00 a 15."
+  if (( n < 0 || n >= ${#LAB_NOMES[@]} )); then
+    erro "O exercício $nn não existe. Use um número de 00 a 17."
     return 1
   fi
   printf '%s' "$nn"
@@ -184,3 +186,5 @@ segundos_ate_ultimo_start() {
   [[ -n "$criado" && -n "$iniciado" ]] || { printf 0; return; }
   printf '%s' "$(( $(date -d "$iniciado" +%s) - $(date -d "$criado" +%s) ))"
 }
+
+source "$SCRIPTS_DIR/redes.sh"

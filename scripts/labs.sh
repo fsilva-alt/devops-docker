@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Geradores dos laboratórios. Carregado por setup.sh e reset.sh.
 #
-# Cada função gerar_NN cria a pasta do desafio já no estado inicial descrito em
-# exercises/NN-nome/README.md. Cada limpar_NN remove o que o desafio criou no
+# Cada função gerar_NN cria a pasta do exercício já no estado inicial descrito em
+# exercises/NN-nome/README.md. Cada limpar_NN remove o que o exercício criou no
 # Docker (containers, imagens, volumes, redes), para o reset.sh recomeçar do zero.
 
 # ---------------------------------------------------------------------------
@@ -28,8 +28,8 @@ EOF
 }
 
 # app_py [env] [reload]
-#   env    -> lê a variável de ambiente COZINHA (desafios 9 em diante)
-#   reload -> uvicorn com reload=True, que reinicia quando o arquivo muda (desafio 10)
+#   env    -> lê a variável de ambiente COZINHA (exercícios 9 em diante)
+#   reload -> uvicorn com reload=True, que reinicia quando o arquivo muda (exercício 10)
 app_py() {
   local env=0 reload=0 a
   for a in "$@"; do
@@ -82,16 +82,15 @@ EOF
 
 requirements_txt() { printf 'fastapi==0.115.6\nuvicorn==0.34.0\n'; }
 
-# dockerfile_api <ingenuo|bom> [expose] [env] [health]
-#   ingenuo -> COPY . . antes do pip install (desafio 6 corrige)
+# dockerfile_api <ingenuo|bom> [expose] [env]
+#   ingenuo -> COPY . . antes do pip install (exercício 6 corrige)
 #   bom     -> requirements.txt primeiro, para o cache funcionar
 dockerfile_api() {
   local ordem="$1"; shift
-  local expose=0 env=0 health=0 a
+  local expose=0 env=0 a
   for a in "$@"; do
     [[ "$a" == expose ]] && expose=1
     [[ "$a" == env ]] && env=1
-    [[ "$a" == health ]] && health=1
   done
   printf 'FROM python:3.12-slim\n\nWORKDIR /app\n\n'
   if [[ "$ordem" == ingenuo ]]; then
@@ -101,15 +100,6 @@ dockerfile_api() {
   fi
   if (( env )); then printf '\nENV COZINHA="Cozinha do Curso"\n'; fi
   if (( expose )); then printf '\nEXPOSE 8000\n'; fi
-  if (( health )); then
-    cat <<'EOF'
-
-# O Compose espera este teste passar antes de iniciar o site.
-# O teste roda dentro da API: aqui, 127.0.0.1 aponta para o próprio container.
-HEALTHCHECK --interval=2s --timeout=3s --start-period=5s --retries=10 \
-    CMD ["python", "-c", "import http.client; c = http.client.HTTPConnection('127.0.0.1', 8000, timeout=2); c.request('GET', '/receitas'); r = c.getresponse(); exit(0 if r.status == 200 else 1)"]
-EOF
-  fi
   printf '\nCMD ["python", "app.py"]\n'
 }
 
@@ -175,7 +165,7 @@ for tentativa in range(1, 9):
             raise SystemExit(
                 f"Não foi possível acessar {URL} após 8 tentativas: {erro}.\n"
                 "Confira os logs da API e se os dois containers estão na mesma rede.\n"
-                "Se o nome resolve, mas a conexão expira, consulte o diagnóstico de rede do desafio."
+                "Se o nome resolve, mas a conexão expira, execute rede.sh e tente novamente."
             )
         print(f"Aguardando a API em {URL} (tentativa {tentativa}/8)...", file=sys.stderr, flush=True)
         time.sleep(1)
@@ -227,7 +217,7 @@ li { padding: 0.4rem 0; border-bottom: 1px solid #eee; }
 EOF
 }
 
-# site_app_js <url>   (receitas.json no desafio 12; /api/receitas no 14)
+# site_app_js <url>   (receitas.json no exercício 12; /api/receitas no 14)
 site_app_js() {
 cat <<EOF
 // Busca a lista de receitas e desenha na página.
@@ -237,10 +227,7 @@ async function carregar() {
   const lista = document.getElementById("receitas");
   const origem = document.getElementById("origem");
   try {
-    const resposta = await fetch(URL_RECEITAS, { signal: AbortSignal.timeout(15000) });
-    if (!resposta.ok) {
-      throw new Error(\`HTTP \${resposta.status} — confira os logs do servidor\`);
-    }
+    const resposta = await fetch(URL_RECEITAS);
     const receitas = await resposta.json();
     origem.textContent = \`\${receitas.length} receitas vindas de \${URL_RECEITAS}\`;
     lista.innerHTML = "";
@@ -250,8 +237,7 @@ async function carregar() {
       lista.appendChild(item);
     }
   } catch (erro) {
-    const detalhe = erro.name === "TimeoutError" ? "o servidor demorou mais de 15 segundos para responder" : erro.message;
-    origem.textContent = \`Não consegui carregar \${URL_RECEITAS}: \${detalhe}. Consulte os logs e recarregue a página após corrigir.\`;
+    origem.textContent = \`Não consegui carregar \${URL_RECEITAS}: \${erro.message}\`;
   }
 }
 
@@ -284,10 +270,7 @@ server {
     # O "resolver" é o DNS interno do Docker: assim o nginx procura o "api" de
     # novo a cada poucos segundos e continua achando se o container for recriado.
     location /api/ {
-        resolver 127.0.0.11 valid=5s ipv6=off;
-        resolver_timeout 3s;
-        proxy_connect_timeout 3s;
-        proxy_read_timeout 10s;
+        resolver 127.0.0.11 valid=5s;
         set $api "http://api:8000";
         rewrite ^/api/(.*)$ /$1 break;
         proxy_pass $api;
@@ -315,7 +298,7 @@ gerar_site() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafios 1 a 3 — sem pasta: só containers
+# Exercícios 1 a 3 — sem pasta: só containers
 # ---------------------------------------------------------------------------
 limpar_01() {
   local id
@@ -338,7 +321,7 @@ limpar_02() {
 limpar_03() { rm_container relogio descartavel; }
 
 # ---------------------------------------------------------------------------
-# Desafio 4 — Meu primeiro Dockerfile
+# Exercício 4 — Meu primeiro Dockerfile
 # ---------------------------------------------------------------------------
 gerar_04() {
   local dir; dir="$(lab_dir 04)"
@@ -348,7 +331,7 @@ gerar_04() {
 limpar_04() { rm_imagem receitas:1.0 receitas:latest; }
 
 # ---------------------------------------------------------------------------
-# Desafio 5 — Instalando dependências
+# Exercício 5 — Instalando dependências
 # ---------------------------------------------------------------------------
 gerar_05() {
   local dir; dir="$(lab_dir 05)"
@@ -359,7 +342,7 @@ gerar_05() {
 limpar_05() { rm_imagem receitas-api:1.0; }
 
 # ---------------------------------------------------------------------------
-# Desafio 6 — Camadas e cache
+# Exercício 6 — Camadas e cache
 # ---------------------------------------------------------------------------
 gerar_06() {
   local dir; dir="$(lab_dir 06)"
@@ -371,7 +354,7 @@ gerar_06() {
 limpar_06() { rm_imagem receitas-api:1.1; }
 
 # ---------------------------------------------------------------------------
-# Desafio 7 — O que não entra na imagem
+# Exercício 7 — O que não entra na imagem
 # ---------------------------------------------------------------------------
 gerar_07() {
   local dir; dir="$(lab_dir 07)"
@@ -397,34 +380,34 @@ gerar_07() {
 limpar_07() { rm_imagem receitas-api:1.2; }
 
 # ---------------------------------------------------------------------------
-# Desafio 8 — Abrindo portas
+# Exercício 8 — Abrindo portas
 # ---------------------------------------------------------------------------
 gerar_08() {
   local dir; dir="$(lab_dir 08)"
   mkdir -p "$dir"
   app_py > "$dir/app.py"
   requirements_txt > "$dir/requirements.txt"
-  dockerfile_api bom > "$dir/Dockerfile"       # acrescente EXPOSE neste desafio
+  dockerfile_api bom > "$dir/Dockerfile"       # acrescente EXPOSE neste exercício
   printf '__pycache__/\n.venv/\n.env\n' > "$dir/.dockerignore"
 }
 limpar_08() { rm_container api; rm_imagem receitas-api:1.3; }
 
 # ---------------------------------------------------------------------------
-# Desafio 9 — Configuração por ambiente
+# Exercício 9 — Configuração por ambiente
 # ---------------------------------------------------------------------------
 gerar_09() {
   local dir; dir="$(lab_dir 09)"
   mkdir -p "$dir"
   app_py env > "$dir/app.py"
   requirements_txt > "$dir/requirements.txt"
-  dockerfile_api bom expose > "$dir/Dockerfile"   # acrescente ENV neste desafio
+  dockerfile_api bom expose > "$dir/Dockerfile"   # acrescente ENV neste exercício
   printf '__pycache__/\n.venv/\n.env\n' > "$dir/.dockerignore"
   printf '# Um valor por linha, sem aspas nem espaços em volta do =\nCOZINHA=Cozinha da Vovó\n' > "$dir/cozinha.env"
 }
 limpar_09() { rm_container cozinha; rm_imagem receitas-api:1.4; }
 
 # ---------------------------------------------------------------------------
-# Desafio 10 — Editando ao vivo
+# Exercício 10 — Editando ao vivo
 # ---------------------------------------------------------------------------
 gerar_10() {
   local dir; dir="$(lab_dir 10)"
@@ -437,7 +420,7 @@ gerar_10() {
 limpar_10() { rm_container dev; rm_imagem receitas-api:1.5; }
 
 # ---------------------------------------------------------------------------
-# Desafio 11 — Dados que ficam
+# Exercício 11 — Dados que ficam
 # ---------------------------------------------------------------------------
 gerar_11() {
   local dir; dir="$(lab_dir 11)"
@@ -448,7 +431,7 @@ gerar_11() {
 limpar_11() { rm_imagem bloco:1.0; rm_volume notas; }
 
 # ---------------------------------------------------------------------------
-# Desafio 12 — Site estático
+# Exercício 12 — Site estático
 # ---------------------------------------------------------------------------
 gerar_12() {
   local dir; dir="$(lab_dir 12)"
@@ -457,7 +440,7 @@ gerar_12() {
 limpar_12() { rm_container web; rm_imagem receitas-web:1.0; }
 
 # ---------------------------------------------------------------------------
-# Desafio 13 — Containers conversando
+# Exercício 13 — Containers conversando
 # ---------------------------------------------------------------------------
 gerar_13() {
   local dir; dir="$(lab_dir 13)"
@@ -471,21 +454,21 @@ gerar_13() {
 limpar_13() { rm_container receitas; rm_rede cozinha; rm_imagem receitas-api:1.6; }
 
 # ---------------------------------------------------------------------------
-# Desafio 14 — Docker Compose
+# Exercício 14 — Docker Compose
 # ---------------------------------------------------------------------------
 gerar_14() {
   local dir; dir="$(lab_dir 14)"
   mkdir -p "$dir/api" "$dir/web"
   app_py env > "$dir/api/app.py"
   requirements_txt > "$dir/api/requirements.txt"
-  dockerfile_api bom expose env health > "$dir/api/Dockerfile"
+  dockerfile_api bom expose env > "$dir/api/Dockerfile"
   printf '__pycache__/\n.venv/\n.env\n' > "$dir/api/.dockerignore"
   dockerfile_web > "$dir/web/Dockerfile"
   nginx_conf > "$dir/web/nginx.conf"
   gerar_site "$dir/web/site" /api/receitas
 }
-limpar_14() {
-  local dir f; dir="$(lab_dir 14)"
+limpar_projeto_compose() {
+  local dir="$1" f
   for f in compose.yaml compose.yml docker-compose.yaml docker-compose.yml; do
     if [[ -f "$dir/$f" ]]; then
       ( cd "$dir" && docker compose down --rmi local -v --remove-orphans >/dev/null 2>&1 ) || true
@@ -500,9 +483,41 @@ limpar_14() {
   rm_rede "$(basename "$dir")_default"
   rm_imagem "$(basename "$dir")-api" "$(basename "$dir")-web"
 }
+limpar_14() { limpar_projeto_compose "$(lab_dir 14)"; }
 
 # ---------------------------------------------------------------------------
-# gerar_lab NN — recria o desafio NN (apaga a pasta e o que ele criou no Docker)
+# Exercício 16 — Desenvolvimento com Compose (opcional)
+# ---------------------------------------------------------------------------
+gerar_16() {
+  local dir; dir="$(lab_dir 16)"
+  mkdir -p "$dir"
+  app_py env reload > "$dir/app.py"
+  requirements_txt > "$dir/requirements.txt"
+  dockerfile_api bom expose env > "$dir/Dockerfile"
+  printf '__pycache__/\n.venv/\n.env\n' > "$dir/.dockerignore"
+}
+limpar_16() {
+  limpar_projeto_compose "$(lab_dir 16)"
+  rm_imagem receitas-api:dev
+}
+
+# ---------------------------------------------------------------------------
+# Exercício 17 — Persistência com Compose (opcional)
+# ---------------------------------------------------------------------------
+gerar_17() {
+  local dir; dir="$(lab_dir 17)"
+  mkdir -p "$dir"
+  bloco_py > "$dir/bloco.py"
+  dockerfile_bloco > "$dir/Dockerfile"
+}
+limpar_17() {
+  limpar_projeto_compose "$(lab_dir 17)"
+  rm_volume 17-compose-persistencia_notas
+  rm_imagem receitas-notas:1.0
+}
+
+# ---------------------------------------------------------------------------
+# gerar_lab NN — recria o exercício NN (apaga a pasta e o que ele criou no Docker)
 # ---------------------------------------------------------------------------
 gerar_lab() {
   local nn="$1"

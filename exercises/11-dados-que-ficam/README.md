@@ -1,12 +1,12 @@
-# Desafio 11 — Dados que ficam
+# Exercício 11 — Dados que ficam
 
 ⏱ 5 minutos · Módulo 4: Dados · **Opcional**
 
-Pode ser feito depois da aula. Os desafios de site, redes e Compose não dependem deste volume; siga para o desafio 12.
+Pode ficar para depois da aula. Os exercícios de site, redes e Compose não dependem deste volume, então você pode seguir direto para o 12.
 
 ## Objetivo
 
-Você vai observar o que acontece com os arquivos quando um container é removido e usar um **volume**, um espaço de armazenamento gerenciado pelo Docker, para manter as notas mesmo depois de remover o container que as criou.
+Primeiro, você vê o que acontece com os arquivos de um container quando ele é removido. Depois, usa um **volume**, um espaço de armazenamento gerenciado pelo Docker, para que as notas sobrevivam ao container que as criou.
 
 ## Onde
 
@@ -17,17 +17,17 @@ cd ~/labs/11-dados-que-ficam
 ## Estado inicial
 
 - `bloco.py`: um bloco de notas. Cada nota passada na linha de comando é acrescentada a `/dados/notas.txt`; depois ele imprime todas.
-- `Dockerfile`: pronto, com `ENTRYPOINT` no lugar de `CMD`. Neste exemplo, `ENTRYPOINT` define o programa a executar. O texto depois de `docker run bloco:1.0` é um **argumento**, uma informação passada ao programa: aqui, o conteúdo da nota.
+- `Dockerfile`: pronto, com `ENTRYPOINT` no lugar de `CMD`. Neste exemplo, `ENTRYPOINT` define o programa a executar. O texto depois de `docker run bloco:1.0` é um **argumento**, uma informação passada ao programa; aqui, o argumento é o conteúdo da nota.
 
 ## Onde os dados ficam guardados
 
 | Lugar | Até quando os dados ficam | Uso comum |
 |---|---|---|
 | Camada gravável do container | até o `docker rm` | arquivos temporários; cache |
-| Bind mount (`-v /pasta/sua:/x`) | enquanto os arquivos existirem na pasta do Codespace | desenvolvimento (desafio 10); configuração |
+| Bind mount (`-v /pasta/sua:/x`) | enquanto os arquivos existirem na pasta do Codespace | desenvolvimento (exercício 10); configuração |
 | **Volume** (`-v nome:/x`) | até o `docker volume rm` | dados do programa: banco de dados, uploads, notas |
 
-Um volume é uma pasta que o Docker guarda e administra. Você não precisa saber onde ela fica no disco; só o nome.
+Um volume é, no fundo, uma pasta que o Docker administra. Para usá-lo, você só precisa do nome; não é preciso saber onde ele fica no disco.
 
 ## Tarefa
 
@@ -39,7 +39,7 @@ Um volume é uma pasta que o Docker guarda e administra. Você não precisa sabe
    docker run --rm bloco:1.0 "assar o bolo"
    ```
 
-   A segunda execução mostra **só** "assar o bolo". A primeira nota estava na camada de arquivos do primeiro container, removido automaticamente por `--rm`.
+   A segunda execução mostra apenas "assar o bolo". A primeira nota estava na camada gravável do primeiro container, que o `--rm` removeu ao final.
 
 2. Crie um volume e ligue-o à pasta `/dados` do container:
 
@@ -49,7 +49,7 @@ Um volume é uma pasta que o Docker guarda e administra. Você não precisa sabe
    docker run --rm -v notas:/dados bloco:1.0 "assar o bolo"
    ```
 
-   Agora as duas notas aparecem: containers diferentes, mesmo volume.
+   Agora as duas notas aparecem: os containers são diferentes, mas o volume é o mesmo.
 
 3. Execute o programa sem passar uma nova nota. Ele apenas mostra as notas já guardadas. Depois, liste os volumes e consulte os detalhes de `notas`:
 
@@ -78,4 +78,4 @@ O volume é independente da imagem. Leia o arquivo com outra imagem qualquer:
 docker run --rm -v notas:/dados alpine cat /dados/notas.txt
 ```
 
-Depois, experimente `docker volume rm notas` enquanto nenhum container o estiver usando. Esse comando apaga o volume **e as notas guardadas nele**. Confirme a remoção com `docker volume ls`. Para refazer o desafio, use `reset.sh 11`, entre novamente na pasta e repita as etapas; isso não recupera as notas apagadas.
+Depois, experimente `docker volume rm notas` enquanto nenhum container o estiver usando. Esse comando apaga o volume **e as notas guardadas nele**. Confirme a remoção com `docker volume ls`. Para refazer o exercício, use `reset.sh 11`, entre novamente na pasta e repita as etapas; isso não recupera as notas apagadas.

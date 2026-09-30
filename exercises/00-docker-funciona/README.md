@@ -1,18 +1,18 @@
-# Desafio 0 — Docker funciona?
+# Exercício 0 — Docker funciona?
 
 ⏱ 3 minutos · feito **antes da aula**, logo depois do instalador
 
 ## Objetivo
 
-Você vai executar seu primeiro container e conferir se o ambiente está pronto para os exercícios. Faça esta etapa antes da aula para se familiarizar com o terminal e ter tempo de pedir ajuda se aparecer algum erro.
+Antes da aula, execute seu primeiro container e confira se o ambiente está pronto para os exercícios. Fazendo isso com antecedência, você se acostuma com o terminal e ainda tem tempo de pedir ajuda se aparecer algum erro.
 
 ## Onde
 
-No terminal do Codespace, em qualquer pasta. O Docker gerencia os containers e as imagens; estes comandos não dependem da pasta em que o terminal está.
+No terminal do Codespace, em qualquer pasta. Quem cuida dos containers e das imagens é o Docker, então estes comandos não dependem da pasta em que o terminal está.
 
 ## Como o Docker funciona
 
-Um Codespace criado com o modelo **Blank** vem com o Docker instalado. Um **container** é um ambiente isolado para executar um programa. Ele é criado a partir de uma **imagem**, que reúne o programa e os arquivos necessários para executá-lo. Para isso, o Docker usa duas partes:
+Um Codespace criado com o modelo **Blank** já vem com o Docker instalado. Um **container** é um ambiente isolado onde um programa é executado. Ele é criado a partir de uma **imagem**, que reúne o programa e os arquivos de que ele precisa. O Docker tem duas partes:
 
 | Peça | O que é |
 |---|---|
@@ -23,7 +23,7 @@ Se aparecer *Cannot connect to the Docker daemon* (não foi possível conectar a
 
 ## Tarefa
 
-1. Execute o comando abaixo no terminal e pressione Enter. Ele mostra as versões do cliente (**Client**) e do serviço (**Server**). Se as duas aparecerem, a comunicação está funcionando:
+1. Digite o comando abaixo no terminal e pressione Enter. Ele mostra a versão do cliente (**Client**) e a do serviço (**Server**). Se as duas aparecerem, cliente e serviço estão se comunicando:
 
    ```bash
    docker version
@@ -35,9 +35,9 @@ Se aparecer *Cannot connect to the Docker daemon* (não foi possível conectar a
    docker run hello-world
    ```
 
-   Procure a mensagem **Hello from Docker!**. O texto em inglês explica o processo: o cliente envia o pedido, o serviço obtém a imagem, cria um container e mostra a mensagem no terminal. Se a imagem já estiver disponível, não é preciso baixá-la novamente.
+   Procure a mensagem **Hello from Docker!**. O texto em inglês que vem em seguida descreve o que aconteceu. O cliente enviou o pedido, e o serviço obteve a imagem, criou um container e mostrou a mensagem no terminal. Se a imagem já estiver no Codespace, o Docker não a baixa de novo.
 
-3. Confira se o Docker Compose também está disponível. Essa ferramenta será usada no desafio 14 para iniciar mais de um serviço com um comando:
+3. Confira se o Docker Compose também está instalado. Ele aparece no exercício 14 e serve para iniciar vários serviços com um único comando:
 
    ```bash
    docker compose version
@@ -49,12 +49,12 @@ Se aparecer *Cannot connect to the Docker daemon* (não foi possível conectar a
 check.sh 00
 ```
 
-A verificação também confere que o instalador conseguiu baixar as quatro imagens-base da aula (`hello-world`, `alpine`, `python:3.12-slim`, `nginx:alpine`). Se faltar alguma, rode `setup.sh`. Depois, ela cria dois containers em uma rede temporária, testa a comunicação pelo nome e remove os recursos do teste. Assim, você confere também a rede que será necessária nos desafios 13 e 14. Se falhar, siga a dica exibida e consulte o [guia do aluno](../../docs/guia-do-aluno.md).
+Além do Docker, a verificação confere se o instalador baixou as quatro imagens-base da aula (`hello-world`, `alpine`, `python:3.12-slim`, `nginx:alpine`). Se faltar alguma, rode `setup.sh`. Em seguida, ela cria dois containers em uma rede temporária, testa se um encontra o outro pelo nome e apaga o que criou para o teste. É essa comunicação pela rede que os exercícios 13 e 14 vão usar. Se algo falhar, siga a dica exibida e consulte o [guia do aluno](../../docs/guia-do-aluno.md).
 
 ## Dica
 
-Depois de conferir, **pare o Codespace** em [github.com/codespaces](https://github.com/codespaces) (⋯ → *Stop codespace*), para não gastar sua franquia gratuita. No dia da aula, é só abrir de novo: imagens e laboratórios continuam lá.
+Depois de conferir, **pare o Codespace** em [github.com/codespaces](https://github.com/codespaces) (⋯ → *Stop codespace*), para não gastar sua franquia gratuita. No dia da aula, abra o mesmo Codespace de novo; as imagens e os laboratórios estarão guardados nele.
 
 ## Missão extra
 
-Execute `docker info` para consultar um resumo do serviço Docker. Procure a linha `Containers:`, que mostra o total de containers, incluindo os parados. O container de teste `hello-world` deve estar nessa contagem.
+Execute `docker info` para ver um resumo do serviço Docker. Procure a linha `Containers:`, que mostra o total de containers, incluindo os parados. O container do teste com `hello-world` entra nessa conta.

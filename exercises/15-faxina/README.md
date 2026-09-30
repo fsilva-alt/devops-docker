@@ -1,12 +1,14 @@
-# Desafio 15 — Faxina
+# Exercício 15 — Faxina
 
 ⏱ 4 minutos · Encerramento · **Opcional**
 
-Pode ser feito depois da aula, quando terminar os desafios que quiser praticar. Ao encerrar a sessão, pare ou exclua o Codespace mesmo se deixar esta limpeza para depois.
+Pode ser feita depois da aula. Mesmo que você adie a limpeza, pare ou exclua o Codespace ao encerrar a sessão.
+
+**Faça a faxina por último**, depois de todos os exercícios que quiser praticar, inclusive os opcionais 16 e 17. Ela remove recursos que as verificações anteriores usam.
 
 ## Objetivo
 
-Você vai descobrir quanto disco o Docker está usando e limpar os recursos que criou nos exercícios: containers parados, imagens sem nome, redes e volumes. **Faça este desafio por último**: ele remove recursos usados nas verificações anteriores.
+Descobrir quanto disco o Docker está usando e limpar o que você criou ao longo do curso: containers parados, imagens sem nome, redes e volumes.
 
 ## Onde
 
@@ -32,7 +34,7 @@ Os containers criados sem `--rm` continuam existindo até serem removidos, mesmo
    docker container prune
    ```
 
-   O trecho `$(docker ps -q)` executa primeiro `docker ps -q` e insere os IDs encontrados no comando `docker stop`. Se não houver containers rodando, `stop` avisará que falta um argumento. Nesse caso, você pode seguir para `docker container prune`.
+   O trecho `$(docker ps -q)` executa primeiro `docker ps -q` e insere os IDs encontrados no comando `docker stop`. Se não houver containers rodando, `stop` avisará que falta um argumento. Nesse caso, siga para `docker container prune`.
 
 3. Remova as imagens sem nome, sobras dos builds:
 
@@ -57,12 +59,19 @@ Aprova sem nenhum container (rodando ou parado) e sem imagens `<none>`.
 
 ## Dicas
 
-- Depois da limpeza, as verificações dos desafios que dependem dos containers removidos deixam de aprovar. Para praticar novamente, use `reset.sh NN`, substituindo `NN` pelo número, e siga o enunciado desde o início.
-- `docker container prune` remove containers parados. Já `docker image prune` remove imagens sem nome que não são usadas por nenhum container, mesmo parado. Por isso, removemos primeiro os containers e depois as imagens.
+- Depois da limpeza, as verificações dos exercícios que dependem dos containers removidos deixam de aprovar. Para praticar novamente, use `reset.sh NN`, substituindo `NN` pelo número, e siga o enunciado desde o início.
+- `docker container prune` remove containers parados. Já `docker image prune` remove imagens sem nome que não são usadas por nenhum container, mesmo parado. Por isso, os containers saem primeiro, e as imagens depois.
 
 ## Missão extra
 
-Apague também o que tem nome: o volume, a rede e as imagens do curso. A verificação reconhece a extra quando nada do curso sobrou.
+Apague também o que tem nome: o volume, a rede e as imagens do curso. A verificação reconhece a missão extra quando nada do curso sobrou.
+
+Se você fez os opcionais de Compose, remova também os recursos deles. Execute apenas as linhas dos projetos que você criou; `-v` apaga as notas do exercício 17:
+
+```bash
+docker compose -f ~/labs/16-compose-desenvolvimento/compose.yaml down
+docker compose -f ~/labs/17-compose-persistencia/compose.yaml down -v
+```
 
 ```bash
 cd ~/labs/14-docker-compose && docker compose down && cd -

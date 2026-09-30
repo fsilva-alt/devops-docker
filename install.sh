@@ -8,12 +8,14 @@
 # O que ele faz:
 #   1. guarda a pasta atual e vai para a sua pasta home;
 #   2. baixa o curso para ~/devops-docker (ou atualiza, se já existir);
-#   3. confere o Docker, baixa as imagens-base e gera os laboratórios em ~/labs;
+#   3. confere o Docker (e o firewall, veja scripts/redes.sh), baixa as
+#      imagens-base e gera os laboratórios em ~/labs;
 #   4. cria um atalho labs na pasta inicial (ln -s ~/labs labs);
-#   5. coloca os comandos check.sh, reset.sh e setup.sh no PATH (bash e zsh);
+#   5. coloca os comandos check.sh, reset.sh, setup.sh e rede.sh no PATH (bash e
+#      zsh) e, no Codespace, refaz o ajuste de firewall a cada terminal novo;
 #   6. mostra os próximos passos.
 #
-# Pode ser rodado de novo sem medo: é idempotente.
+# Pode ser rodado de novo: atualiza o curso sem apagar o seu trabalho.
 #
 # Variáveis opcionais: CURSO_REPO (URL ou caminho do repositório), CURSO_RAMO,
 # CURSO_DIR (padrão ~/devops-docker) e LABS_DIR (padrão ~/labs).
@@ -61,19 +63,30 @@ if [ "$PASTA_INICIAL" != "$(CDPATH= cd "$LABS_DIR" && pwd -P)" ] && [ ! -e "$ATA
   passo "Atalho para os laboratórios criado em $ATALHO_LABS"
 fi
 
-# --- 4. Comandos no PATH ------------------------------------------------------------
+# --- 4. Comandos no PATH e ajuste de rede a cada terminal ---------------------------
 BLOCO_INICIO='# >>> curso de docker >>>'
 BLOCO_FIM='# <<< curso de docker <<<'
+BLOCO="$(
+  printf '%s\n' "$BLOCO_INICIO"
+  printf 'export PATH="%s/scripts:$PATH"\n' "$CURSO_DIR"
+  if [ "$LABS_DIR" != "$HOME/labs" ]; then printf 'export LABS_DIR="%s"\n' "$LABS_DIR"; fi
+  # O ajuste de firewall se perde quando o Codespace é parado (scripts/redes.sh)
+  printf 'if [ "${CODESPACES:-}" = true ]; then ( "%s/scripts/rede.sh" >/dev/null 2>&1 & ); fi\n' "$CURSO_DIR"
+  printf '%s' "$BLOCO_FIM"
+)"
 for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
   # .bashrc é criado se não existir; .zshrc só é alterado se já existir
   if [ ! -f "$rc" ] && [ "$rc" != "$HOME/.bashrc" ]; then continue; fi
-  if ! grep -qF "$BLOCO_INICIO" "$rc" 2>/dev/null; then
-    {
-      printf '\n%s\n' "$BLOCO_INICIO"
-      printf 'export PATH="%s/scripts:$PATH"\n' "$CURSO_DIR"
-      if [ "$LABS_DIR" != "$HOME/labs" ]; then printf 'export LABS_DIR="%s"\n' "$LABS_DIR"; fi
-      printf '%s\n' "$BLOCO_FIM"
-    } >> "$rc"
+  atual="$(awk -v i="$BLOCO_INICIO" -v f="$BLOCO_FIM" '$0 == i {dentro = 1} dentro {print} $0 == f {dentro = 0}' "$rc" 2>/dev/null || true)"
+  [ "$atual" = "$BLOCO" ] && continue
+  if [ -n "$atual" ]; then
+    # Bloco de uma instalação anterior: substitui pelo atual
+    awk -v i="$BLOCO_INICIO" -v f="$BLOCO_FIM" '$0 == i {dentro = 1} !dentro {print} $0 == f {dentro = 0}' "$rc" > "$rc.curso-tmp"
+    cat "$rc.curso-tmp" > "$rc"
+    rm -f "$rc.curso-tmp"
+    printf '%s\n' "$BLOCO" >> "$rc"
+  else
+    printf '\n%s\n' "$BLOCO" >> "$rc"
   fi
 done
 

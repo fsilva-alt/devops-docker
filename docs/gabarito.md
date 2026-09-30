@@ -1,14 +1,14 @@
 # Gabarito
 
-Use estas soluções para conferir sua tentativa, localizar o que falta ou revisar os exercícios depois da aula. Os enunciados explicam cada etapa; aqui você encontra os arquivos e comandos completos. Depois de consultar, experimente repetir a tarefa e explicar o que cada comando faz.
+Aqui estão os arquivos e comandos completos de cada exercício; as explicações ficam nos enunciados. Tente resolver primeiro e venha aqui para conferir o resultado ou descobrir o que faltou. Depois de consultar, tente refazer a tarefa e explicar o que cada comando faz.
 
 ## Como usar
 
-- Nos desafios 4 a 14, entre primeiro na pasta indicada na seção **Onde** do enunciado. O comando `cd` muda a pasta do terminal. Os outros desafios podem ser feitos em qualquer pasta.
-- Execute os comandos de terminal um por vez. Copie os blocos de Dockerfile e YAML para o arquivo indicado, usando o editor, e salve antes de continuar.
-- Ao terminar, execute `check.sh` com o número do desafio, como `check.sh 05`. Os nomes de imagens, containers e arquivos devem ser os mesmos dos exemplos.
+- Nos exercícios 4 a 14, 16 e 17, entre primeiro na pasta indicada na seção **Onde** do enunciado (o comando `cd` muda a pasta do terminal). Os outros podem ser feitos em qualquer pasta.
+- Execute os comandos um por vez no terminal. Os blocos de Dockerfile e YAML vão no editor, no arquivo indicado; salve antes de continuar.
+- Ao terminar, execute `check.sh` com o número do exercício, como `check.sh 05`. Use os mesmos nomes de imagens, containers e arquivos dos exemplos.
 
-## Desafio 0 — Docker funciona?
+## Exercício 0 — Docker funciona?
 
 ```bash
 docker version
@@ -16,7 +16,7 @@ docker run hello-world
 docker compose version
 ```
 
-## Desafio 1 — Olá, container
+## Exercício 1 — Olá, container
 
 ```bash
 docker run hello-world
@@ -26,7 +26,7 @@ docker ps -a
 docker images
 ```
 
-## Desafio 2 — Dentro do container
+## Exercício 2 — Dentro do container
 
 No terminal do Codespace, abra o Python interativo:
 
@@ -55,9 +55,9 @@ De volta ao Codespace, tente ler a marca em um novo container:
 docker run --rm python:3.12-slim cat /marca.txt
 ```
 
-O erro *No such file or directory* é esperado: esse container não tem o arquivo criado em `explorador`. Se faltou `--rm` na primeira etapa, consulte `docker ps -a` e remova apenas o container do Python interativo com `docker rm <id>`, substituindo `<id>` pelo identificador dele.
+O erro *No such file or directory* é esperado: esse container não tem o arquivo criado em `explorador`. Se você esqueceu o `--rm` na primeira etapa, encontre o container do Python interativo com `docker ps -a` e remova só ele com `docker rm <id>`, trocando `<id>` pelo identificador que aparece na lista.
 
-## Desafio 3 — Ciclo de vida
+## Exercício 3 — Ciclo de vida
 
 ```bash
 docker run -d --name relogio alpine sh -c 'while true; do date; sleep 1; done'
@@ -69,9 +69,9 @@ docker rm descartavel                         # erro: está rodando
 docker rm -f descartavel
 ```
 
-## Desafio 4 — Meu primeiro Dockerfile
+## Exercício 4 — Meu primeiro Dockerfile
 
-Na pasta do desafio, execute `code Dockerfile`, copie este conteúdo e salve:
+Na pasta do exercício, execute `code Dockerfile`, copie este conteúdo e salve:
 
 ```dockerfile
 FROM python:3.12-slim
@@ -85,7 +85,7 @@ docker run --rm receitas:1.0
 docker tag receitas:1.0 receitas:latest       # missão extra
 ```
 
-## Desafio 5 — Instalando dependências
+## Exercício 5 — Instalando dependências
 
 Crie e salve o `Dockerfile` com este conteúdo:
 
@@ -102,10 +102,10 @@ docker build -t receitas-api:1.0 .
 docker run --rm receitas-api:1.0 pip list
 ```
 
-## Desafio 6 — Camadas e cache · opcional
+## Exercício 6 — Camadas e cache · opcional
 
 1. Construa com `docker build -t receitas-api:1.1 .`.
-2. Em `app.py`, acrescente `{"nome": "Mousse de maracujá", "rende": "6 porções"},` antes do `]` que fecha a lista `RECEITAS`. Mantenha o alinhamento das outras receitas, salve e repita a construção. O pip será executado novamente.
+2. Em `app.py`, acrescente `{"nome": "Mousse de maracujá", "rende": "6 porções"},` antes do `]` que fecha a lista `RECEITAS`. Mantenha o alinhamento das outras receitas, salve e construa de novo. Repare que o pip roda outra vez.
 3. Substitua o conteúdo do `Dockerfile` pelo exemplo abaixo e salve:
 
 ```dockerfile
@@ -119,9 +119,9 @@ CMD ["python", "app.py"]
 
 4. Execute `docker build -t receitas-api:1.1 .` com a nova ordem. Depois, troque `Mousse de maracujá` por `Mousse de limão` em `app.py`, salve e repita o comando. A etapa do pip deve aparecer como `CACHED`. Consulte o histórico com `docker history receitas-api:1.1`.
 
-A verificação exige o `app.py` diferente do original **e** igual ao que está dentro da imagem.
+Para aprovar, o `app.py` precisa estar diferente do original e, ao mesmo tempo, igual ao que está dentro da imagem.
 
-## Desafio 7 — O que não entra na imagem · opcional
+## Exercício 7 — O que não entra na imagem · opcional
 
 Crie o arquivo `.dockerignore` no editor, com um nome por linha, e salve:
 
@@ -140,7 +140,7 @@ docker build -t receitas-api:1.2 .
 docker run --rm receitas-api:1.2 ls -A /app
 ```
 
-## Desafio 8 — Abrindo portas
+## Exercício 8 — Abrindo portas
 
 Acrescente `EXPOSE 8000` antes de `CMD` no Dockerfile, salve e execute:
 
@@ -150,9 +150,9 @@ docker run -d --name api -p 8001:8000 receitas-api:1.3
 curl localhost:8001/receitas
 ```
 
-Na aba **PORTS**, localize a porta **8001** e clique no ícone de globo para abrir o navegador. Acrescente `/docs` ao endereço para consultar e testar as rotas da API.
+Na aba **PORTS**, procure a porta 8001 e clique no ícone de globo para abri-la no navegador. Acrescente `/docs` ao endereço para ver e testar as rotas da API.
 
-## Desafio 9 — Configuração por ambiente
+## Exercício 9 — Configuração por ambiente
 
 Acrescente `ENV COZINHA="Cozinha do Curso"` antes de `EXPOSE` no Dockerfile, salve e execute:
 
@@ -170,7 +170,7 @@ docker run -d --name cozinha -p 8002:8000 --env-file cozinha.env receitas-api:1.
 curl localhost:8002/
 ```
 
-## Desafio 10 — Editando ao vivo
+## Exercício 10 — Editando ao vivo
 
 ```bash
 docker build -t receitas-api:1.5 .
@@ -189,7 +189,7 @@ Salve o arquivo e consulte a API no terminal:
 curl localhost:8003/receitas
 ```
 
-## Desafio 11 — Dados que ficam · opcional
+## Exercício 11 — Dados que ficam · opcional
 
 ```bash
 docker build -t bloco:1.0 .
@@ -200,7 +200,7 @@ docker run --rm -v notas:/dados bloco:1.0 "comprar cenouras"
 docker run --rm -v notas:/dados bloco:1.0 "assar o bolo"
 ```
 
-## Desafio 12 — Site estático
+## Exercício 12 — Site estático
 
 Crie e salve o `Dockerfile` com este conteúdo:
 
@@ -215,23 +215,23 @@ docker run -d --name web -p 8080:80 receitas-web:1.0
 curl localhost:8080/
 ```
 
-Erro comum: `COPY site/ /usr/share/nginx/html/site/` (o nginx mostra a página padrão dele).
+Um erro comum é escrever `COPY site/ /usr/share/nginx/html/site/`. Nesse caso, o nginx mostra a página padrão dele em vez do site.
 
-## Desafio 13 — Containers conversando
+## Exercício 13 — Containers conversando
 
 ```bash
 docker build -t receitas-api:1.6 .
-docker network inspect cozinha >/dev/null 2>&1 || docker network create cozinha
+docker network create cozinha
 docker run -d --name receitas --network cozinha receitas-api:1.6
 docker logs receitas
 docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py
 ```
 
-O cliente tenta novamente enquanto a API inicia. Se a conexão continuar expirando, siga o [diagnóstico do desafio 13](../exercises/13-containers-conversando/README.md#se-a-api-não-responder). Uma rede existente pode ser reutilizada. Se `receitas` já existir de uma tentativa anterior, remova-o com `docker rm -f receitas` antes de repetir o `docker run`.
+Enquanto a API inicia, o cliente fica tentando de novo. Se a conexão continuar expirando, siga o [diagnóstico do exercício 13](../exercises/13-containers-conversando/README.md#se-a-api-não-responder). Se o container `receitas` sobrou de uma tentativa anterior, remova-o com `docker rm -f receitas` antes de repetir o `docker run`.
 
-A verificação também identifica quando o `receitas` **não** publica porta nenhuma.
+A verificação também percebe quando o `receitas` não publica nenhuma porta.
 
-## Desafio 14 — Docker Compose
+## Exercício 14 — Docker Compose
 
 Crie e salve o arquivo `compose.yaml`, mantendo os espaços no início de cada linha:
 
@@ -245,21 +245,78 @@ services:
     ports:
       - "8090:80"
     depends_on:
-      api:
-        condition: service_healthy
+      - api
 ```
 
 ```bash
-docker compose config
 docker compose up -d --build
 docker compose ps
-curl --noproxy '*' -fsS --max-time 10 localhost:8090/api/receitas
-docker compose logs web api
+curl localhost:8090/api/receitas
 ```
 
-O `api/Dockerfile` fornecido já inclui um `HEALTHCHECK`; `service_healthy` espera esse teste passar antes de iniciar `web`. Se o site abrir sem receitas, use o [diagnóstico do desafio 14](../exercises/14-docker-compose/README.md#se-a-página-não-carregar-as-receitas).
+## Exercício 16 — Desenvolvimento com Compose · opcional
 
-## Desafio 15 — Faxina · opcional
+Na pasta `~/labs/16-compose-desenvolvimento`, crie `compose.yaml`:
+
+```yaml
+services:
+  api:
+    build: .
+    image: receitas-api:dev
+    ports:
+      - "8100:8000"
+    volumes:
+      - .:/app
+```
+
+```bash
+docker compose up -d --build
+```
+
+Acrescente `{"nome": "Pudim", "rende": "8 porções"},` à lista `RECEITAS` em `app.py` e salve. Depois, sem reconstruir a imagem, execute:
+
+```bash
+curl localhost:8100/receitas
+docker compose exec api cat /app/app.py
+docker run --rm receitas-api:dev cat /app/app.py
+check.sh 16
+```
+
+## Exercício 17 — Persistência com Compose · opcional
+
+Na pasta `~/labs/17-compose-persistencia`, crie `compose.yaml`:
+
+```yaml
+services:
+  bloco:
+    build: .
+    image: receitas-notas:1.0
+    volumes:
+      - notas:/dados
+
+volumes:
+  notas:
+```
+
+```bash
+docker compose build
+docker compose run --rm bloco "comprar cenouras"
+docker compose run --rm bloco "assar o bolo"
+docker compose down
+docker compose run --rm bloco
+check.sh 17
+```
+
+Missão extra, depois da verificação: `docker compose down -v` apaga as notas. A próxima execução começa com um volume vazio.
+
+## Exercício 15 — Faxina · opcional
+
+Faça por último. Se você fez os exercícios 16 e 17, remova também os recursos deles:
+
+```bash
+docker compose -f ~/labs/16-compose-desenvolvimento/compose.yaml down
+docker compose -f ~/labs/17-compose-persistencia/compose.yaml down -v
+```
 
 ```bash
 docker system df

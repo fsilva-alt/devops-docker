@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Verificações de cada desafio. Carregado por check.sh.
-# Cada função verificar_NN roda dentro da pasta do desafio (quando ele tem uma)
+# Verificações de cada exercício. Carregado por check.sh.
+# Cada função verificar_NN roda dentro da pasta do exercício (quando ele tem uma)
 # e registra falhas com falhar "o que está errado" "dica". A missão extra usa
 # extra_ok / extra_nao.
 
@@ -38,7 +38,7 @@ exigir_porta() {   # container, porta-container, porta-host, url-de-teste, trech
     return 1
   fi
   if [[ "$host" != "$3" ]]; then
-    falhar "A porta $2 do container está ligada à porta $host do Codespace, mas o desafio pede a $3." \
+    falhar "A porta $2 do container está ligada à porta $host do Codespace, mas o exercício pede a $3." \
       "docker rm -f $1 e rode de novo com -p $3:$2"
     return 1
   fi
@@ -77,13 +77,13 @@ arquivo_compose() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 0 — Docker funciona? (feito antes da aula)
+# Exercício 0 — Docker funciona? (feito antes da aula)
 # ---------------------------------------------------------------------------
-# Testa DNS e HTTP entre dois containers, como nos desafios 13 e 14.
+# Testa DNS e HTTP entre dois containers, como nos exercícios 13 e 14.
 # O subshell garante a limpeza mesmo se algum comando falhar.
 testar_rede_docker() (
   local nome="curso-rede-teste-${BASHPID}-${RANDOM}"
-  trap 'docker rm -f "$nome" "$nome-cliente" >/dev/null 2>&1 || true; docker network rm "$nome" >/dev/null 2>&1 || true' EXIT
+  trap 'docker rm -f "$nome" "$nome-cliente" >/dev/null 2>&1 || true; rm_rede "$nome"' EXIT
   docker network create "$nome" >/dev/null || return 1
   docker run -d --name "$nome" --network "$nome" --network-alias servidor \
     python:3.12-slim python -c '
@@ -126,13 +126,13 @@ verificar_00() {
       info "Dois containers conseguiram conversar pelo nome em uma rede Docker."
     else
       falhar "O Docker executa containers, mas o teste de comunicação pela rede falhou: $rede" \
-        "Pare e reabra o mesmo Codespace, repita check.sh 00 e consulte docs/guia-do-aluno.md se o erro persistir."
+        "Execute rede.sh e repita check.sh 00. Se o erro continuar, pare e reabra o Codespace."
     fi
   fi
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 1 — Olá, container
+# Exercício 1 — Olá, container
 # ---------------------------------------------------------------------------
 verificar_01() {
   [[ -n "$(containers_de hello-world)" ]] || falhar "Nenhum container da imagem hello-world." "docker run hello-world"
@@ -148,7 +148,7 @@ verificar_01() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 2 — Dentro do container
+# Exercício 2 — Dentro do container
 # ---------------------------------------------------------------------------
 verificar_02() {
   if ! container_existe explorador; then
@@ -172,7 +172,7 @@ verificar_02() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 3 — Ciclo de vida
+# Exercício 3 — Ciclo de vida
 # ---------------------------------------------------------------------------
 verificar_03() {
   local run="docker run -d --name relogio alpine sh -c 'while true; do date; sleep 1; done'"
@@ -189,7 +189,7 @@ verificar_03() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 4 — Meu primeiro Dockerfile
+# Exercício 4 — Meu primeiro Dockerfile
 # ---------------------------------------------------------------------------
 verificar_04() {
   exigir_dockerfile || return 0
@@ -213,7 +213,7 @@ verificar_04() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 5 — Instalando dependências
+# Exercício 5 — Instalando dependências
 # ---------------------------------------------------------------------------
 verificar_05() {
   exigir_dockerfile || return 0
@@ -233,7 +233,7 @@ verificar_05() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 6 — Camadas e cache
+# Exercício 6 — Camadas e cache
 # ---------------------------------------------------------------------------
 verificar_06() {
   exigir_dockerfile || return 0
@@ -255,7 +255,7 @@ verificar_06() {
   fi
   local original; original="$(app_py)"
   if [[ "$(cat app.py)" == "$original" ]]; then
-    falhar "O app.py ainda é o original: o desafio pede uma mudança no código (uma receita nova) para ver o cache em ação." \
+    falhar "O app.py ainda é o original: o exercício pede uma mudança no código (uma receita nova) para ver o cache em ação." \
       "Acrescente uma receita à lista RECEITAS em app.py e rode docker build -t receitas-api:1.1 . de novo"
   fi
   local dentro; dentro="$(timeout 30 docker run --rm receitas-api:1.1 cat /app/app.py 2>/dev/null || true)"
@@ -266,7 +266,7 @@ verificar_06() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 7 — O que não entra na imagem
+# Exercício 7 — O que não entra na imagem
 # ---------------------------------------------------------------------------
 verificar_07() {
   [[ -f .dockerignore ]] || falhar "Não há um arquivo .dockerignore nesta pasta." \
@@ -292,7 +292,7 @@ verificar_07() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 8 — Abrindo portas
+# Exercício 8 — Abrindo portas
 # ---------------------------------------------------------------------------
 verificar_08() {
   exigir_dockerfile || return 0
@@ -311,7 +311,7 @@ verificar_08() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 9 — Configuração por ambiente
+# Exercício 9 — Configuração por ambiente
 # ---------------------------------------------------------------------------
 verificar_09() {
   exigir_dockerfile || return 0
@@ -330,7 +330,7 @@ verificar_09() {
   if [[ -z "$valor" ]]; then
     falhar "O container 'cozinha' não tem a variável COZINHA." "docker rm -f cozinha && $run"
   elif [[ -n "$padrao" && "$valor" == "$padrao" ]]; then
-    falhar "O container 'cozinha' usa o mesmo valor da imagem ('$valor'); o desafio pede outro, passado no docker run." \
+    falhar "O container 'cozinha' usa o mesmo valor da imagem ('$valor'); o exercício pede outro, passado no docker run." \
       "docker rm -f cozinha && $run"
   fi
   exigir_porta cozinha 8000 8002 http://localhost:8002/ "$valor" || return 0
@@ -338,7 +338,7 @@ verificar_09() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 10 — Editando ao vivo
+# Exercício 10 — Editando ao vivo
 # ---------------------------------------------------------------------------
 verificar_10() {
   if ! imagem_existe receitas-api:1.5; then
@@ -353,7 +353,7 @@ verificar_10() {
   origem="$(docker container inspect -f '{{range .Mounts}}{{if eq .Destination "/app"}}{{.Source}}{{end}}{{end}}' dev)"
   if [[ "$tipo" != bind || ! "$origem" -ef . ]]; then
     falhar "O container 'dev' não tem esta pasta montada em /app (tipo: ${tipo:-nenhum}; origem: ${origem:-nenhuma})." \
-      "docker rm -f dev && $run   (rode de dentro da pasta do desafio)"
+      "docker rm -f dev && $run   (rode de dentro da pasta do exercício)"
   fi
   grep -q 'Pudim' app.py || falhar "O app.py desta pasta ainda não tem a receita de Pudim." \
     "Edite app.py no VS Code e acrescente {\"nome\": \"Pudim\", \"rende\": \"8 porções\"} à lista RECEITAS."
@@ -366,7 +366,7 @@ verificar_10() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 11 — Dados que ficam
+# Exercício 11 — Dados que ficam
 # ---------------------------------------------------------------------------
 verificar_11() {
   imagem_existe bloco:1.0 || falhar "A imagem bloco:1.0 não existe." "docker build -t bloco:1.0 ."
@@ -380,13 +380,13 @@ verificar_11() {
     falhar "O volume 'notas' existe, mas está vazio." \
       "docker run --rm -v notas:/dados bloco:1.0 \"comprar cenouras\"   (o -v liga o volume à pasta /dados do container)"
   elif (( n < 2 )); then
-    falhar "Só há 1 nota no volume; o desafio pede pelo menos 2, gravadas por containers diferentes." \
+    falhar "Só há 1 nota no volume; o exercício pede pelo menos 2, gravadas por containers diferentes." \
       "Rode de novo com outra nota: docker run --rm -v notas:/dados bloco:1.0 \"assar o bolo\""
   fi
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 12 — Site estático
+# Exercício 12 — Site estático
 # ---------------------------------------------------------------------------
 verificar_12() {
   exigir_dockerfile || return 0
@@ -409,7 +409,7 @@ verificar_12() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 13 — Containers conversando
+# Exercício 13 — Containers conversando
 # ---------------------------------------------------------------------------
 verificar_13() {
   imagem_existe receitas-api:1.6 || falhar "A imagem receitas-api:1.6 não existe." "docker build -t receitas-api:1.6 ."
@@ -428,7 +428,7 @@ verificar_13() {
   local resposta
   if ! resposta="$(cliente_py | timeout 30 docker run --rm -i --network cozinha python:3.12-slim python - 2>&1)"; then
     falhar "De dentro da rede 'cozinha', http://receitas:8000/receitas não respondeu: $resposta" \
-      "Veja docker logs receitas e docker network inspect cozinha. Execute check.sh 00 para testar a rede do Docker e consulte o diagnóstico no enunciado do desafio 13."
+      "Veja docker logs receitas. Se a API está rodando, mas a conexão expira, execute rede.sh e repita o cliente."
   elif [[ "$resposta" != *"Bolo de cenoura"* ]]; then
     falhar "A API respondeu, mas não contém a receita Bolo de cenoura." "Confira app.py, reconstrua receitas-api:1.6 e recrie o container receitas."
   fi
@@ -436,7 +436,7 @@ verificar_13() {
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 14 — Docker Compose
+# Exercício 14 — Docker Compose
 # ---------------------------------------------------------------------------
 verificar_14() {
   if [[ -z "$(arquivo_compose)" ]]; then
@@ -462,11 +462,11 @@ verificar_14() {
     "No serviço web: ports: → - \"8090:80\". Depois docker compose up -d"
   local json; json="$(http_get http://localhost:8090/api/receitas)"
   [[ "$json" == *"Bolo de cenoura"* ]] || falhar "http://localhost:8090/api/receitas não chega até a API." \
-    "Veja docker compose logs web api. Confira o serviço api, o healthcheck e depends_on com condition: service_healthy. Se a API está saudável, consulte o diagnóstico de rede do desafio 14 e execute check.sh 00."
+    "O nginx repassa /api/ para http://api:8000/: o serviço precisa se chamar exatamente 'api'. Veja docker compose logs web. Se a conexão expira, execute rede.sh."
 }
 
 # ---------------------------------------------------------------------------
-# Desafio 15 — Faxina
+# Exercício 15 — Faxina
 # ---------------------------------------------------------------------------
 verificar_15() {
   local rodando parados
@@ -487,11 +487,81 @@ verificar_15() {
 }
 
 # ---------------------------------------------------------------------------
+# Exercício 16 — Desenvolvimento com Compose (opcional)
+# ---------------------------------------------------------------------------
+verificar_16() {
+  if [[ -z "$(arquivo_compose)" ]]; then
+    falhar "Não há um arquivo compose.yaml nesta pasta." "Crie o serviço api com build, image, ports e volumes, como no enunciado."
+    return 0
+  fi
+  if ! docker compose config >/dev/null 2>&1; then
+    falhar "O compose.yaml tem um erro de sintaxe." "Execute docker compose config e confira os espaços no início das linhas."
+    return 0
+  fi
+  local id tipo origem
+  id="$(docker compose ps -q api 2>/dev/null || true)"
+  if [[ -z "$id" ]]; then
+    falhar "O serviço api não está rodando." "docker compose up -d --build"
+    return 0
+  fi
+  tipo="$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/app"}}{{.Type}}{{end}}{{end}}' "$id")"
+  origem="$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/app"}}{{.Source}}{{end}}{{end}}' "$id")"
+  [[ "$tipo" == bind && "$origem" -ef . ]] || falhar "O serviço api não compartilha esta pasta em /app." \
+    'No serviço api, acrescente volumes: com - .:/app e execute docker compose up -d.'
+  exigir_imagem_do_container "$id" receitas-api:dev
+  grep -q 'Pudim' app.py || falhar "O app.py ainda não tem a receita de Pudim." "Acrescente a receita como no enunciado e salve."
+  exigir_porta "$id" 8000 8100 http://localhost:8100/receitas Pudim \
+    "Salve app.py e consulte docker compose logs api para conferir a recarga." || return 0
+  local dentro; dentro="$(docker run --rm receitas-api:dev cat /app/app.py 2>/dev/null || true)"
+  if [[ "$dentro" == *Pudim* ]]; then
+    falhar "A imagem já contém o Pudim: falta observar uma alteração recebida pelo bind mount." \
+      "Retire o Pudim, construa a imagem e inicie o serviço. Depois acrescente o Pudim e salve, sem refazer o build."
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Exercício 17 — Persistência com Compose (opcional)
+# ---------------------------------------------------------------------------
+verificar_17() {
+  if [[ -z "$(arquivo_compose)" ]]; then
+    falhar "Não há um arquivo compose.yaml nesta pasta." "Crie o serviço bloco e declare o volume notas, como no enunciado."
+    return 0
+  fi
+  if ! docker compose config >/dev/null 2>&1; then
+    falhar "O compose.yaml tem um erro de sintaxe." "Execute docker compose config. Declare volumes: também no nível principal."
+    return 0
+  fi
+  if ! docker compose config --services | grep -qx bloco; then
+    falhar "O compose.yaml não define o serviço bloco." "Use services: → bloco: → build: ."
+    return 0
+  fi
+  if ! docker compose config --volumes | grep -qx notas; then
+    falhar "O compose.yaml não declara o volume notas." "Monte notas:/dados no serviço bloco e declare volumes: → notas: no nível principal."
+    return 0
+  fi
+  imagem_existe receitas-notas:1.0 || falhar "A imagem receitas-notas:1.0 não existe." "docker compose build"
+  if ! volume_existe 17-compose-persistencia_notas; then
+    falhar "O volume do projeto ainda não foi criado." 'docker compose run --rm bloco "comprar cenouras"'
+    return 0
+  fi
+  local saida
+  # compose run lê a entrada padrão: com timeout e um terminal, ficaria parado
+  if ! saida="$(timeout 30 docker compose run --rm -T --no-deps bloco 2>&1 </dev/null)"; then
+    falhar "O serviço bloco não conseguiu ler as notas: $saida" "Confira o Dockerfile e a montagem notas:/dados no compose.yaml."
+    return 0
+  fi
+  if [[ "$saida" != *"1. comprar cenouras"* || "$saida" != *"2. assar o bolo"* ]]; then
+    falhar "O serviço bloco não encontrou as duas notas esperadas no volume." \
+      'Execute docker compose run --rm bloco "comprar cenouras" e depois docker compose run --rm bloco "assar o bolo".'
+  fi
+}
+
+# ---------------------------------------------------------------------------
 # Relatório
 # ---------------------------------------------------------------------------
 relatorio() {
   local nn="$1"
-  local titulo; titulo="Desafio $nn — $(lab_nome "$nn")"
+  local titulo; titulo="Exercício $nn — $(lab_nome "$nn")"
   if (( ${#FALHAS[@]} == 0 )); then
     ok "${C_NEG}$titulo${C_FIM}: concluído! 🎉"
   else

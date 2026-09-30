@@ -1,12 +1,12 @@
-# Desafio 7 — O que não entra na imagem
+# Exercício 7 — O que não entra na imagem
 
 ⏱ 4 minutos · Módulo 2: Dockerfile · **Opcional**
 
-Pode ser feito depois da aula. O desafio 8 já traz seu próprio `.dockerignore` para continuar.
+Pode ser feito depois da aula. O exercício 8 já traz o próprio `.dockerignore`, então dá para seguir sem fazer este agora.
 
 ## Objetivo
 
-Você vai escolher quais arquivos da pasta do projeto ficam fora da imagem. Para isso, vai criar um `.dockerignore`, um arquivo que lista o que o Docker deve ignorar durante a construção.
+Nem tudo o que está na pasta do projeto precisa ir para a imagem. Você vai escolher o que fica de fora e registrar isso em um `.dockerignore`, arquivo que lista o que o Docker deve ignorar durante a construção.
 
 ## Onde
 
@@ -63,9 +63,9 @@ check.sh 07
 
 ## Dicas
 
-- O `.dockerignore` filtra o **contexto de construção**, a pasta indicada pelo ponto em `docker build .`. Os arquivos excluídos deixam de ser enviados para cópia na imagem.
-- Compare o tamanho das imagens antes e depois com `docker images receitas-api`. A coluna `SIZE` mostra o tamanho.
+- O `.dockerignore` filtra o contexto de construção, a pasta indicada pelo ponto em `docker build .`. Os arquivos listados nele não são enviados ao Docker e, por isso, não têm como ser copiados para a imagem.
+- Para ver a diferença de tamanho, execute `docker images receitas-api:1.2` depois do build da etapa 1 e de novo depois do build da etapa 3, e compare a coluna `SIZE`. O segundo build reaproveita a tag; a imagem anterior fica sem nome e sai dessa lista.
 
 ## Missão extra
 
-Inclua também `Dockerfile` e `.dockerignore` no `.dockerignore`: eles servem para construir a imagem, não precisam estar dentro dela. Construa e confira o `ls -A /app`.
+Acrescente também `Dockerfile` e `.dockerignore` ao `.dockerignore`. Esses arquivos servem para construir a imagem e não precisam estar dentro dela. Construa de novo e confira com `ls -A /app`.

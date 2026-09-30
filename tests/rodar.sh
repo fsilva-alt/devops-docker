@@ -6,7 +6,7 @@
 # Constrói a imagem de tests/Dockerfile (um Docker completo e vazio), monta este
 # repositório em /workspaces/devops-docker (somente leitura) e executa
 # tests/entrada.sh, que sobe o daemon e roda tests/solucoes.sh: o install.sh
-# como um aluno faria e depois cada desafio nos três cenários (vazio, errado,
+# como um aluno faria e depois cada exercício nos três cenários (vazio, errado,
 # certo), conferindo check.sh.
 #
 # Precisa de --privileged (o daemon interno cria namespaces e cgroups). O volume

@@ -1,10 +1,10 @@
-# Desafio 12 — Site estático
+# Exercício 12 — Site estático
 
 ⏱ 5 minutos · Módulo 5: Vários containers
 
 ## Objetivo
 
-Você vai executar um site em um container usando o **nginx**, um servidor web que entrega os arquivos da página ao navegador. Os arquivos já estão prontos: você vai criar a imagem, copiar o site para ela e publicar uma porta, como fez com a API.
+Colocar um site no ar dentro de um container com o **nginx**, um servidor web que entrega os arquivos da página ao navegador. Os arquivos do site já estão prontos. O seu trabalho é montar uma imagem com eles e publicar uma porta, como você fez com a API.
 
 ## Onde
 
@@ -23,11 +23,11 @@ Uma pasta `site/` com:
 | `receitas.json` | A lista de receitas em JSON, um formato de texto para organizar dados |
 | `style.css` | Define a aparência da página, como cores, fontes e espaçamentos, usando CSS |
 
-Neste **site estático**, o nginx entrega arquivos prontos; a lista de receitas vem de `receitas.json`. No desafio 14, o site buscará essa lista na API. Por enquanto, falta criar apenas o `Dockerfile`.
+Em um **site estático**, o nginx só entrega arquivos prontos; aqui, a lista de receitas vem de `receitas.json`. No exercício 14, o site passará a buscar essa lista na API. Na pasta, só falta o `Dockerfile`.
 
 ## Imagens prontas
 
-A imagem `nginx:alpine` já traz um servidor web configurado para servir o que estiver em `/usr/share/nginx/html` na porta 80. Você só precisa colocar os seus arquivos lá. É assim com a maioria das imagens oficiais: leia a descrição no Docker Hub para saber "onde colocar as coisas".
+A imagem `nginx:alpine` já traz um servidor web configurado para servir o que estiver em `/usr/share/nginx/html` na porta 80. Você só precisa colocar os seus arquivos lá. A maioria das imagens oficiais funciona assim, e a descrição de cada uma no Docker Hub diz onde colocar os arquivos e as configurações.
 
 ## Tarefa
 
@@ -39,7 +39,7 @@ A imagem `nginx:alpine` já traz um servidor web configurado para servir o que e
    COPY site/ /usr/share/nginx/html/
    ```
 
-   Sem `CMD`: a imagem do nginx já tem o dela (iniciar o servidor).
+   Não é preciso `CMD`, porque a imagem do nginx já tem o dela, que inicia o servidor.
 
 2. Construa e rode, ligando a porta 8080 do Codespace à 80 do container:
 
@@ -48,12 +48,14 @@ A imagem `nginx:alpine` já traz um servidor web configurado para servir o que e
    docker run -d --name web -p 8080:80 receitas-web:1.0
    ```
 
-3. Execute os comandos abaixo para consultar o HTML e os dados pelo terminal. Depois, abra a aba **PORTS**, localize a porta **8080** e clique no ícone de globo para ver a página no navegador. A lista de receitas é preenchida por `app.js`, executado pelo navegador:
+3. Consulte o HTML e os dados pelo terminal:
 
    ```bash
    curl localhost:8080/
    curl localhost:8080/receitas.json
    ```
+
+   Depois, abra a aba **PORTS**, localize a porta 8080 e clique no ícone de globo para ver a página no navegador. Quem preenche a lista de receitas é o `app.js`, executado pelo navegador.
 
 ## Verificação
 
@@ -68,7 +70,7 @@ check.sh 12
 
 ## Missão extra
 
-Edite o site sem reconstruir a imagem, como no desafio 10. Primeiro, remova o container `web` e crie outro com a pasta `site` compartilhada:
+Edite o site sem reconstruir a imagem, como no exercício 10. Primeiro, remova o container `web` e crie outro com a pasta `site` compartilhada:
 
 ```bash
 docker rm -f web
