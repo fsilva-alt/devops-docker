@@ -28,6 +28,9 @@ a{color:var(--accent)}
 a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--r-s)}
 code,pre,kbd{font-family:var(--mono)}
 code{background:var(--panel-2);border-radius:4px;padding:.08em .4em;font-size:.9em;color:var(--accent);white-space:nowrap}
+/* código longo (preparado em renderSlide) quebra só nos espaços em vez de vazar da caixa */
+code.wrap{white-space:normal;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+code.wrap span{white-space:nowrap}
 h1,h2,h3{font-family:var(--display);font-weight:600;letter-spacing:-.015em;line-height:1.15;margin:0;text-wrap:balance}
 p{margin:0}
 strong{font-weight:600;color:var(--ink)}
@@ -355,6 +358,7 @@ const INTRO = {
           <div class="box lift"><h3>Comando ou conteúdo de arquivo?</h3><p>Nos slides, <code>$</code> marca uma linha para executar no terminal. Copie o comando sem esse símbolo e pressione <kbd>Enter</kbd>. Execute uma linha por vez.</p><p>Quando a instrução pedir um arquivo, copie o conteúdo no editor e salve com <kbd>Ctrl+S</kbd> ou <kbd>Cmd+S</kbd> no Mac. Linhas com <code>#</code> são comentários.</p></div>
           <div class="box"><h3>Como fazer os exercícios</h3><p>Leia o objetivo, consulte os comandos e siga a tarefa na pasta indicada. Ao terminar, execute <code>check.sh</code> com o número do exercício: ele confirma o resultado ou mostra o que ajustar.</p><p>Os marcados como <strong>opcionais</strong> e a <strong>Missão extra</strong> podem ficar para depois. Para executar os comandos, use os exemplos completos da tarefa. Nas tabelas de consulta, <code>&lt;nome&gt;</code> indica um valor a substituir, <code>[opção]</code> indica algo opcional, e <code>…</code> indica um exemplo abreviado.</p></div>
         </div>
+        <div class="box lift"><h3>Instale o material do curso</h3><p>Execute esta linha uma única vez no terminal do Codespace. O instalador baixa as imagens da aula, prepara os arquivos dos exercícios em <code>~/labs</code> e disponibiliza os comandos <code>check.sh</code> e <code>reset.sh</code>.</p>${cmd('$ sh -c "$(curl -fsSL https://raw.githubusercontent.com/fsilva-alt/devops-docker/main/install.sh)"')}<p style="margin-top:10px">Espere aparecer <strong>Curso de Docker instalado com sucesso!</strong> e abra um terminal novo antes de continuar. Se você já instalou antes da aula, pule esta etapa.</p></div>
         <div class="callout"><strong>Comandos para se localizar:</strong> <code>pwd</code> mostra a pasta atual; <code>ls</code> lista seu conteúdo; <code>cd caminho</code> entra em outra pasta. O símbolo <code>~</code> representa sua pasta pessoal. Para abrir um arquivo no editor, use <code>code nome-do-arquivo</code>.</div>
       </div>`},
     {h:'O que é um container?', eyebrow:'Introdução · 2 de 6', body:`
@@ -1415,6 +1419,17 @@ function renderSlide(d, i){
   document.getElementById('dots').innerHTML = d.slides.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');
   const el = document.getElementById('slide');
   el.innerHTML = `<div class="eyebrow">${esc(s.eyebrow || (isIntro? 'Introdução' : `Exercício ${pad(d.n)} · ${d.mod}`))}${d.el?' · Opcional':''}</div><h2>${s.h}</h2>${s.body}`;
+  // Até 29 caracteres o código cabe inteiro em qualquer caixa; acima disso pode quebrar,
+  // mas só nos espaços, para "--version" não virar "--" e "version" em linhas diferentes.
+  // A primeira coluna das tabelas continua sem quebra: ela rola dentro de .tw.
+  el.querySelectorAll('code').forEach(c => {
+    if (c.textContent.length < 30 || c.closest('td:first-child')) return;
+    c.replaceChildren(...c.textContent.split(' ').flatMap((w, k) => {
+      const s = document.createElement('span'); s.textContent = w;
+      return k ? [' ', s] : [s];
+    }));
+    c.classList.add('wrap');
+  });
   el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
   const prev = document.getElementById('btnPrev'), next = document.getElementById('btnNext');
   prev.toggleAttribute('disabled', i === 0);

@@ -9,7 +9,7 @@
 
 ## Como acompanhar os exercícios
 
-- Comece pelo slide **Como acompanhar a aula**. Ele apresenta o terminal, o editor e a diferença entre um comando e o conteúdo de um arquivo.
+- Comece pelo slide **Como acompanhar a aula**. Ele apresenta o terminal, o editor, o comando que instala o material do curso e a diferença entre um comando e o conteúdo de um arquivo.
 - Siga a trilha principal: **0 → 1 → 2 → 3 → 4 → 5 → 8 → 9 → 10 → 12 → 13 → 14**. Ela inclui o 10 (Editando ao vivo).
 - Os exercícios 6, 7, 11, 15, 16 e 17 são opcionais, assim como as seções **Missão extra**. O 16 e o 17 são práticas de Compose para depois da aula. Faça a faxina (15) por último.
 - Em cada exercício, leia o objetivo, entre na pasta indicada, execute uma etapa por vez e compare o resultado com o enunciado.
