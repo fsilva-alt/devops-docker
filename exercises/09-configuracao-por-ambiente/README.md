@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Mudar o nome da cozinha exibido pela API **sem reconstruir a imagem**. Vamos usar uma **variável de ambiente**, uma configuração com nome e valor que o programa lê ao iniciar. Neste exercício, o nome é `COZINHA`, e o valor pode ser `Cozinha da Ana`.
+Você vai mudar o nome da cozinha exibido pela API **sem reconstruir a imagem**, usando uma **variável de ambiente**: uma configuração com nome e valor que o programa lê ao iniciar. Neste exercício, o nome é `COZINHA`, e o valor pode ser `Cozinha da Ana`.
 
 ## Onde
 

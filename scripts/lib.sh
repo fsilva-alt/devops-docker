@@ -83,8 +83,12 @@ lab_tem_pasta() {
 
 # Descobre o desafio a partir do diretório atual (LABS_DIR/NN-nome/...).
 detectar_lab() {
-  local rel="${PWD#"$LABS_DIR"/}"
-  [[ "$rel" != "$PWD" ]] || return 1
+  # O atalho labs pode dar um PWD lógico diferente do caminho dos laboratórios.
+  local atual raiz rel
+  atual="$(pwd -P)"
+  raiz="$(cd "$LABS_DIR" 2>/dev/null && pwd -P)" || return 1
+  rel="${atual#"$raiz"/}"
+  [[ "$rel" != "$atual" ]] || return 1
   local nn="${rel%%/*}"
   nn="${nn%%-*}"
   [[ "$nn" =~ ^[0-9]{2}$ ]] || return 1
@@ -157,7 +161,7 @@ ler_do_container() { docker cp "$1:$2" - 2>/dev/null | tar -xO 2>/dev/null || tr
 http_get() {
   local tentativa corpo
   for tentativa in 1 2 3 4 5 6 7 8; do
-    if corpo="$(curl -sf --max-time 5 "$1" 2>/dev/null)"; then
+    if corpo="$(curl --noproxy '*' -sf --max-time 5 "$1" 2>/dev/null)"; then
       printf '%s' "$corpo"
       return 0
     fi

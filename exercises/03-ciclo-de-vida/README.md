@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Executar um container em **segundo plano**, ou seja, mantendo o terminal disponível para outros comandos. Você vai consultar os **logs** (mensagens produzidas pelo programa), parar o container, iniciá-lo novamente e removê-lo.
+Você vai executar um container em **segundo plano**, mantendo o terminal disponível para outros comandos, e consultar seus **logs** (mensagens produzidas pelo programa). Também vai praticar como parar, iniciar novamente e remover containers.
 
 ## Onde
 

@@ -4,8 +4,7 @@ Uma aula ao vivo de 3 horas, pelo Zoom, com exercícios feitos no navegador. Voc
 
 Não é preciso ter experiência com programação ou Docker. Os programas usados nos exercícios já vêm prontos; você vai aprender a executá-los em containers e fazer pequenas alterações seguindo os exemplos.
 
-> **Aluno?** Siga a seção [Antes da aula](#antes-da-aula) agora e, no dia, a [Sequência da aula](#sequência-da-aula).
-> **Professor ou monitor?** Veja o [guia do professor](docs/guia-do-professor.md).
+Comece pela seção [Antes da aula](#antes-da-aula) e, depois, siga a [Sequência da aula](#sequência-da-aula). O [guia do aluno](docs/guia-do-aluno.md) reúne dicas para acompanhar os desafios e resolver problemas comuns.
 
 ## O que você vai aprender
 
@@ -33,7 +32,7 @@ Faça esta preparação **pelo menos um dia antes**. Assim, há tempo para resol
    sh -c "$(curl -fsSL https://raw.githubusercontent.com/fsilva-alt/devops-docker/main/install.sh)"
    ```
 
-   Esse comando baixa e executa o instalador do curso. Ele salva o material em `~/devops-docker`, baixa as imagens usadas na aula e prepara os arquivos dos exercícios em `~/labs`. Aguarde a mensagem **"Curso de Docker instalado com sucesso!"**. O símbolo `~` representa sua pasta pessoal no Codespace.
+   Esse comando baixa e executa o instalador do curso. Ele salva o material em `~/devops-docker`, baixa as imagens usadas na aula e prepara os arquivos dos exercícios em `~/labs`. Também cria um atalho `labs` na pasta em que você executou o instalador, para acessar os exercícios pelo explorador do VS Code. Aguarde a mensagem **"Curso de Docker instalado com sucesso!"**. O símbolo `~` representa sua pasta pessoal no Codespace.
 
 4. Abra outro terminal pelo menu **Terminal → New Terminal**. Execute os comandos abaixo, **um por vez**, pressionando Enter ao final de cada linha:
 
@@ -92,16 +91,16 @@ Dentro da pasta de um laboratório, `check.sh` e `reset.sh` funcionam sem o núm
 | [7](exercises/07-o-que-nao-entra/README.md) | O que não entra na imagem · **opcional** | `.dockerignore` |
 | [8](exercises/08-abrindo-portas/README.md) | Abrindo portas | `-p`, `EXPOSE`, aba PORTS, `/docs` |
 | [9](exercises/09-configuracao-por-ambiente/README.md) | Configuração por ambiente | `ENV`, `-e`, `--env-file`, `exec` |
-| [10](exercises/10-editando-ao-vivo/README.md) | Editando ao vivo · **opcional** | bind mount `-v "$PWD:/app"` |
+| [10](exercises/10-editando-ao-vivo/README.md) | Editando ao vivo | bind mount `-v "$PWD:/app"` |
 | [11](exercises/11-dados-que-ficam/README.md) | Dados que ficam · **opcional** | `docker volume`, `ENTRYPOINT` |
 | [12](exercises/12-site-estatico/README.md) | Site estático | `nginx:alpine` + HTML/JS |
 | [13](exercises/13-containers-conversando/README.md) | Containers conversando | `network create`, DNS por nome |
 | [14](exercises/14-docker-compose/README.md) | Docker Compose | `compose.yaml`, `up -d`, `ps`, `logs`, `down` |
 | [15](exercises/15-faxina/README.md) | Faxina · **opcional** | `system df`, `prune` |
 
-Os cinco desafios **opcionais são 6, 7, 10, 11 e 15**: aprofundam otimização de imagens, edição ao vivo, persistência e limpeza. Podem ser feitos depois da aula, liberando 23 minutos para acompanhar a turma. Os laboratórios seguintes já têm seus próprios arquivos de partida, então você pode continuar sem concluir os opcionais.
+Os quatro desafios **opcionais são 6, 7, 11 e 15**: aprofundam otimização de imagens, persistência e limpeza. Você pode reservar essas práticas para depois da aula e usar esse tempo para tirar dúvidas ou concluir as etapas anteriores. Os laboratórios seguintes já têm seus próprios arquivos de partida.
 
-A trilha principal é **0 → 1 → 2 → 3 → 4 → 5 → 8 → 9 → 12 → 13 → 14**: dos primeiros containers ao site e à API juntos com Compose. A seção **Missão extra** de cada enunciado também é opcional.
+A trilha principal é **0 → 1 → 2 → 3 → 4 → 5 → 8 → 9 → 10 → 12 → 13 → 14**: dos primeiros containers à edição ao vivo e ao site e à API juntos com Compose. O desafio **10 — Editando ao vivo** faz parte dessa trilha. A seção **Missão extra** de cada enunciado é opcional.
 
 Você vai trabalhar com um **livro de receitas**. Primeiro, um programa Python mostra as receitas no terminal. Depois, uma API fornece esses dados pela rede. Por fim, um site exibe a lista no navegador, e o Docker Compose inicia os containers do site e da API juntos.
 

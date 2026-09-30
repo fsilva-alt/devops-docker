@@ -91,7 +91,8 @@ git -C "$ORIGEM" init -q -b main
 git -C "$ORIGEM" -c user.name=dev -c user.email=dev@exemplo.com add -A
 git -C "$ORIGEM" -c user.name=dev -c user.email=dev@exemplo.com commit -q -m "Versão em teste"
 
-cd /tmp   # o instalador tem de funcionar de qualquer pasta (ele faz cd $HOME)
+WORKSPACE="$(mktemp -d)"
+cd "$WORKSPACE"   # simula a pasta aberta no editor do Codespace
 saida="$(CURSO_REPO="$ORIGEM" sh "$ORIGEM/install.sh" 2>&1)" \
   && conta_ok "install.sh roda com sh (POSIX) e termina sem erro" \
   || { conta_falha "install.sh falhou"; printf '%s\n' "$saida"; exit 1; }
@@ -103,6 +104,9 @@ grep -q 'check.sh 00' <<<"$saida" && conta_ok "install.sh indica o primeiro pass
   || conta_falha "~/devops-docker/scripts/check.sh não existe"
 [[ -d "$HOME/labs/04-meu-primeiro-dockerfile" && -d "$HOME/labs/14-docker-compose/web/site" ]] \
   && conta_ok "laboratórios gerados em ~/labs" || conta_falha "laboratórios não foram gerados em ~/labs"
+[[ -L "$WORKSPACE/labs" && "$WORKSPACE/labs" -ef "$HOME/labs" ]] \
+  && conta_ok "atalho labs criado na pasta de onde o instalador foi executado" \
+  || conta_falha "atalho labs não aponta para os laboratórios"
 grep -q 'devops-docker/scripts' "$HOME/.bashrc" && conta_ok "PATH adicionado ao ~/.bashrc" \
   || conta_falha "PATH não foi adicionado ao ~/.bashrc"
 grep -q 'devops-docker/scripts' "$HOME/.zshrc" && conta_ok "PATH adicionado ao ~/.zshrc" \
@@ -123,6 +127,18 @@ saida="$(CURSO_REPO="$ORIGEM" sh "$ORIGEM/install.sh" 2>&1)" && grep -q 'Atualiz
   || conta_falha "segunda execução apagou os labs"
 (( $(grep -c '# >>> curso de docker >>>' "$HOME/.bashrc") == 1 )) && conta_ok "PATH não duplicado no ~/.bashrc" \
   || conta_falha "bloco do PATH duplicado no ~/.bashrc"
+[[ -L "$WORKSPACE/labs" && ! -L "$HOME/labs/labs" ]] \
+  && conta_ok "segunda execução preserva o atalho sem criar labs/labs" \
+  || conta_falha "segunda execução duplicou ou perdeu o atalho"
+rm "$WORKSPACE/labs"
+mkdir "$WORKSPACE/labs"
+touch "$WORKSPACE/labs/meu-arquivo"
+saida="$(CURSO_REPO="$ORIGEM" sh "$ORIGEM/install.sh" 2>&1)"
+[[ -f "$WORKSPACE/labs/meu-arquivo" && ! -L "$WORKSPACE/labs" ]] \
+  && conta_ok "install.sh preserva uma pasta labs que já existia" \
+  || conta_falha "install.sh sobrescreveu a pasta labs existente"
+rm -r "$WORKSPACE/labs"
+ln -s "$HOME/labs" "$WORKSPACE/labs"
 rm -f "$HOME/labs/04-meu-primeiro-dockerfile/marca"
 
 # Daqui em diante, tudo usa a instalação feita pelo aluno
@@ -136,13 +152,44 @@ passo "Desafio 00 — Docker funciona?"
 reprova 00 vazio "docker run hello-world"
 docker run hello-world >/dev/null
 aprova 00 certo
+[[ -z "$(docker network ls --filter name=curso-rede-teste- -q)" && -z "$(docker ps -aq --filter name=curso-rede-teste-)" ]] \
+  && conta_ok "00 o teste de rede remove seus containers e sua rede" \
+  || conta_falha "00 o teste de rede deixou recursos para trás"
+if saida="$(
+  source "$CURSO_DIR/scripts/checks.sh"
+  # Simula containers que iniciam, mas não conseguem conversar pela bridge.
+  docker() {
+    if [[ "${1:-} ${2:-}" == 'network create' ]]; then
+      command docker network create --opt com.docker.network.bridge.enable_icc=false "$3"
+    else
+      command docker "$@"
+    fi
+  }
+  verificar_00
+  relatorio 00
+)"; then
+  conta_falha "00 aprovou uma rede com comunicação entre containers bloqueada"
+elif [[ "$saida" == *"teste de comunicação pela rede falhou"* ]]; then
+  conta_ok "00 detecta timeout entre containers antes dos desafios 13 e 14"
+else
+  conta_falha "00 não explicou a falha de comunicação"; printf '%s\n' "$saida"
+fi
+[[ -z "$(docker network ls --filter name=curso-rede-teste- -q)" && -z "$(docker ps -aq --filter name=curso-rede-teste-)" ]] \
+  && conta_ok "00 limpa os recursos também após falha de rede" \
+  || conta_falha "00 deixou recursos após falha de rede"
 
 # ---------------------------------------------------------------------------
 passo "Desafio 01 — Olá, container"
 reprova 01 vazio "print"
 docker run python:3.12-slim python --version >/dev/null
 reprova 01 "errado (python sem print)" "print"
-docker run python:3.12-slim python -c "print('Olá, Docker!')" | grep -q 'Olá' || conta_falha "01: o print não saiu do container"
+saida="$(bash --noprofile --norc -i 2>&1 <<'EOF'
+docker run python:3.12-slim python -c 'print("Olá, Docker!")'
+exit
+EOF
+)"
+grep -qx 'Olá, Docker!' <<<"$saida" && conta_ok "01 o comando funciona no Bash interativo com expansão de histórico" \
+  || { conta_falha "01 o print falhou no Bash interativo"; printf '%s\n' "$saida"; }
 aprova 01 certo
 
 # ---------------------------------------------------------------------------
@@ -276,7 +323,7 @@ aprova 09 "certo + extra (env-file)" extra
 # ---------------------------------------------------------------------------
 passo "Desafio 10 — Editando ao vivo"
 reprova 10 vazio "docker build"
-cd "$(lab_dir 10)"
+cd "$WORKSPACE/labs/10-editando-ao-vivo"
 build receitas-api:1.5
 run_d --name dev -p 8003:8000 receitas-api:1.5
 reprova 10 "errado (sem bind mount)" "montada em /app"
@@ -325,7 +372,11 @@ passo "Desafio 13 — Containers conversando"
 reprova 13 vazio "cozinha"
 cd "$(lab_dir 13)"
 build receitas-api:1.6
-docker network create cozinha >/dev/null
+docker network inspect cozinha >/dev/null 2>&1 || docker network create cozinha >/dev/null
+rede_antes="$(docker network inspect -f '{{.Id}}' cozinha)"
+docker network inspect cozinha >/dev/null 2>&1 || docker network create cozinha >/dev/null
+[[ "$rede_antes" == "$(docker network inspect -f '{{.Id}}' cozinha)" ]] \
+  && conta_ok "13 preparar a rede duas vezes reutiliza cozinha" || conta_falha "13 a rede existente não foi reutilizada"
 reprova 13 "errado (sem container)" "--network cozinha"
 run_d --name receitas receitas-api:1.6
 reprova 13 "errado (fora da rede)" "não está na rede"
@@ -333,13 +384,26 @@ docker rm -f receitas >/dev/null
 run_d --name receitas --network cozinha -p 8004:8000 receitas-api:1.6
 aprova 13 "certo (com -p, sem extra)"
 docker rm -f receitas >/dev/null
-run_d --name receitas --network cozinha receitas-api:1.6
-sleep 3   # o uvicorn ainda está subindo
-docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py | grep -q 'Bolo de cenoura' \
-  && conta_ok "13 cliente.py acha a API pelo nome" || conta_falha "13: cliente.py não achou a API"
+# Simula um início lento, sem sleep no cliente ou na verificação.
+run_d --name receitas --network cozinha receitas-api:1.6 sh -c 'sleep 4; exec python app.py'
+saida="$(docker run --rm --network cozinha -v "$PWD:/app" \
+  -e HTTP_PROXY=http://127.0.0.1:9 -e http_proxy=http://127.0.0.1:9 \
+  python:3.12-slim python /app/cliente.py 2>&1)"
+if [[ "$saida" == *"Bolo de cenoura"* && "$saida" == *"Aguardando a API"* ]]; then
+  conta_ok "13 cliente.py espera a API iniciar e ignora proxies externos"
+else
+  conta_falha "13 cliente.py falhou ao aguardar a API ou não repetiu o pedido"; printf '%s\n' "$saida"
+fi
 docker run --rm -v "$PWD:/app" python:3.12-slim python /app/cliente.py >/dev/null 2>&1 \
   && conta_falha "13: fora da rede o nome não deveria resolver" || conta_ok "13 fora da rede, o nome não resolve"
 aprova 13 "certo + extra" extra
+docker stop -t 1 receitas >/dev/null
+saida="$(docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py 2>&1)" \
+  && conta_falha "13 cliente deveria falhar com a API parada" \
+  || { [[ "$saida" == *"após 8 tentativas"* && "$saida" != *Traceback* ]] \
+    && conta_ok "13 API indisponível produz diagnóstico limitado, sem traceback" \
+    || conta_falha "13 falha do cliente não explicou como conferir a rede"; }
+docker start receitas >/dev/null
 
 # ---------------------------------------------------------------------------
 passo "Desafio 14 — Docker Compose"
@@ -347,9 +411,12 @@ reprova 14 vazio "compose.yaml"
 cd "$(lab_dir 14)"
 printf 'services:\n  api:\n    build: ./api\n' > compose.yaml
 reprova 14 "errado (só a api)" "serviço 'web'"
-printf 'services:\n  api:\n    build: ./api\n\n  web:\n    build: ./web\n    ports:\n      - "8090:80"\n    depends_on:\n      - api\n' > compose.yaml
+printf 'services:\n  api:\n    build: ./api\n\n  web:\n    build: ./web\n    ports:\n      - "8090:80"\n    depends_on:\n      api:\n        condition: service_healthy\n' > compose.yaml
 reprova 14 "errado (sem up)" "docker compose up"
 docker compose up -d --build --quiet-pull >/dev/null 2>&1
+[[ "$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q api)")" == healthy ]] \
+  && conta_ok "14 Compose espera a API saudável antes de iniciar web" \
+  || conta_falha "14 API ainda não estava saudável após o up"
 esperar_http localhost:8090/api/receitas || conta_falha "14: a API atrás do nginx não respondeu em 10 s"
 aprova 14 certo
 curl -sf localhost:8090/app.js | grep -q '/api/receitas' && conta_ok "14 o site pede as receitas em /api/receitas" \
@@ -359,11 +426,29 @@ reprova 14 "errado (depois do down)" "docker compose up"
 docker compose up -d >/dev/null 2>&1
 esperar_http localhost:8090/api/receitas || conta_falha "14: a API não voltou depois do up"
 aprova 14 "certo (up de novo, sem build)"
-printf 'services:\n  api:\n    build: ./api\n    environment:\n      COZINHA: "Cozinha do Compose"\n\n  web:\n    build: ./web\n    ports:\n      - "8090:80"\n    depends_on:\n      - api\n' > compose.yaml
+printf 'services:\n  api:\n    build: ./api\n    environment:\n      COZINHA: "Cozinha do Compose"\n\n  web:\n    build: ./web\n    ports:\n      - "8090:80"\n    depends_on:\n      api:\n        condition: service_healthy\n' > compose.yaml
 docker compose up -d >/dev/null 2>&1
 for _ in $(seq 1 20); do curl -sf localhost:8090/api/ 2>/dev/null | grep -q 'Cozinha do Compose' && break; sleep 0.5; done
 curl -sf localhost:8090/api/ | grep -q 'Cozinha do Compose' && conta_ok "14 environment no compose chega à API (só o api foi recriado)" \
   || conta_falha "14: environment do compose não chegou à API"
+
+# Ocupa o IP antigo para confirmar que o nginx encontra a API após ela mudar de IP.
+api_id="$(docker compose ps -q api)"
+ip_antigo="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$api_id")"
+web_antes="$(docker compose ps -q web)"
+docker compose rm -sf api >/dev/null 2>&1
+run_d --name ocupa-ip --network 14-docker-compose_default alpine sleep 60
+docker compose up -d api >/dev/null 2>&1
+ip_novo="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$(docker compose ps -q api)")"
+if [[ "$ip_novo" != "$ip_antigo" && "$web_antes" == "$(docker compose ps -q web)" ]] && esperar_http localhost:8090/api/receitas; then
+  conta_ok "14 nginx reencontra a API com outro IP sem recriar web"
+else
+  conta_falha "14 nginx não reencontrou a API após a troca de IP"
+fi
+docker rm -f ocupa-ip >/dev/null
+curl -sf 'localhost:8090/api/receitas?teste=1' | grep -q 'Bolo de cenoura' \
+  && conta_ok "14 proxy remove /api/ e preserva uma URL com query string" \
+  || conta_falha "14 proxy falhou com query string"
 
 # ---------------------------------------------------------------------------
 passo "Desafio 15 — Faxina"
@@ -385,10 +470,10 @@ aprova 15 "certo + extra" extra
 
 # ---------------------------------------------------------------------------
 passo "Utilitários"
-cd "$(lab_dir 13)"
+cd "$WORKSPACE/labs/13-containers-conversando"
 saida="$(check.sh 2>&1 || true)"     # reprova (a faxina apagou tudo), mas tem de detectar o 13
 grep -q 'Desafio 13' <<<"$saida" && conta_ok "check.sh sem argumento detecta o desafio pela pasta" \
-  || { conta_falha "check.sh sem argumento não detectou o desafio"; printf '%s\n' "$saida"; }
+  || { conta_falha "check.sh sem argumento não detectou o desafio pelo atalho labs"; printf '%s\n' "$saida"; }
 cd "$CURSO_DIR"
 setup.sh | grep -q '0 laboratório(s) gerado(s), 11 mantido(s)' && conta_ok "setup.sh é idempotente" \
   || conta_falha "setup.sh regenerou labs existentes"

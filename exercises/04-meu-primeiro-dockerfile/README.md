@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Criar uma **imagem** com o programa de receitas fornecido pelo curso. Você vai escrever um `Dockerfile`, construir a imagem com `docker build` e executar um container a partir dela.
+Você vai criar uma **imagem** com o programa de receitas fornecido pelo curso: escrever um `Dockerfile`, construir a imagem com `docker build` e executar um container a partir dela.
 
 ## Onde
 

@@ -6,7 +6,7 @@ Pode ser feito depois da aula. O desafio 8 já traz um Dockerfile com a ordem aj
 
 ## Objetivo
 
-Organizar o `Dockerfile` para que uma alteração no código não obrigue o Docker a reinstalar as dependências. Você vai observar como ele reutiliza resultados de etapas anteriores para construir a imagem mais rápido.
+Você vai organizar o `Dockerfile` para que uma alteração no código não obrigue o Docker a reinstalar as dependências e observar como ele reutiliza resultados de etapas anteriores para construir a imagem mais rápido.
 
 ## Onde
 

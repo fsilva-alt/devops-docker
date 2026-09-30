@@ -6,7 +6,7 @@
 # Docker (containers, imagens, volumes, redes), para o reset.sh recomeçar do zero.
 
 # ---------------------------------------------------------------------------
-# Conteúdo do "projeto" que os alunos colocam em containers: um livro de
+# Conteúdo do projeto que você coloca em containers: um livro de
 # receitas, primeiro como script, depois como API em FastAPI e como site.
 # ---------------------------------------------------------------------------
 
@@ -69,26 +69,29 @@ def receitas():
 
 if __name__ == "__main__":
 EOF
+  printf '    # 127.0.0.1 é o loopback: recebe pedidos apenas deste container.\n'
+  printf '    # 0.0.0.0 faz o servidor escutar em todas as interfaces IPv4 do container,\n'
+  printf '    # permitindo pedidos de outros containers ou de uma porta publicada com -p.\n'
   if (( reload )); then
     printf '    # reload=True: o uvicorn reinicia sozinho quando app.py muda.\n'
     printf '    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)\n'
   else
-    printf '    # 0.0.0.0 = aceita conexões de fora do container (o 127.0.0.1 de lá é só de lá).\n'
     printf '    uvicorn.run(app, host="0.0.0.0", port=8000)\n'
   fi
 }
 
 requirements_txt() { printf 'fastapi==0.115.6\nuvicorn==0.34.0\n'; }
 
-# dockerfile_api <ingenuo|bom> [expose] [env]
+# dockerfile_api <ingenuo|bom> [expose] [env] [health]
 #   ingenuo -> COPY . . antes do pip install (desafio 6 corrige)
 #   bom     -> requirements.txt primeiro, para o cache funcionar
 dockerfile_api() {
   local ordem="$1"; shift
-  local expose=0 env=0 a
+  local expose=0 env=0 health=0 a
   for a in "$@"; do
     [[ "$a" == expose ]] && expose=1
     [[ "$a" == env ]] && env=1
+    [[ "$a" == health ]] && health=1
   done
   printf 'FROM python:3.12-slim\n\nWORKDIR /app\n\n'
   if [[ "$ordem" == ingenuo ]]; then
@@ -98,6 +101,15 @@ dockerfile_api() {
   fi
   if (( env )); then printf '\nENV COZINHA="Cozinha do Curso"\n'; fi
   if (( expose )); then printf '\nEXPOSE 8000\n'; fi
+  if (( health )); then
+    cat <<'EOF'
+
+# O Compose espera este teste passar antes de iniciar o site.
+# O teste roda dentro da API: aqui, 127.0.0.1 aponta para o próprio container.
+HEALTHCHECK --interval=2s --timeout=3s --start-period=5s --retries=10 \
+    CMD ["python", "-c", "import http.client; c = http.client.HTTPConnection('127.0.0.1', 8000, timeout=2); c.request('GET', '/receitas'); r = c.getresponse(); exit(0 if r.status == 200 else 1)"]
+EOF
+  fi
   printf '\nCMD ["python", "app.py"]\n'
 }
 
@@ -141,12 +153,39 @@ cat <<'EOF'
 """Cliente: busca as receitas na API chamando o container pelo nome."""
 
 import json
+import sys
+import time
+import urllib.error
 import urllib.request
 
-URL = "http://receitas:8000/receitas"
+URL = sys.argv[1] if len(sys.argv) > 1 else "http://receitas:8000/receitas"
+# A comunicação é direta na rede Docker; não deve passar por um proxy HTTP externo.
+cliente = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
-with urllib.request.urlopen(URL, timeout=5) as resposta:
-    receitas = json.load(resposta)
+# -d libera o terminal antes de o servidor estar pronto. Espere por um tempo limitado.
+for tentativa in range(1, 9):
+    try:
+        with cliente.open(URL, timeout=2) as resposta:
+            receitas = json.load(resposta)
+        break
+    except urllib.error.HTTPError as erro:
+        raise SystemExit(f"A API em {URL} respondeu HTTP {erro.code}. Confira o caminho /receitas.")
+    except (urllib.error.URLError, TimeoutError, ConnectionError) as erro:
+        if tentativa == 8:
+            raise SystemExit(
+                f"Não foi possível acessar {URL} após 8 tentativas: {erro}.\n"
+                "Confira os logs da API e se os dois containers estão na mesma rede.\n"
+                "Se o nome resolve, mas a conexão expira, consulte o diagnóstico de rede do desafio."
+            )
+        print(f"Aguardando a API em {URL} (tentativa {tentativa}/8)...", file=sys.stderr, flush=True)
+        time.sleep(1)
+    except (ValueError, UnicodeError) as erro:
+        raise SystemExit(f"A resposta de {URL} não é um JSON válido: {erro}.")
+
+if not isinstance(receitas, list) or not all(
+    isinstance(r, dict) and "nome" in r and "rende" in r for r in receitas
+):
+    raise SystemExit(f"A resposta de {URL} não contém a lista de receitas esperada.")
 
 print(f"A API em {URL} respondeu com {len(receitas)} receitas:")
 for r in receitas:
@@ -198,7 +237,10 @@ async function carregar() {
   const lista = document.getElementById("receitas");
   const origem = document.getElementById("origem");
   try {
-    const resposta = await fetch(URL_RECEITAS);
+    const resposta = await fetch(URL_RECEITAS, { signal: AbortSignal.timeout(15000) });
+    if (!resposta.ok) {
+      throw new Error(\`HTTP \${resposta.status} — confira os logs do servidor\`);
+    }
     const receitas = await resposta.json();
     origem.textContent = \`\${receitas.length} receitas vindas de \${URL_RECEITAS}\`;
     lista.innerHTML = "";
@@ -208,7 +250,8 @@ async function carregar() {
       lista.appendChild(item);
     }
   } catch (erro) {
-    origem.textContent = \`Não consegui carregar \${URL_RECEITAS}: \${erro.message}\`;
+    const detalhe = erro.name === "TimeoutError" ? "o servidor demorou mais de 15 segundos para responder" : erro.message;
+    origem.textContent = \`Não consegui carregar \${URL_RECEITAS}: \${detalhe}. Consulte os logs e recarregue a página após corrigir.\`;
   }
 }
 
@@ -241,7 +284,10 @@ server {
     # O "resolver" é o DNS interno do Docker: assim o nginx procura o "api" de
     # novo a cada poucos segundos e continua achando se o container for recriado.
     location /api/ {
-        resolver 127.0.0.11 valid=5s;
+        resolver 127.0.0.11 valid=5s ipv6=off;
+        resolver_timeout 3s;
+        proxy_connect_timeout 3s;
+        proxy_read_timeout 10s;
         set $api "http://api:8000";
         rewrite ^/api/(.*)$ /$1 break;
         proxy_pass $api;
@@ -358,7 +404,7 @@ gerar_08() {
   mkdir -p "$dir"
   app_py > "$dir/app.py"
   requirements_txt > "$dir/requirements.txt"
-  dockerfile_api bom > "$dir/Dockerfile"       # sem EXPOSE: o aluno acrescenta
+  dockerfile_api bom > "$dir/Dockerfile"       # acrescente EXPOSE neste desafio
   printf '__pycache__/\n.venv/\n.env\n' > "$dir/.dockerignore"
 }
 limpar_08() { rm_container api; rm_imagem receitas-api:1.3; }
@@ -371,7 +417,7 @@ gerar_09() {
   mkdir -p "$dir"
   app_py env > "$dir/app.py"
   requirements_txt > "$dir/requirements.txt"
-  dockerfile_api bom expose > "$dir/Dockerfile"   # sem ENV: o aluno acrescenta
+  dockerfile_api bom expose > "$dir/Dockerfile"   # acrescente ENV neste desafio
   printf '__pycache__/\n.venv/\n.env\n' > "$dir/.dockerignore"
   printf '# Um valor por linha, sem aspas nem espaços em volta do =\nCOZINHA=Cozinha da Vovó\n' > "$dir/cozinha.env"
 }
@@ -432,7 +478,7 @@ gerar_14() {
   mkdir -p "$dir/api" "$dir/web"
   app_py env > "$dir/api/app.py"
   requirements_txt > "$dir/api/requirements.txt"
-  dockerfile_api bom expose env > "$dir/api/Dockerfile"
+  dockerfile_api bom expose env health > "$dir/api/Dockerfile"
   printf '__pycache__/\n.venv/\n.env\n' > "$dir/api/.dockerignore"
   dockerfile_web > "$dir/web/Dockerfile"
   nginx_conf > "$dir/web/nginx.conf"

@@ -4,14 +4,13 @@
 |---|---|
 | Formato | Aula ao vivo pelo Zoom, com exercícios no Codespace de cada participante |
 | Duração | 3 horas |
-| Turma | Cerca de 100 pessoas |
 | Público | Iniciantes, inclusive pessoas sem experiência com programação, Docker ou terminal |
 | Pré-requisitos | Conta GitHub pessoal e navegador atualizado. O Docker já vem no Codespace |
 | Preparação | Seguir a seção “Antes da aula” do README: criar um Codespace em branco, executar o instalador e conferir o ambiente com `check.sh 00` |
 
 ## Objetivos de aprendizagem
 
-Ao final, a pessoa deverá ser capaz de:
+Ao longo dos desafios, você vai aprender a:
 
 - explicar o que é um container, a diferença entre imagem e container, e o que o Docker resolve (e não resolve);
 - executar, consultar, parar, iniciar e remover containers, além de ler suas mensagens de funcionamento (logs);
@@ -32,7 +31,7 @@ Ao final, a pessoa deverá ser capaz de:
 | 2. Dockerfile | `FROM`, `COPY`, `CMD`, `WORKDIR`, `RUN`; `docker build -t`; tags; camadas e cache (ordem das instruções); `docker history`; `.dockerignore` |
 | 3. Portas e configuração | Rede do container; `-p fora:dentro`; `EXPOSE`; `0.0.0.0` vs `127.0.0.1`; aba PORTS do Codespace; `ENV`, `-e`, `--env-file` |
 | 4. Dados | Camada gravável; bind mount (`-v $PWD:/app`) para desenvolvimento; volumes nomeados (`docker volume`) para dados; `ENTRYPOINT` vs `CMD` |
-| 5. Vários containers | Imagens oficiais prontas (nginx); redes definidas pelo usuário e DNS por nome; `compose.yaml`: `services`, `build`, `ports`, `depends_on`, `environment`; `up -d`, `ps`, `logs`, `down` |
+| 5. Vários containers | Imagens oficiais prontas (nginx); redes definidas pelo usuário e DNS por nome; `compose.yaml`: `services`, `build`, `ports`, `depends_on` com `service_healthy`, `environment`; `HEALTHCHECK`; `up -d`, `ps`, `logs`, `down` |
 | Encerramento | `docker system df`; `container prune`, `image prune`; registries e próximos passos |
 
 Do desafio 4 em diante, usamos um **livro de receitas**. Primeiro, um programa Python mostra os dados no terminal. Depois, uma API feita com FastAPI fornece as receitas pela rede. Por fim, um site exibe os dados no navegador, e o Docker Compose inicia os containers do site e da API juntos. O código é fornecido; as pequenas alterações são guiadas pelos enunciados.
@@ -58,7 +57,7 @@ Do desafio 4 em diante, usamos um **livro de receitas**. Primeiro, um programa P
 | 1:42–1:47 | **Desafio 8** | Abrindo portas |
 | 1:47–1:52 | **Desafio 9** | Configuração por ambiente |
 | 1:52–2:01 | Módulo 4 | Onde os dados ficam guardados: camada gravável, bind mount, volume; `ENTRYPOINT` |
-| 2:01–2:06 | **Desafio 10 · opcional** | Editando ao vivo |
+| 2:01–2:06 | **Desafio 10** | Editando ao vivo |
 | 2:06–2:11 | **Desafio 11 · opcional** | Dados que ficam |
 | 2:11–2:21 | Módulo 5 | Imagens prontas (nginx); redes e DNS por nome; Compose: um arquivo, vários serviços |
 | 2:21–2:26 | **Desafio 12** | Site estático |
@@ -72,19 +71,19 @@ Do desafio 4 em diante, usamos um **livro de receitas**. Primeiro, um programa P
 
 | Tipo de bloco | Minutos |
 |---|---:|
-| Desafios da trilha principal (1–5, 8, 9, 12–14) | 55 |
-| Desafios opcionais (6, 7, 10, 11, 15) ou apoio à turma | 23 |
+| Desafios da trilha principal (1–5, 8–10, 12–14) | 60 |
+| Desafios opcionais (6, 7, 11, 15) ou tempo para tirar dúvidas | 18 |
 | Conteúdo expositivo | 71 |
 | Abertura (inclui Desafio 0 e introdução) | 12 |
 | Intervalo | 10 |
 | Encerramento | 9 |
 | **Total** | **180** |
 
-### Folga de tempo
+### Como organizar sua prática
 
-O cronograma ocupa as 3 horas previstas e inclui cinco desafios opcionais: **6, 7, 10, 11 e 15**. Seus 23 minutos podem ser usados para dúvidas e apoio à turma; a prática opcional fica para depois da aula. Mantenha a apresentação dos conceitos de cache, `.dockerignore`, bind mounts, volumes e limpeza. Reserve os 9 minutos finais para perguntas e orientações de encerramento.
+O cronograma ocupa as 3 horas previstas e inclui quatro desafios opcionais: **6, 7, 11 e 15**. Você pode usar esses 18 minutos para tirar dúvidas ou concluir etapas anteriores e fazer os opcionais depois. Acompanhe também as explicações de cache, `.dockerignore`, volumes e limpeza: elas ajudam a entender os exemplos seguintes. Os 9 minutos finais são dedicados às suas perguntas e aos próximos passos.
 
-A trilha principal preserva os fundamentos, a construção de imagens, portas, configuração, o site, redes e Compose. Os opcionais aprofundam otimização, desenvolvimento, persistência e manutenção; os laboratórios seguintes já vêm com os arquivos necessários para continuar.
+A trilha principal é **0 → 1 → 2 → 3 → 4 → 5 → 8 → 9 → 10 → 12 → 13 → 14**. Ela inclui a edição ao vivo com bind mounts. Os opcionais aprofundam otimização, persistência e manutenção; os laboratórios seguintes já vêm com os arquivos necessários para você continuar.
 
 ## Os 16 desafios
 
@@ -92,7 +91,7 @@ Os desafios 4 a 14 têm arquivos iniciais em `~/labs/NN-nome/`: código, site e,
 
 | # | Desafio | Tempo | Estado inicial | Tarefa | Verificação |
 |---|---|---:|---|---|---|
-| 0 | Docker funciona? | 3 | Codespace com Docker | `docker version`, `docker run hello-world`, `docker compose version` | Daemon responde; container do hello-world existe; imagens-base baixadas |
+| 0 | Docker funciona? | 3 | Codespace com Docker | `docker version`, `docker run hello-world`, `docker compose version` | Daemon responde; hello-world existe; imagens-base baixadas; dois containers conversam pelo nome |
 | 1 | Olá, container | 5 | hello-world já rodado | `docker run python:3.12-slim python -c "print(...)"`, `ps -a`, `images` | Existe container do Python com um `print` |
 | 2 | Dentro do container | 5 | — | Abrir o Python interativo com `run -it --rm`; criar `explorador`, gravar `/marca.txt` e comparar com outro container | `explorador` tem `/marca.txt`; o container do Python interativo foi removido |
 | 3 | Ciclo de vida | 5 | — | `run -d --name relogio`, `logs`, `stop`, `start`, criar e remover `descartavel` | `relogio` rodando, reiniciado e com logs; `descartavel` não existe |
@@ -102,7 +101,7 @@ Os desafios 4 a 14 têm arquivos iniciais em `~/labs/NN-nome/`: código, site e,
 | 7 | O que não entra na imagem · **opcional** | 4 | Exemplos de arquivos desnecessários: `.venv/`, `__pycache__/`, `.env`, notas e fotos | Consultar os arquivos da imagem, criar `.dockerignore` e reconstruir | Imagem `receitas-api:1.2` sem os cinco itens excluídos |
 | 8 | Abrindo portas | 5 | Dockerfile sem `EXPOSE` | `EXPOSE 8000`, `run -d --name api -p 8001:8000`, `curl`, aba PORTS, `/docs` | `api` rodando, porta 8001→8000, `/receitas` responde |
 | 9 | Configuração por ambiente | 5 | `app.py` lê `COZINHA`; Dockerfile sem `ENV` | `ENV` na imagem, `-e` no run, `exec env`; extra: `--env-file` | Imagem tem padrão; `cozinha` roda com outro valor em 8002 |
-| 10 | Editando ao vivo · **opcional** | 5 | `app.py` com `reload=True` | `run -d --name dev -p 8003:8000 -v "$PWD:/app"`, editar `app.py` (Pudim), `curl` | `dev` com bind mount; API mostra o Pudim |
+| 10 | Editando ao vivo | 5 | `app.py` com `reload=True` | `run -d --name dev -p 8003:8000 -v "$PWD:/app"`, editar `app.py` (Pudim), `curl` | `dev` com bind mount; API mostra o Pudim |
 | 11 | Dados que ficam · **opcional** | 5 | `bloco.py` + Dockerfile com `ENTRYPOINT` | Comparar a remoção de arquivos do container com a preservação de notas no volume; `volume create notas`; `-v notas:/dados` | Volume `notas` com pelo menos 2 notas |
 | 12 | Site estático | 5 | `site/` (HTML, CSS, JS, JSON) | `FROM nginx:alpine`, `COPY site/`, `build -t receitas-web:1.0`, `run -p 8080:80` | `web` rodando; `/`, `/app.js` e `/receitas.json` respondem |
 | 13 | Containers conversando | 6 | API + `cliente.py` | `network create cozinha`, `run --network cozinha --name receitas` (sem `-p`), cliente pelo nome | De dentro da rede, `http://receitas:8000/receitas` responde; extra: sem porta publicada |

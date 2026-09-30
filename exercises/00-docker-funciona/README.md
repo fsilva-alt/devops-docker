@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Confirmar que o seu Codespace consegue rodar containers. Se algo estiver errado aqui, é melhor descobrir com um dia de folga do que no meio da aula.
+Você vai executar seu primeiro container e conferir se o ambiente está pronto para os exercícios. Faça esta etapa antes da aula para se familiarizar com o terminal e ter tempo de pedir ajuda se aparecer algum erro.
 
 ## Onde
 
@@ -49,7 +49,7 @@ Se aparecer *Cannot connect to the Docker daemon* (não foi possível conectar a
 check.sh 00
 ```
 
-A verificação também confere que o instalador conseguiu baixar as quatro imagens-base da aula (`hello-world`, `alpine`, `python:3.12-slim`, `nginx:alpine`). Se faltar alguma, rode `setup.sh`.
+A verificação também confere que o instalador conseguiu baixar as quatro imagens-base da aula (`hello-world`, `alpine`, `python:3.12-slim`, `nginx:alpine`). Se faltar alguma, rode `setup.sh`. Depois, ela cria dois containers em uma rede temporária, testa a comunicação pelo nome e remove os recursos do teste. Assim, você confere também a rede que será necessária nos desafios 13 e 14. Se falhar, siga a dica exibida e consulte o [guia do aluno](../../docs/guia-do-aluno.md).
 
 ## Dica
 

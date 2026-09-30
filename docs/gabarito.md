@@ -1,6 +1,6 @@
 # Gabarito
 
-Soluções para consultar durante a preparação da aula ou ao revisar os exercícios. Os enunciados explicam cada etapa; aqui estão os arquivos e comandos necessários. A versão executável, usada pelos testes, está em `tests/solucoes.sh`.
+Use estas soluções para conferir sua tentativa, localizar o que falta ou revisar os exercícios depois da aula. Os enunciados explicam cada etapa; aqui você encontra os arquivos e comandos completos. Depois de consultar, experimente repetir a tarefa e explicar o que cada comando faz.
 
 ## Como usar
 
@@ -20,7 +20,7 @@ docker compose version
 
 ```bash
 docker run hello-world
-docker run python:3.12-slim python -c "print('Olá, Docker!')"
+docker run python:3.12-slim python -c 'print("Olá, Docker!")'
 docker ps
 docker ps -a
 docker images
@@ -170,7 +170,7 @@ docker run -d --name cozinha -p 8002:8000 --env-file cozinha.env receitas-api:1.
 curl localhost:8002/
 ```
 
-## Desafio 10 — Editando ao vivo · opcional
+## Desafio 10 — Editando ao vivo
 
 ```bash
 docker build -t receitas-api:1.5 .
@@ -221,12 +221,15 @@ Erro comum: `COPY site/ /usr/share/nginx/html/site/` (o nginx mostra a página p
 
 ```bash
 docker build -t receitas-api:1.6 .
-docker network create cozinha
+docker network inspect cozinha >/dev/null 2>&1 || docker network create cozinha
 docker run -d --name receitas --network cozinha receitas-api:1.6
+docker logs receitas
 docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py
 ```
 
-A missão extra é reconhecida quando o `receitas` **não** publica porta nenhuma.
+O cliente tenta novamente enquanto a API inicia. Se a conexão continuar expirando, siga o [diagnóstico do desafio 13](../exercises/13-containers-conversando/README.md#se-a-api-não-responder). Uma rede existente pode ser reutilizada. Se `receitas` já existir de uma tentativa anterior, remova-o com `docker rm -f receitas` antes de repetir o `docker run`.
+
+A verificação também identifica quando o `receitas` **não** publica porta nenhuma.
 
 ## Desafio 14 — Docker Compose
 
@@ -242,14 +245,19 @@ services:
     ports:
       - "8090:80"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 ```
 
 ```bash
+docker compose config
 docker compose up -d --build
 docker compose ps
-curl localhost:8090/api/receitas
+curl --noproxy '*' -fsS --max-time 10 localhost:8090/api/receitas
+docker compose logs web api
 ```
+
+O `api/Dockerfile` fornecido já inclui um `HEALTHCHECK`; `service_healthy` espera esse teste passar antes de iniciar `web`. Se o site abrir sem receitas, use o [diagnóstico do desafio 14](../exercises/14-docker-compose/README.md#se-a-página-não-carregar-as-receitas).
 
 ## Desafio 15 — Faxina · opcional
 

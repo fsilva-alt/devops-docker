@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Construir uma imagem que inclua o programa e suas **dependências**, ou seja, os outros pacotes de software de que ele precisa. Vamos usar `RUN` para instalar o FastAPI e o uvicorn durante a construção da imagem.
+Você vai construir uma imagem que inclua o programa e suas **dependências**, ou seja, os outros pacotes de software de que ele precisa. Para isso, vai usar `RUN` para instalar o FastAPI e o uvicorn durante a construção da imagem.
 
 O livro de receitas agora é uma **API**: um programa que recebe pedidos pela rede e responde com dados. O FastAPI ajuda a definir essas respostas, e o uvicorn é o servidor que recebe os pedidos. O código já está pronto.
 

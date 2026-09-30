@@ -6,7 +6,7 @@ Pode ser feito depois da aula. Os desafios de site, redes e Compose não depende
 
 ## Objetivo
 
-Observar o que acontece com os arquivos quando um container é removido. Você vai usar um **volume**, um espaço de armazenamento gerenciado pelo Docker, para manter as notas mesmo depois de remover o container que as criou.
+Você vai observar o que acontece com os arquivos quando um container é removido e usar um **volume**, um espaço de armazenamento gerenciado pelo Docker, para manter as notas mesmo depois de remover o container que as criou.
 
 ## Onde
 

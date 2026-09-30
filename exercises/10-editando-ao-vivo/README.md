@@ -1,12 +1,12 @@
 # Desafio 10 — Editando ao vivo
 
-⏱ 5 minutos · Módulo 4: Dados · **Opcional**
+⏱ 5 minutos · Módulo 4: Dados · **Trilha principal**
 
-Pode ser feito depois da aula. Para seguir a trilha principal, vá ao desafio 12; ele já tem os arquivos do site.
+Faça este desafio depois do 9. Você usará o compartilhamento de pastas novamente nos desafios de site e comunicação entre containers.
 
 ## Objetivo
 
-Alterar o programa no VS Code e ver a mudança na API **sem reconstruir a imagem**. Para isso, você vai compartilhar a pasta do projeto com o container usando um **bind mount**.
+Você vai alterar o programa no VS Code e ver a mudança na API **sem reconstruir a imagem**. Para isso, vai compartilhar a pasta do projeto com o container usando um **bind mount**.
 
 ## Onde
 

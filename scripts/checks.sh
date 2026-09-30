@@ -79,6 +79,28 @@ arquivo_compose() {
 # ---------------------------------------------------------------------------
 # Desafio 0 — Docker funciona? (feito antes da aula)
 # ---------------------------------------------------------------------------
+# Testa DNS e HTTP entre dois containers, como nos desafios 13 e 14.
+# O subshell garante a limpeza mesmo se algum comando falhar.
+testar_rede_docker() (
+  local nome="curso-rede-teste-${BASHPID}-${RANDOM}"
+  trap 'docker rm -f "$nome" "$nome-cliente" >/dev/null 2>&1 || true; docker network rm "$nome" >/dev/null 2>&1 || true' EXIT
+  docker network create "$nome" >/dev/null || return 1
+  docker run -d --name "$nome" --network "$nome" --network-alias servidor \
+    python:3.12-slim python -c '
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+class Teste(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"[{\"nome\": \"Teste de rede\", \"rende\": \"2 containers\"}]")
+
+HTTPServer(("0.0.0.0", 8000), Teste).serve_forever()
+' >/dev/null || return 1
+  cliente_py | timeout 30 docker run --rm -i --name "$nome-cliente" --network "$nome" python:3.12-slim \
+    python - http://servidor:8000/receitas
+)
+
 verificar_00() {
   if ! command -v docker >/dev/null 2>&1; then
     falhar "O comando docker não está instalado." "Num Codespace ele já vem. Em outra máquina: https://docs.docker.com/get-docker/"
@@ -99,6 +121,13 @@ verificar_00() {
   (( ${#faltam[@]} == 0 )) || falhar "Imagens-base ainda não baixadas: ${faltam[*]}" "Rode setup.sh (ele baixa tudo o que a aula usa)."
   if (( ${#FALHAS[@]} == 0 )); then
     info "Docker $(docker version -f '{{.Server.Version}}' 2>/dev/null) · $(docker compose version --short 2>/dev/null | sed 's/^/Compose /')"
+    local rede
+    if rede="$(testar_rede_docker 2>&1)"; then
+      info "Dois containers conseguiram conversar pelo nome em uma rede Docker."
+    else
+      falhar "O Docker executa containers, mas o teste de comunicação pela rede falhou: $rede" \
+        "Pare e reabra o mesmo Codespace, repita check.sh 00 e consulte docs/guia-do-aluno.md se o erro persistir."
+    fi
   fi
 }
 
@@ -112,7 +141,7 @@ verificar_01() {
     [[ "$(container_cmd "$id")" == *print* ]] && achou=1
   done
   (( achou )) || falhar "Não encontrei um container criado a partir de python:3.12-slim executando um print." \
-    "docker run python:3.12-slim python -c \"print('Olá, Docker!')\""
+    "docker run python:3.12-slim python -c 'print(\"Olá, Docker!\")'"
   local n; n="$(docker ps -aq | wc -l | tr -d ' ')"
   (( ${#FALHAS[@]} == 0 )) && info "docker ps -a lista $n container(s), todos parados: cada docker run criou um."
   return 0
@@ -319,9 +348,11 @@ verificar_10() {
   local run="docker run -d --name dev -p 8003:8000 -v \"\$PWD:/app\" receitas-api:1.5"
   exigir_container_rodando dev "$run" || return 0
   exigir_imagem_do_container dev receitas-api:1.5
-  local montagens; montagens="$(docker container inspect -f '{{range .Mounts}}{{.Type}} {{.Source}} {{.Destination}}{{"\n"}}{{end}}' dev)"
-  if ! grep -qF "bind $PWD /app" <<<"$montagens"; then
-    falhar "O container 'dev' não tem esta pasta montada em /app (montagens: ${montagens:-nenhuma})." \
+  local tipo origem
+  tipo="$(docker container inspect -f '{{range .Mounts}}{{if eq .Destination "/app"}}{{.Type}}{{end}}{{end}}' dev)"
+  origem="$(docker container inspect -f '{{range .Mounts}}{{if eq .Destination "/app"}}{{.Source}}{{end}}{{end}}' dev)"
+  if [[ "$tipo" != bind || ! "$origem" -ef . ]]; then
+    falhar "O container 'dev' não tem esta pasta montada em /app (tipo: ${tipo:-nenhum}; origem: ${origem:-nenhuma})." \
       "docker rm -f dev && $run   (rode de dentro da pasta do desafio)"
   fi
   grep -q 'Pudim' app.py || falhar "O app.py desta pasta ainda não tem a receita de Pudim." \
@@ -388,17 +419,18 @@ verificar_13() {
   fi
   local run="docker run -d --name receitas --network cozinha receitas-api:1.6"
   exigir_container_rodando receitas "$run" || return 0
+  exigir_imagem_do_container receitas receitas-api:1.6
   local redes; redes="$(docker container inspect -f '{{range $k, $v := .NetworkSettings.Networks}}{{$k}} {{end}}' receitas)"
   if [[ " $redes " != *" cozinha "* ]]; then
     falhar "O container 'receitas' não está na rede 'cozinha' (está em: $redes)." "docker rm -f receitas && $run"
     return 0
   fi
   local resposta
-  resposta="$(timeout 40 docker run --rm --network cozinha python:3.12-slim \
-    python -c "import urllib.request; print(urllib.request.urlopen('http://receitas:8000/receitas', timeout=5).read().decode())" 2>&1 || true)"
-  if [[ "$resposta" != *"Bolo de cenoura"* ]]; then
-    falhar "De dentro da rede 'cozinha', http://receitas:8000/receitas não respondeu: $(echo "$resposta" | tail -1)" \
-      "O nome do container (receitas) é o nome de rede. Veja docker logs receitas e docker network inspect cozinha"
+  if ! resposta="$(cliente_py | timeout 30 docker run --rm -i --network cozinha python:3.12-slim python - 2>&1)"; then
+    falhar "De dentro da rede 'cozinha', http://receitas:8000/receitas não respondeu: $resposta" \
+      "Veja docker logs receitas e docker network inspect cozinha. Execute check.sh 00 para testar a rede do Docker e consulte o diagnóstico no enunciado do desafio 13."
+  elif [[ "$resposta" != *"Bolo de cenoura"* ]]; then
+    falhar "A API respondeu, mas não contém a receita Bolo de cenoura." "Confira app.py, reconstrua receitas-api:1.6 e recrie o container receitas."
   fi
   if [[ -z "$(porta_publicada receitas 8000)" ]]; then extra_ok; else extra_nao; fi
 }
@@ -430,7 +462,7 @@ verificar_14() {
     "No serviço web: ports: → - \"8090:80\". Depois docker compose up -d"
   local json; json="$(http_get http://localhost:8090/api/receitas)"
   [[ "$json" == *"Bolo de cenoura"* ]] || falhar "http://localhost:8090/api/receitas não chega até a API." \
-    "O nginx repassa /api/ para http://api:8000/: o serviço precisa se chamar exatamente 'api'. Veja docker compose logs web"
+    "Veja docker compose logs web api. Confira o serviço api, o healthcheck e depends_on com condition: service_healthy. Se a API está saudável, consulte o diagnóstico de rede do desafio 14 e execute check.sh 00."
 }
 
 # ---------------------------------------------------------------------------

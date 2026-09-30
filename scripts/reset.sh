@@ -29,9 +29,10 @@ exigir_docker || exit 2
 dentro=0
 if lab_tem_pasta "$nn"; then
   dir="$(lab_dir "$nn")"
-  # Se o aluno estiver dentro da pasta que vai ser apagada, o shell dele ficaria
-  # num diretório inexistente. Avisa para ele fazer cd de novo.
-  [[ "$PWD" == "$dir"* ]] && dentro=1
+  # Se você estiver dentro da pasta que será apagada, precisará entrar novamente.
+  atual="$(pwd -P)"
+  destino="$(cd "$dir" 2>/dev/null && pwd -P)" || destino="$dir"
+  [[ "$atual" == "$destino" || "$atual" == "$destino/"* ]] && dentro=1
   info "Recriando o desafio $nn em $dir (e limpando o que ele criou no Docker)..."
 else
   info "Limpando o que o desafio $nn criou no Docker..."

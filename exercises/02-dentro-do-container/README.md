@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Digitar comandos dentro de um container e criar um arquivo nele. Você vai observar que, por padrão, **um arquivo criado em um container não aparece em outro**, mesmo que os dois usem a mesma imagem.
+Você vai digitar comandos dentro de um container e criar um arquivo nele. Depois, vai observar que, por padrão, **um arquivo criado em um container não aparece em outro**, mesmo que os dois usem a mesma imagem.
 
 ## Onde
 

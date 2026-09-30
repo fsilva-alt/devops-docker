@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Acessar, do navegador, uma API que roda **dentro** de um container: publicar a porta com `-p` e documentá-la com `EXPOSE`.
+Você vai acessar, pelo navegador, uma API que roda **dentro** de um container: publicar a porta com `-p` e documentá-la com `EXPOSE`.
 
 ## Onde
 
@@ -25,7 +25,20 @@ navegador ──▶ Codespace:8001 ──▶ container:8000 (uvicorn)
                   ▲ fora              ▲ dentro
 ```
 
-A ordem é sempre `-p <fora>:<dentro>`. `EXPOSE 8000` no Dockerfile **não** abre porta nenhuma: só documenta qual porta o programa usa, para quem for rodar a imagem.
+A ordem é sempre `-p <fora>:<dentro>`. `EXPOSE 8000` é principalmente uma **declaração/documentação**: registra nos metadados da imagem a porta prevista para o programa. Não inicia o servidor, não configura em qual endereço ele escuta e não publica a porta no Codespace. `-p 8001:8000` funciona **mesmo sem `EXPOSE`**. Neste exercício, você usa os dois para aprender seus papéis. A opção `docker run -P` (P maiúsculo) pode usar essa declaração para publicar as portas declaradas em portas escolhidas pelo Docker.
+
+### Por que o servidor usa `0.0.0.0`?
+
+`127.0.0.1` é o endereço de **loopback**, um caminho de volta para o próprio ambiente de rede. Cada container deste curso tem o seu; ele não é o mesmo do Codespace:
+
+| Onde você faz o pedido | Para onde `127.0.0.1` ou `localhost` aponta |
+|---|---|
+| No terminal do Codespace | O próprio Codespace |
+| Dentro do container `api` | O próprio container `api` |
+| Dentro de outro container | Esse outro container, não a API |
+| No navegador do seu computador | Seu computador, não o Codespace |
+
+Se o uvicorn escutar apenas em `127.0.0.1:8000` **dentro da API**, aceitará pedidos apenas daquele container. Publicar com `-p` não muda isso. Por isso, `app.py` usa `host="0.0.0.0"`: o servidor escuta em todas as interfaces IPv4 **do container**, incluindo a interface que recebe pedidos de fora. `0.0.0.0` é uma configuração de escuta; para acessar a API, use `localhost:8001` no terminal do Codespace ou o endereço da aba **PORTS** no navegador.
 
 ## Tarefa
 
@@ -35,7 +48,7 @@ A ordem é sempre `-p <fora>:<dentro>`. `EXPOSE 8000` no Dockerfile **não** abr
    EXPOSE 8000
    ```
 
-   e construa:
+   Essa linha documenta a porta; quem permite o acesso pelo Codespace é o `-p` da próxima etapa. Salve e construa:
 
    ```bash
    docker build -t receitas-api:1.3 .
@@ -75,7 +88,7 @@ check.sh 08
 ## Dicas
 
 - *port is already allocated* significa que outro programa ou container já usa a porta 8001 do Codespace. Consulte `docker ps` para identificar qual é. A verificação deste desafio espera a porta 8001; libere-a antes de repetir o comando.
-- O `app.py` escuta em `0.0.0.0`, não em `127.0.0.1`. Dentro do container, `127.0.0.1` é só o próprio container; um servidor preso nele nunca recebe conexões de fora, mesmo com `-p`.
+- Se a porta foi publicada, mas a API não responde, confira `docker logs api`: o servidor deve escutar em `0.0.0.0:8000`, como no código fornecido.
 
 ## Missão extra
 

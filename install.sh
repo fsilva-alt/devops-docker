@@ -6,11 +6,12 @@
 #   sh -c "$(curl -fsSL https://raw.githubusercontent.com/fsilva-alt/devops-docker/main/install.sh)"
 #
 # O que ele faz:
-#   1. vai para a sua pasta home;
+#   1. guarda a pasta atual e vai para a sua pasta home;
 #   2. baixa o curso para ~/devops-docker (ou atualiza, se já existir);
 #   3. confere o Docker, baixa as imagens-base e gera os laboratórios em ~/labs;
-#   4. coloca os comandos check.sh, reset.sh e setup.sh no PATH (bash e zsh);
-#   5. mostra os próximos passos.
+#   4. cria um atalho labs na pasta inicial (ln -s ~/labs labs);
+#   5. coloca os comandos check.sh, reset.sh e setup.sh no PATH (bash e zsh);
+#   6. mostra os próximos passos.
 #
 # Pode ser rodado de novo sem medo: é idempotente.
 #
@@ -19,6 +20,7 @@
 
 set -eu
 
+PASTA_INICIAL="$(pwd -P)"
 CURSO_REPO="${CURSO_REPO:-https://github.com/fsilva-alt/devops-docker.git}"
 CURSO_RAMO="${CURSO_RAMO:-main}"
 CURSO_DIR="${CURSO_DIR:-$HOME/devops-docker}"
@@ -50,7 +52,16 @@ fi
 passo "Conferindo o Docker, baixando imagens e preparando os laboratórios em $LABS_DIR"
 bash "$CURSO_DIR/scripts/setup.sh" || falha "O setup.sh não terminou. Leia a mensagem acima, corrija e rode o instalador de novo."
 
-# --- 3. Comandos no PATH ------------------------------------------------------------
+# --- 3. Atalho para os laboratórios no explorador do editor --------------------
+# Equivale a ln -s ~/labs labs na pasta de onde você chamou o instalador.
+# Não usa -f: preserva qualquer pasta, arquivo ou link que já tenha esse nome.
+ATALHO_LABS="$PASTA_INICIAL/labs"
+if [ "$PASTA_INICIAL" != "$(CDPATH= cd "$LABS_DIR" && pwd -P)" ] && [ ! -e "$ATALHO_LABS" ] && [ ! -L "$ATALHO_LABS" ]; then
+  ln -s "$LABS_DIR" "$ATALHO_LABS"
+  passo "Atalho para os laboratórios criado em $ATALHO_LABS"
+fi
+
+# --- 4. Comandos no PATH ------------------------------------------------------------
 BLOCO_INICIO='# >>> curso de docker >>>'
 BLOCO_FIM='# <<< curso de docker <<<'
 for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
@@ -66,7 +77,7 @@ for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
   fi
 done
 
-# --- 4. Mensagem final ----------------------------------------------------------------
+# --- 5. Mensagem final ----------------------------------------------------------------
 n_labs=$(find "$LABS_DIR" -mindepth 1 -maxdepth 1 -type d -name '[0-9][0-9]-*' | wc -l | tr -d ' ')
 printf '\n'
 printf '\033[32m╭──────────────────────────────────────────────────────╮\033[0m\n'

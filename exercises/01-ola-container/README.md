@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Executar um programa Python **dentro de um container**, sem instalar Python no Codespace. Você vai comparar a **imagem**, que contém o programa e seus arquivos, com o **container**, criado a partir dela a cada `docker run`.
+Você vai executar um programa Python **dentro de um container**, sem instalar Python no Codespace, e comparar a **imagem**, que contém o programa e seus arquivos, com o **container**, criado a partir dela a cada `docker run`.
 
 ## Onde
 
@@ -25,10 +25,10 @@ Você já executou `docker run hello-world` no desafio 0. Não precisa preparar 
 2. Crie um container com Python, uma linguagem de programação. O trecho depois de `python:3.12-slim` é o comando que será executado dentro dele:
 
    ```bash
-   docker run python:3.12-slim python -c "print('Olá, Docker!')"
+   docker run python:3.12-slim python -c 'print("Olá, Docker!")'
    ```
 
-   `print('Olá, Docker!')` é uma instrução Python que mostra essa mensagem na tela. A opção `-c` pede ao Python para executar o texto entre aspas. Tudo isso acontece com o Python da imagem `python:3.12-slim`.
+   `print("Olá, Docker!")` é uma instrução Python que mostra essa mensagem na tela. A opção `-c` pede ao Python para executar o texto entre aspas. Mantenha as **aspas simples por fora** e as duplas na mensagem: assim, o Bash não interpreta o `!` como uma consulta ao histórico de comandos. Tudo isso acontece com o Python da imagem `python:3.12-slim`.
 
 3. Onde foram parar esses containers? `docker ps` mostra só os que estão rodando (nenhum: os dois já terminaram). Com `-a`, aparecem todos:
 

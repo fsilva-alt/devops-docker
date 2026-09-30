@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Executar um site em um container usando o **nginx**, um servidor web: ele entrega os arquivos da página ao navegador. Os arquivos já estão prontos. Você vai criar a imagem, copiar o site para ela e publicar uma porta, como fez com a API.
+Você vai executar um site em um container usando o **nginx**, um servidor web que entrega os arquivos da página ao navegador. Os arquivos já estão prontos: você vai criar a imagem, copiar o site para ela e publicar uma porta, como fez com a API.
 
 ## Onde
 

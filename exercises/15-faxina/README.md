@@ -6,7 +6,7 @@ Pode ser feito depois da aula, quando terminar os desafios que quiser praticar. 
 
 ## Objetivo
 
-Descobrir quanto disco o Docker está usando e limpar o que sobrou da aula: containers parados, imagens sem nome, redes e volumes esquecidos. **Faça este desafio por último**: ele apaga o trabalho dos anteriores.
+Você vai descobrir quanto disco o Docker está usando e limpar os recursos que criou nos exercícios: containers parados, imagens sem nome, redes e volumes. **Faça este desafio por último**: ele remove recursos usados nas verificações anteriores.
 
 ## Onde
 

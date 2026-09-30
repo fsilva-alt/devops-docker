@@ -6,7 +6,7 @@ Pode ser feito depois da aula. O desafio 8 já traz seu próprio `.dockerignore`
 
 ## Objetivo
 
-Escolher quais arquivos da pasta do projeto ficam fora da imagem. Para isso, você vai criar um `.dockerignore`, um arquivo que lista o que o Docker deve ignorar durante a construção.
+Você vai escolher quais arquivos da pasta do projeto ficam fora da imagem. Para isso, vai criar um `.dockerignore`, um arquivo que lista o que o Docker deve ignorar durante a construção.
 
 ## Onde
 
