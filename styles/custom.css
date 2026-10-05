@@ -1,0 +1,166 @@
+/* Estilos próprios deste curso. São incluídos depois do tema base do coursekit e usam os
+   mesmos tokens (--accent, --surface-2, --border, --text-3 …), por isso funcionam nos modos
+   claro e escuro. Use-os no Markdown com HTML ou com atributos {.classe}. */
+
+/* Rótulo acima do título de uma seção: Conceito, Referência, Tarefa … */
+.prose .eyebrow {
+  margin: 3rem 0 0;
+  font-size: .875rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--accent-text);
+}
+.prose .eyebrow:first-child { margin-top: 0; }
+.prose .eyebrow + :is(h2, h3) { margin-top: .25rem; }
+
+/* Objetivo de cada desafio. */
+.prose .lead {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+/* Rótulo secundário (datas, pistas). */
+.prose .up {
+  font-size: .875rem;
+  color: var(--text-3);
+}
+.prose p.up { margin: 0 0 .25rem; }
+
+/* Links de documentação: a descrição fica embaixo do link. */
+.prose ul.links small {
+  display: block;
+  font-size: .875rem;
+  color: var(--text-3);
+}
+
+/* Diagramas dentro de colunas começam alinhados ao topo. */
+.column > :is(.flow, .layers, .gwrap, .netbox):first-child { margin-top: 0; }
+
+/* Diagramas de fluxo: caixas (.node) ligadas por setas (.arr). */
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+  margin: 1.4em 0;
+}
+.flow .node {
+  flex: 1 1 150px;
+  min-width: 150px;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  text-align: center;
+}
+.flow .node b { font-weight: 650; color: var(--text); }
+.flow .node small { font-size: .875rem; line-height: 1.4; color: var(--text-3); }
+.flow .node.hi { border-color: var(--accent); background: var(--accent-soft); }
+.flow .node.dim { border-color: var(--border); color: var(--text-3); }
+.flow .arr {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  padding: 0 6px;
+  font-size: .875rem;
+  color: var(--text-3);
+  text-align: center;
+}
+.flow .arr strong { font-family: var(--font-mono); font-weight: 500; color: var(--accent-text); }
+.flow .arr .a { font-size: 1.6em; line-height: 1; color: var(--accent-text); }
+.flow .arr.back .a { color: var(--c-warning); }
+.flow.vert { flex-direction: column; }
+.flow.vert .node { flex-basis: auto; }
+@media (max-width: 640px) {
+  .flow { flex-direction: column; }
+  .flow .arr .a { transform: rotate(90deg); }
+}
+
+/* Um grupo de caixas com borda tracejada e rótulo (uma rede, uma máquina). */
+.netbox {
+  position: relative;
+  margin: 1.6em 0 1.4em;
+  padding: 26px 14px 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+}
+.netbox::before {
+  content: attr(data-label);
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  padding: 0 8px;
+  background: var(--bg);
+  font-size: .875rem;
+  font-weight: 600;
+  color: var(--accent-text);
+}
+.netbox .flow { margin: 0; }
+
+/* Camadas de uma imagem, empilhadas: a primeira da lista fica em cima. */
+.layers {
+  margin: 1.4em 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.layers .cap { margin-bottom: .5rem; font-size: .875rem; color: var(--text-3); }
+.layers .stk { display: grid; gap: 4px; }
+.layer {
+  display: flex;
+  flex-wrap: wrap;            /* narrow screens: the description moves under the instruction */
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 9px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.layer b { min-width: 0; font-family: var(--font-mono); font-size: .9375rem; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+.layer small { margin-left: auto; font-size: .875rem; line-height: 1.35; text-align: right; color: var(--text-3); }
+.layer.hi { border-color: var(--accent); background: var(--accent-soft); }
+.layer.rw { border-style: dashed; border-color: var(--c-warning); background: transparent; }
+.layer.rw b { color: var(--c-warning); }
+.layer.dim { opacity: .55; }
+.layer .tg {
+  padding: 1px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: .875rem;
+  white-space: nowrap;
+  color: var(--text-3);
+}
+.layer .tg.ok { border-color: var(--c-tip); color: var(--c-tip); }
+.layer .tg.redo { border-color: var(--c-danger); color: var(--c-danger); }
+.layers .base { margin-top: .375rem; font-size: .875rem; text-align: center; color: var(--text-3); }
+
+/* Moldura dos diagramas em SVG. */
+.gwrap {
+  margin: 1.4em 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.gwrap .cap { margin-bottom: .375rem; font-size: .875rem; color: var(--text-3); }
+
+/* Linha do tempo da introdução (SVG). */
+svg.tl { display: block; max-width: 100%; height: auto; margin: 0 auto; font-family: var(--font-mono); }
+svg.tl line { stroke: var(--border-strong); stroke-width: 2; }
+svg.tl circle { fill: var(--surface); stroke: var(--text-2); stroke-width: 2; }
+svg.tl .hi circle { fill: var(--accent); stroke: var(--accent); }
+svg.tl .hi text { fill: var(--accent-ink); }
+svg.tl .end circle { fill: var(--c-note); stroke: var(--c-note); }
+svg.tl .end text { fill: var(--bg); }
+svg.tl text { fill: var(--text); font-size: 11px; font-weight: 500; text-anchor: middle; }
+svg.tl text.cap { fill: var(--text-3); font-size: 12px; font-weight: 400; }
+svg.tl text.title { fill: var(--accent-text); font-size: 15px; font-weight: 600; }

@@ -1,0 +1,3 @@
+# Página gerada pelo coursekit e caches (gere de novo com ./build.sh)
+dist/
+.cache/

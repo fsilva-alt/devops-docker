@@ -1,0 +1,55 @@
+# Gera a página do curso com o coursekit e guarda o index.html como artefato.
+# Execute em Actions → "Build do curso" → Run workflow.
+#
+# O coursekit é um repositório privado: cadastre em Settings → Secrets and variables →
+# Actions o segredo COURSEKIT_TOKEN, um token com permissão de leitura (Contents: Read)
+# em fsilva-alt/coursekit.
+name: Build do curso
+
+on:
+  workflow_dispatch:
+    inputs:
+      coursekit_ref:
+        description: Branch, tag ou commit do coursekit
+        required: false
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o curso
+        uses: actions/checkout@v5
+        with:
+          path: curso
+
+      # build.sh procura o coursekit ao lado do curso (../coursekit)
+      - name: Baixar o coursekit
+        uses: actions/checkout@v5
+        with:
+          repository: fsilva-alt/coursekit
+          ref: ${{ inputs.coursekit_ref }}
+          token: ${{ secrets.COURSEKIT_TOKEN || github.token }}
+          path: coursekit
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # "Última atualização" usa a data dos arquivos: use a do último commit, não a do checkout.
+      - name: Datar os capítulos pelo último commit
+        working-directory: curso
+        run: find course.yml chapters -name '*.md' -o -name course.yml | xargs touch -d "$(git log -1 --format=%cI)"
+
+      - name: Gerar index.html
+        run: ./curso/build.sh --strict
+
+      - name: Guardar index.html
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}
+          path: curso/dist/index.html
+          if-no-files-found: error
