@@ -1,9 +1,8 @@
 # Gera a página do curso com o coursekit e guarda o index.html como artefato.
 # Execute em Actions → "Build do curso" → Run workflow.
 #
-# O coursekit é um repositório privado: cadastre em Settings → Secrets and variables →
-# Actions o segredo COURSEKIT_TOKEN, um token com permissão de leitura (Contents: Read)
-# em fsilva-alt/coursekit.
+# O coursekit é público: o checkout usa o GITHUB_TOKEN padrão, sem segredo adicional.
+# O curso e os artefatos permanecem acessíveis apenas a quem tem acesso ao repositório privado.
 name: Build do curso
 
 on:
@@ -32,7 +31,6 @@ jobs:
         with:
           repository: fsilva-alt/coursekit
           ref: ${{ inputs.coursekit_ref }}
-          token: ${{ secrets.COURSEKIT_TOKEN || github.token }}
           path: coursekit
 
       - uses: actions/setup-python@v6
