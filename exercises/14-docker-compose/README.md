@@ -1,10 +1,10 @@
-# Desafio 14 — Docker Compose
+# Exercício 14 — Docker Compose
 
 ⏱ 7 minutos · Módulo 5: Vários containers
 
 ## Objetivo
 
-Usar o **Docker Compose** para configurar e iniciar o site e a API juntos. O arquivo `compose.yaml` descreve cada **serviço**, uma parte da aplicação: neste caso, `api` fornece os dados e `web` entrega o site. Com um comando, o Compose constrói as imagens, cria a rede e inicia os containers.
+O site e a API passam a ser configurados e iniciados juntos, com o **Docker Compose**. O arquivo `compose.yaml` descreve cada **serviço**, isto é, cada parte da aplicação. Aqui são dois: `api`, que fornece os dados, e `web`, que entrega o site. A partir desse arquivo, um único comando constrói as imagens, cria a rede e inicia os containers.
 
 ## Onde
 
@@ -16,10 +16,10 @@ cd ~/labs/14-docker-compose
 
 Duas pastas, cada uma com o seu `Dockerfile`:
 
-- `api/`: a API FastAPI, como no desafio 13.
-- `web/`: o site do desafio 12, mais um `nginx.conf` que repassa tudo o que começa com `/api/` para `http://api:8000/`. O `app.js` agora busca `/api/receitas` em vez de um arquivo local.
+- `api/`: a API FastAPI, como no exercício 13.
+- `web/`: o site do exercício 12, mais um `nginx.conf` que repassa tudo o que começa com `/api/` para `http://api:8000/`. O `app.js` agora busca `/api/receitas` em vez de um arquivo local.
 
-O `nginx.conf` já está configurado para procurar a API pelo nome `api`. Por isso, use exatamente esse nome no Compose. Os serviços podem se encontrar pelo nome na rede, como os containers do desafio anterior.
+Como o `nginx.conf` procura a API pelo nome `api`, o serviço da API precisa ter exatamente esse nome no Compose. Os serviços se encontram pelo nome na rede do projeto, assim como os containers do 13.
 
 ## Tarefa
 
@@ -47,14 +47,16 @@ O `nginx.conf` já está configurado para procurar a API pelo nome `api`. Por is
    docker compose ps
    ```
 
-3. Teste o site e a API com os comandos abaixo. Depois, na aba **PORTS**, localize a porta **8090** e clique no ícone de globo. O navegador busca as receitas em `/api/receitas`, e o nginx encaminha esse pedido à API. A página mostra esse caminho junto da lista de receitas. Se houver erro logo no início, espere alguns segundos e tente novamente.
+3. Teste o site e a API pelo terminal. Se der erro logo no início, espere alguns segundos e tente de novo:
 
    ```bash
    curl localhost:8090/
    curl localhost:8090/api/receitas
    ```
 
-4. Logs de um serviço:
+   Depois, na aba **PORTS**, localize a porta 8090 e clique no ícone de globo. O navegador busca as receitas em `/api/receitas`, e o nginx encaminha esse pedido à API. A página mostra esse caminho junto da lista de receitas.
+
+4. Consulte os logs de um serviço:
 
    ```bash
    docker compose logs api
@@ -69,7 +71,7 @@ check.sh 14
 ## Dicas
 
 - Os comandos do Compose precisam ser rodados **na pasta do `compose.yaml`**.
-- `docker ps` mostra os containers com o prefixo da pasta (`14-docker-compose-api-1`): o Compose nomeia por você.
+- O Compose dá nome aos containers usando a pasta como prefixo. Em `docker ps`, o da API aparece como `14-docker-compose-api-1`.
 - Erro de YAML? `docker compose config` valida o arquivo e mostra a linha do problema.
 - `docker compose down` para e remove os containers e a rede do projeto. As imagens ficam disponíveis; `docker compose up -d` cria e inicia os containers novamente usando essas imagens.
 
@@ -85,4 +87,4 @@ services:
       COZINHA: "Cozinha do Compose"
 ```
 
-Salve e execute `docker compose up -d` novamente. O container da API será recriado com a nova configuração. Consulte `curl localhost:8090/api/` para conferir o nome da cozinha.
+Salve e execute `docker compose up -d` novamente. O container da API será recriado com a nova configuração. Use `curl localhost:8090/api/` para conferir o nome da cozinha.

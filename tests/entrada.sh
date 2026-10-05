@@ -7,6 +7,10 @@ set -euo pipefail
 # O entrypoint da imagem dind aponta o cliente para tcp://docker:2375 (pensado
 # para um container "docker" separado). Aqui o daemon é local: use o socket.
 export DOCKER_HOST=unix:///var/run/docker.sock
+# Definida e vazia: o dockerd-entrypoint.sh usa iptables-nft, como o Docker do
+# Codespace. Qualquer valor não vazio (inclusive 0) escolheria o legacy.
+export DOCKER_IPTABLES_LEGACY=
+export CURSO_TESTE_ISOLADO=1
 
 dockerd-entrypoint.sh >/var/log/dockerd.log 2>&1 &
 

@@ -18,9 +18,12 @@ FORCE=0
 # --- Docker -----------------------------------------------------------------
 exigir_docker || exit 1
 info "Docker $(docker version -f '{{.Server.Version}}') · Compose $(docker compose version --short 2>/dev/null || echo 'não encontrado')"
+if ajustar_firewall_docker; then
+  info "Firewall ajustado para os containers conversarem pelas redes Docker (rede.sh)."
+fi
 
 # --- Imagens-base ----------------------------------------------------------------
-# Baixadas agora para que, na aula, nenhum desafio dependa da velocidade da rede.
+# Baixadas agora para que, na aula, nenhum exercício dependa da velocidade da rede.
 for img in "${IMAGENS_BASE[@]}"; do
   if imagem_existe "$img"; then
     info "Imagem $img já está aqui"
@@ -31,7 +34,7 @@ for img in "${IMAGENS_BASE[@]}"; do
 done
 
 # --- Cache de build ----------------------------------------------------------------
-# Os Dockerfiles dos desafios 6 em diante instalam o FastAPI com as mesmas
+# Os Dockerfiles dos exercícios 6 em diante instalam o FastAPI com as mesmas
 # instruções. Construir uma vez aqui deixa essas camadas no cache do BuildKit,
 # e os builds da aula viram questão de segundos. A imagem em si é descartada.
 aquecer_cache() {
@@ -56,6 +59,7 @@ info "Laboratórios em: $LABS_DIR"
 gerados=0; mantidos=0
 for n in $(seq "$PRIMEIRO_LAB_COM_PASTA" "$ULTIMO_LAB_COM_PASTA"); do
   nn="$(printf '%02d' "$n")"
+  lab_tem_pasta "$nn" || continue
   dir="$(lab_dir "$nn")"
   if [[ -d "$dir" && $FORCE -eq 0 ]]; then
     mantidos=$((mantidos + 1))
@@ -67,5 +71,5 @@ done
 
 ok "Pronto: $gerados laboratório(s) gerado(s), $mantidos mantido(s)."
 if (( mantidos > 0 )); then
-  info "Para recomeçar um desafio específico: reset.sh NN"
+  info "Para recomeçar um exercício específico: reset.sh NN"
 fi
