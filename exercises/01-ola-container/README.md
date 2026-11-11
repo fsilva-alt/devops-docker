@@ -1,6 +1,6 @@
 # Exercício 1 — Olá, container
 
-⏱ 5 minutos · Módulo 1: Fundamentos
+⏱ 5 minutos · Fundamentos
 
 ## Objetivo
 
@@ -30,7 +30,7 @@ Você já executou `docker run hello-world` no exercício 0 e não precisa prepa
 
    `print("Olá, Docker!")` é uma instrução Python que mostra essa mensagem na tela, e a opção `-c` pede ao Python para executar esse texto. Quem executa é o Python que vem na imagem `python:3.12-slim`. Mantenha as **aspas simples por fora** e as duplas na mensagem. Com aspas simples, o Bash não interpreta o `!` como uma consulta ao histórico de comandos.
 
-3. Onde foram parar esses containers? `docker ps` mostra só os que estão rodando, e agora não há nenhum, porque os dois já terminaram. Com `-a`, aparecem todos:
+3. Veja onde foram parar esses containers. `docker ps` mostra só os que estão rodando, e agora não há nenhum, porque os dois já terminaram. Com `-a`, aparecem todos:
 
    ```bash
    docker ps

@@ -13,7 +13,7 @@
 .prose .eyebrow:first-child { margin-top: 0; }
 .prose .eyebrow + :is(h2, h3) { margin-top: .25rem; }
 
-/* Objetivo de cada desafio. */
+/* Objetivo de cada exercício. */
 .prose .lead {
   font-size: 1.25rem;
   line-height: 1.6;

@@ -1,6 +1,6 @@
 # Exercício 8 — Abrindo portas
 
-⏱ 5 minutos · Módulo 3: Portas e configuração
+⏱ 5 minutos · Portas e configuração
 
 ## Objetivo
 

@@ -9,7 +9,7 @@ duration: 8
 ## Como acompanhar a aula
 
 {.lead}
-Você não precisa saber programar. Os programas do curso já estão prontos; vamos usá-los para aprender Docker, um passo de cada vez.
+Você não precisa saber programar. Os programas do curso já vêm prontos. Com eles, você aprende Docker um passo de cada vez.
 
 ::::columns
 :::card Seu ambiente no navegador
@@ -18,19 +18,29 @@ O **Codespace** é um computador Linux acessado pela internet. Nele, o **VS Code
 Abra o terminal em **Terminal → New Terminal**. A preparação completa está no [README do curso](https://github.com/fsilva-alt/devops-docker#antes-da-aula).
 :::
 :::card Comando ou conteúdo de arquivo?
-Nos slides, `$` marca uma linha para executar no terminal. Copie o comando sem esse símbolo e pressione **Enter**. Execute uma linha por vez.
+Nos slides, o `$` marca uma linha de comando. Copie a linha sem esse símbolo, cole no terminal e pressione **Enter**. Rode uma linha por vez.
 
-Quando a instrução pedir um arquivo, copie o conteúdo no editor e salve com **Ctrl+S** ou **Cmd+S** no Mac. Linhas com `#` são comentários.
+Quando a tarefa pedir um arquivo, cole o conteúdo no editor e salve com **Ctrl+S** (**Cmd+S** no Mac). Linhas que começam com `#` são comentários.
 :::
-:::card Como fazer os desafios
-Leia o objetivo, entre na pasta indicada e siga a tarefa. Ao terminar, execute `check.sh` com o número do desafio: ele confirma o resultado ou mostra o que ajustar.
+:::card Como fazer os exercícios
+Leia o objetivo, entre na pasta indicada e siga a tarefa. Ao terminar, rode `check.sh` com o número do exercício. Ele diz se está certo ou mostra o que falta ajustar.
 
-A **Missão extra** é opcional. Para executar os comandos, use os exemplos completos da tarefa. Nas tabelas de consulta, `<nome>` indica um valor a substituir, `[opção]` indica algo opcional, e `…` indica um exemplo abreviado.
+A **Missão extra** é opcional. Copie os comandos da tarefa, que estão completos. Nas tabelas de consulta, `<nome>` é um valor que você troca, `[opção]` é uma parte opcional e `…` marca um exemplo abreviado.
 :::
 ::::
 
+:::card Instale o material do curso
+No terminal do Codespace, rode o instalador e espere a mensagem **Curso de Docker instalado com sucesso!**:
+
+```console
+$ sh -c "$(curl -fsSL https://raw.githubusercontent.com/fsilva-alt/devops-docker/main/install.sh)"
+```
+
+Ele salva o curso em `~/devops-docker`, baixa as imagens da aula e prepara os exercícios em `~/labs`. Depois, abra um terminal novo para usar `check.sh`. Se já fez isso antes da aula, pode pular este passo.
+:::
+
 :::note Comandos para se localizar:
-`pwd` mostra a pasta atual; `ls` lista seu conteúdo; `cd caminho` entra em outra pasta. O símbolo `~` representa sua pasta pessoal. Para abrir um arquivo no editor, use `code nome-do-arquivo`.
+`pwd` mostra em que pasta você está, `ls` lista o que há nela e `cd caminho` entra em outra pasta. O `~` é a sua pasta pessoal. Para abrir um arquivo no editor, use `code nome-do-arquivo`.
 :::
 
 <p class="eyebrow">Introdução</p>
@@ -59,11 +69,11 @@ A mensagem diz que o pacote fastapi não foi encontrado.
 : é criado a partir de uma imagem para executar o programa. Cada container tem seu próprio estado e pode ser iniciado, parado ou removido
 
 `registro`
-: é um serviço que armazena e distribui imagens, como o Docker Hub
+: é um serviço que guarda e distribui imagens, como o Docker Hub
 :::
 
 :::note Uma imagem, vários containers.
-Você pode usar a mesma imagem em ambientes compatíveis, levando junto as versões do programa e de suas dependências. Isso reduz diferenças entre o ambiente de quem desenvolve e o de quem executa.
+A mesma imagem serve para criar quantos containers você quiser, em qualquer máquina compatível. Como ela leva junto o programa e as dependências nas versões certas, o programa roda igual na máquina de quem desenvolve e na de quem usa.
 :::
 
 <p class="eyebrow">Introdução</p>
@@ -76,26 +86,26 @@ Você pode usar a mesma imagem em ambientes compatíveis, levando junto as vers�
 :::card O Linux já oferecia isolamento
 <p class="up">antes de 2013</p>
 
-O **kernel**, núcleo do Linux, já tinha recursos para separar programas em execução e limitar seu uso de memória e processador. São os *namespaces* e *cgroups* da linha do tempo.
+O **kernel**, núcleo do Linux, já tinha recursos para isolar programas em execução e limitar quanta memória e quanto processador cada um usa. São os *namespaces* e *cgroups* da linha do tempo.
 :::
 :::card O Docker facilita o uso
 <p class="up">março de 2013</p>
 
-A empresa de hospedagem dotCloud publica o código do Docker. A ferramenta reúne a construção e a distribuição de imagens com comandos como `docker run` para executar containers.
+A dotCloud, uma empresa de hospedagem, publica o código do Docker. A ferramenta junta num só lugar a construção de imagens, a distribuição delas e comandos simples para rodar containers, como `docker run`.
 :::
 :::card Formatos compartilhados
 <p class="up">2015 em diante</p>
 
-A **OCI** (Open Container Initiative) define padrões abertos para imagens e execução de containers. Esses padrões permitem usar imagens com diferentes ferramentas compatíveis.
+A **OCI** (Open Container Initiative) define padrões abertos para as imagens e para a execução de containers. Com esses padrões, a mesma imagem funciona em ferramentas diferentes.
 :::
 ::::
 
 :::note
-**Sobre os nomes da linha do tempo:** você não precisa memorizá-los para fazer os exercícios. O ponto principal é que o Docker tornou mais fácil construir, compartilhar e executar ambientes com containers.
+**Sobre os nomes da linha do tempo:** você não precisa decorar nenhum deles para fazer os exercícios. O Docker aproveitou o que o Linux já tinha e deixou mais fácil construir, compartilhar e rodar containers.
 :::
 
 :::note E a máquina virtual?
-Ela executa um sistema operacional próprio. Um container compartilha o kernel da máquina que o executa; por isso, normalmente exige menos recursos para iniciar.
+Uma máquina virtual roda um sistema operacional inteiro só para ela. O container usa o kernel da máquina em que está, por isso costuma iniciar mais rápido e gastar menos recursos.
 :::
 
 <p class="eyebrow">Introdução</p>
@@ -104,21 +114,21 @@ Ela executa um sistema operacional próprio. Um container compartilha o kernel d
 
 ::::columns
 :::card Reutilizar um ambiente preparado
-A imagem guarda o programa, as bibliotecas que ele usa e a versão do Python. Podemos usar essa mesma imagem ao desenvolver, testar e disponibilizar o programa para outras pessoas.
+A imagem guarda o programa, as bibliotecas que ele usa e a versão do Python. A mesma imagem serve para desenvolver, testar e entregar o programa a outras pessoas.
 :::
 :::card Instalar dependências na imagem
-Vamos instalar o FastAPI durante a construção da imagem, chamada de **build**. Depois, cada container criado a partir dela já terá esse pacote disponível.
+O FastAPI é instalado uma vez, durante a construção da imagem, chamada de **build**. Todo container criado a partir dela já vem com esse pacote.
 :::
 :::card Criar e remover ambientes de teste
-Podemos criar um container para experimentar um programa e removê-lo ao terminar. Não é preciso instalar esse programa diretamente no sistema do Codespace.
+Dá para criar um container só para experimentar um programa e removê-lo ao terminar, sem instalar nada no Codespace.
 :::
 :::card Separar projetos
-Dois projetos podem usar versões diferentes do Python, cada um em seu container. Os arquivos e as dependências de um não substituem os do outro.
+Dois projetos podem usar versões diferentes do Python, cada um no seu container. Os arquivos e as dependências de um não interferem nos do outro.
 :::
 ::::
 
 {.lead}
-Na prática, usaremos um livro de receitas: primeiro no terminal, depois como uma API que fornece dados e, por fim, como um site no navegador.
+O exemplo do curso é um livro de receitas: primeiro no terminal, depois como uma API que entrega os dados e, no final, como um site no navegador.
 
 <p class="eyebrow">Introdução</p>
 
@@ -126,22 +136,22 @@ Na prática, usaremos um livro de receitas: primeiro no terminal, depois como um
 
 ::::columns
 :::card Compatibilidade do sistema
-Os containers desta aula usam o kernel Linux do Codespace. A imagem precisa ser compatível com o sistema e a arquitetura que vão executá-la; ela não simula um computador completo.
+Os containers desta aula usam o kernel Linux do Codespace. A imagem precisa ser compatível com o sistema e o processador da máquina onde vai rodar, porque um container não simula um computador completo.
 :::
 :::card Armazenamento dos dados
-Remover um container apaga os arquivos guardados apenas na camada própria dele. No desafio 11, usaremos **volumes** para manter dados fora dessa camada. Um volume não substitui uma cópia de segurança.
+Quando um container é removido, os arquivos que só existiam nele são apagados. No exercício 13, os dados ficam em **volumes**, fora do container. Um volume não substitui um backup.
 :::
 :::card Várias máquinas
-Nesta aula, os containers rodam em um único Codespace. Distribuí-los entre várias máquinas exige outras ferramentas, como Kubernetes. Esse gerenciamento é chamado de **orquestração**.
+Nesta aula, os containers rodam em um único Codespace. Para distribuí-los entre várias máquinas, existem outras ferramentas, como o Kubernetes. Esse trabalho é chamado de **orquestração**.
 :::
 :::card Funcionamento do programa
-A imagem reúne o que o programa precisa para executar, mas não corrige erros no código. Ainda é necessário testar se o programa produz o resultado esperado.
+A imagem leva tudo de que o programa precisa para rodar, mas não corrige erros no código. Você ainda precisa testar se o programa faz o que deveria.
 :::
 :::card Arquivos incluídos na imagem
-Arquivos desnecessários aumentam o tamanho da imagem e o tempo de transferência. No desafio 7, vamos escolher o que fica de fora usando `.dockerignore`.
+Arquivos desnecessários deixam a imagem maior e mais demorada para baixar. No exercício 7, você escolhe o que fica de fora com o `.dockerignore`.
 :::
 :::card Senhas e outras informações privadas
-Quem tem acesso à imagem pode ler os arquivos que ela contém. Senhas devem ser fornecidas na execução, nunca durante a construção da imagem. Veremos configurações de execução no desafio 9.
+Quem tem acesso à imagem consegue ler os arquivos que estão nela. Por isso, senhas são passadas na hora de rodar o container, nunca na construção da imagem. O exercício 9 mostra como passar configurações ao container.
 :::
 ::::
 
@@ -152,20 +162,20 @@ Quem tem acesso à imagem pode ler os arquivos que ela contém. Senhas devem ser
 <div class="flow"><div class="node hi"><b>Docker Engine</b><small>constrói imagens e executa containers no Codespace</small></div><div class="arr"><span class="a">⇄</span>baixar / publicar imagens</div><div class="node"><b>Docker Hub</b><small>serviço de armazenamento e distribuição de imagens</small></div></div>
 
 `Docker Engine`
-: É o Docker instalado no Codespace. Depois de obter uma imagem, ele pode criar containers com ela sem baixá-la novamente.
+: É o Docker instalado no Codespace. Depois de baixar uma imagem, ele cria containers com ela sem precisar baixar de novo.
 
 `Docker Hub`
-: É de onde vêm as imagens `python`, `nginx` e `alpine` usadas no curso. Nesta aula, você não precisa criar uma conta no Docker Hub.
+: É de onde vêm as imagens `python`, `nginx` e `alpine` usadas no curso. Você não precisa ter conta no Docker Hub para esta aula.
 
 `Docker Desktop`
-: É um aplicativo para usar Docker no computador pessoal. Não precisamos instalá-lo, pois usaremos o Docker que já está no Codespace.
+: É um aplicativo para usar o Docker no seu computador. Você não precisa instalar, porque a aula usa o Docker que já vem no Codespace.
 
 :::note
-**Para acompanhar:** tenha sua conta no GitHub e o Codespace preparado conforme o README. Os comandos da aula serão executados no terminal desse ambiente.
+**Para acompanhar:** você precisa de uma conta no GitHub e do Codespace preparado como explica o README. Todos os comandos da aula rodam no terminal do Codespace.
 :::
 
 :::note
-**Para abrir o site:** a aba **PORTS** (portas), ao lado de TERMINAL no VS Code, fornece o endereço de acesso pelo navegador. Vamos usá-la a partir do desafio 8.
+**Para abrir o site:** a aba **PORTS** (portas), ao lado de TERMINAL no VS Code, mostra o endereço para abrir no navegador. Ela é usada a partir do exercício 8.
 :::
 
 :::card Para ler depois

@@ -1,6 +1,6 @@
 # Exercício 9 — Configuração por ambiente
 
-⏱ 5 minutos · Módulo 3: Portas e configuração
+⏱ 5 minutos · Portas e configuração
 
 ## Objetivo
 

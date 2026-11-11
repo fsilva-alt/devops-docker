@@ -56,6 +56,21 @@ aquecer_cache
 mkdir -p "$LABS_DIR"
 info "Laboratórios em: $LABS_DIR"
 
+# Pastas de uma numeração anterior dos exercícios (como 14-docker-compose) fariam
+# o check.sh reconhecer o exercício errado. Elas vão para versao-anterior/, sem
+# apagar nada.
+for antiga in "$LABS_DIR"/[0-9][0-9]-*/; do
+  [[ -d "$antiga" ]] || continue
+  antiga="${antiga%/}"
+  nome="$(basename "$antiga")"
+  [[ "$antiga" == "$(lab_dir "${nome%%-*}")" ]] && continue
+  mkdir -p "$LABS_DIR/versao-anterior"
+  destino="$LABS_DIR/versao-anterior/$nome"
+  [[ -e "$destino" ]] && destino="$destino-$(date +%s)"
+  mv "$antiga" "$destino"
+  aviso "A pasta $nome é de uma versão anterior do curso e foi movida para $destino."
+done
+
 gerados=0; mantidos=0
 for n in $(seq "$PRIMEIRO_LAB_COM_PASTA" "$ULTIMO_LAB_COM_PASTA"); do
   nn="$(printf '%02d' "$n")"

@@ -54,6 +54,30 @@ exigir_porta() {   # container, porta-container, porta-host, url-de-teste, trech
   fi
 }
 
+# Como exigir_porta, com dicas para quem configura a porta no compose.yaml.
+exigir_porta_servico() {   # id, serviço, porta-container, porta-host, url-de-teste, trecho-esperado, [dica]
+  local host; host="$(porta_publicada "$1" "$3")"
+  if [[ -z "$host" ]]; then
+    falhar "O serviço $2 não publica a porta $3." \
+      "No serviço $2 do compose.yaml: ports: → - \"$4:$3\". Salve e execute docker compose up -d"
+    return 1
+  fi
+  if [[ "$host" != "$4" ]]; then
+    falhar "A porta $3 do serviço $2 está ligada à porta $host do Codespace, mas o exercício pede a $4." \
+      "Corrija ports no compose.yaml para \"$4:$3\" e execute docker compose up -d"
+    return 1
+  fi
+  local corpo; corpo="$(http_get "$5")"
+  if [[ -z "$corpo" ]]; then
+    falhar "A porta está publicada, mas $5 não respondeu." "Veja docker compose logs $2: o programa subiu sem erro?"
+    return 1
+  fi
+  if [[ "$corpo" != *"$6"* ]]; then
+    falhar "$5 respondeu, mas sem '$6' na resposta." "${7:-Confira o conteúdo com curl $5}"
+    return 1
+  fi
+}
+
 exigir_dockerfile() {
   [[ -f Dockerfile ]] || { falhar "Não há um arquivo chamado Dockerfile nesta pasta." "Crie o arquivo Dockerfile (com D maiúsculo, sem extensão) e escreva as instruções nele."; return 1; }
 }
@@ -79,7 +103,7 @@ arquivo_compose() {
 # ---------------------------------------------------------------------------
 # Exercício 0 — Docker funciona? (feito antes da aula)
 # ---------------------------------------------------------------------------
-# Testa DNS e HTTP entre dois containers, como nos exercícios 13 e 14.
+# Testa DNS e HTTP entre dois containers, como nos exercícios 16 e 17.
 # O subshell garante a limpeza mesmo se algum comando falhar.
 testar_rede_docker() (
   local nome="curso-rede-teste-${BASHPID}-${RANDOM}"
@@ -338,9 +362,44 @@ verificar_09() {
 }
 
 # ---------------------------------------------------------------------------
-# Exercício 10 — Editando ao vivo
+# Exercício 10 — A API com Compose
 # ---------------------------------------------------------------------------
 verificar_10() {
+  if [[ -z "$(arquivo_compose)" ]]; then
+    falhar "Não há um arquivo compose.yaml nesta pasta." \
+      "Crie compose.yaml com o serviço api (build, ports e environment), como no enunciado."
+    return 0
+  fi
+  if ! docker compose config >/dev/null 2>&1; then
+    falhar "O compose.yaml tem um erro de sintaxe." \
+      "Execute docker compose config para ver a linha do problema. Use dois espaços por nível, sem Tab."
+    return 0
+  fi
+  if ! docker compose config --services 2>/dev/null | grep -qx api; then
+    falhar "O compose.yaml não define o serviço api." "services: → api: → build: ."
+    return 0
+  fi
+  local id; id="$(docker compose ps -q api 2>/dev/null || true)"
+  if [[ -z "$id" ]]; then
+    falhar "O serviço api não está rodando." \
+      "docker compose up -d --build   e depois   docker compose ps   e   docker compose logs api"
+    return 0
+  fi
+  local padrao valor
+  padrao="$(imagem_env "$(container_imagem "$id")" COZINHA)"
+  valor="$(container_env "$id" COZINHA)"
+  if [[ -z "$valor" || "$valor" == "$padrao" ]]; then
+    falhar "O serviço api usa o nome padrão da imagem ('${valor:-nenhum}'); o exercício pede outro, definido no compose.yaml." \
+      "No serviço api: environment: → COZINHA: \"Cozinha do Compose\". Salve e execute docker compose up -d"
+  fi
+  exigir_porta_servico "$id" api 8000 8010 http://localhost:8010/ "${valor:-Livro de receitas}" || return 0
+  if [[ "$valor" == "Cozinha da Vovó" ]]; then extra_ok; else extra_nao; fi
+}
+
+# ---------------------------------------------------------------------------
+# Exercício 11 — Editando ao vivo
+# ---------------------------------------------------------------------------
+verificar_11() {
   if ! imagem_existe receitas-api:1.5; then
     falhar "A imagem receitas-api:1.5 não existe." "docker build -t receitas-api:1.5 ."
     return 0
@@ -366,9 +425,42 @@ verificar_10() {
 }
 
 # ---------------------------------------------------------------------------
-# Exercício 11 — Dados que ficam
+# Exercício 12 — Desenvolvimento com Compose (opcional)
 # ---------------------------------------------------------------------------
-verificar_11() {
+verificar_12() {
+  if [[ -z "$(arquivo_compose)" ]]; then
+    falhar "Não há um arquivo compose.yaml nesta pasta." "Crie o serviço api com build, image, ports e volumes, como no enunciado."
+    return 0
+  fi
+  if ! docker compose config >/dev/null 2>&1; then
+    falhar "O compose.yaml tem um erro de sintaxe." "Execute docker compose config e confira os espaços no início das linhas."
+    return 0
+  fi
+  local id tipo origem
+  id="$(docker compose ps -q api 2>/dev/null || true)"
+  if [[ -z "$id" ]]; then
+    falhar "O serviço api não está rodando." "docker compose up -d --build"
+    return 0
+  fi
+  tipo="$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/app"}}{{.Type}}{{end}}{{end}}' "$id")"
+  origem="$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/app"}}{{.Source}}{{end}}{{end}}' "$id")"
+  [[ "$tipo" == bind && "$origem" -ef . ]] || falhar "O serviço api não compartilha esta pasta em /app." \
+    'No serviço api, acrescente volumes: com - .:/app e execute docker compose up -d.'
+  exigir_imagem_do_container "$id" receitas-api:dev
+  grep -q 'Pudim' app.py || falhar "O app.py ainda não tem a receita de Pudim." "Acrescente a receita como no enunciado e salve."
+  exigir_porta_servico "$id" api 8000 8100 http://localhost:8100/receitas Pudim \
+    "Salve app.py e consulte docker compose logs api para conferir a recarga." || return 0
+  local dentro; dentro="$(docker run --rm receitas-api:dev cat /app/app.py 2>/dev/null || true)"
+  if [[ "$dentro" == *Pudim* ]]; then
+    falhar "A imagem já contém o Pudim: falta observar uma alteração recebida pelo bind mount." \
+      "Retire o Pudim, construa a imagem e inicie o serviço. Depois acrescente o Pudim e salve, sem refazer o build."
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Exercício 13 — Dados que ficam
+# ---------------------------------------------------------------------------
+verificar_13() {
   imagem_existe bloco:1.0 || falhar "A imagem bloco:1.0 não existe." "docker build -t bloco:1.0 ."
   if ! volume_existe notas; then
     falhar "O volume 'notas' não existe." "docker volume create notas"
@@ -386,9 +478,46 @@ verificar_11() {
 }
 
 # ---------------------------------------------------------------------------
-# Exercício 12 — Site estático
+# Exercício 14 — Persistência com Compose (opcional)
 # ---------------------------------------------------------------------------
-verificar_12() {
+verificar_14() {
+  if [[ -z "$(arquivo_compose)" ]]; then
+    falhar "Não há um arquivo compose.yaml nesta pasta." "Crie o serviço bloco e declare o volume notas, como no enunciado."
+    return 0
+  fi
+  if ! docker compose config >/dev/null 2>&1; then
+    falhar "O compose.yaml tem um erro de sintaxe." "Execute docker compose config. Declare volumes: também no nível principal."
+    return 0
+  fi
+  if ! docker compose config --services | grep -qx bloco; then
+    falhar "O compose.yaml não define o serviço bloco." "Use services: → bloco: → build: ."
+    return 0
+  fi
+  if ! docker compose config --volumes | grep -qx notas; then
+    falhar "O compose.yaml não declara o volume notas." "Monte notas:/dados no serviço bloco e declare volumes: → notas: no nível principal."
+    return 0
+  fi
+  imagem_existe receitas-notas:1.0 || falhar "A imagem receitas-notas:1.0 não existe." "docker compose build"
+  if ! volume_existe 14-compose-persistencia_notas; then
+    falhar "O volume do projeto ainda não foi criado." 'docker compose run --rm bloco "comprar cenouras"'
+    return 0
+  fi
+  local saida
+  # compose run lê a entrada padrão: com timeout e um terminal, ficaria parado
+  if ! saida="$(timeout 30 docker compose run --rm -T --no-deps bloco 2>&1 </dev/null)"; then
+    falhar "O serviço bloco não conseguiu ler as notas: $saida" "Confira o Dockerfile e a montagem notas:/dados no compose.yaml."
+    return 0
+  fi
+  if [[ "$saida" != *"1. comprar cenouras"* || "$saida" != *"2. assar o bolo"* ]]; then
+    falhar "O serviço bloco não encontrou as duas notas esperadas no volume." \
+      'Execute docker compose run --rm bloco "comprar cenouras" e depois docker compose run --rm bloco "assar o bolo".'
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Exercício 15 — Site estático
+# ---------------------------------------------------------------------------
+verificar_15() {
   exigir_dockerfile || return 0
   [[ -n "$(linha_da FROM nginx)" ]] || falhar "O Dockerfile não parte de uma imagem do nginx." "FROM nginx:alpine"
   [[ -n "$(linha_da COPY)" ]] || falhar "O Dockerfile não copia o site para dentro da imagem." "COPY site/ /usr/share/nginx/html/"
@@ -409,9 +538,9 @@ verificar_12() {
 }
 
 # ---------------------------------------------------------------------------
-# Exercício 13 — Containers conversando
+# Exercício 16 — Containers conversando
 # ---------------------------------------------------------------------------
-verificar_13() {
+verificar_16() {
   imagem_existe receitas-api:1.6 || falhar "A imagem receitas-api:1.6 não existe." "docker build -t receitas-api:1.6 ."
   if ! rede_existe cozinha; then
     falhar "A rede 'cozinha' não existe." "docker network create cozinha"
@@ -436,11 +565,12 @@ verificar_13() {
 }
 
 # ---------------------------------------------------------------------------
-# Exercício 14 — Docker Compose
+# Exercício 17 — Site e API com Compose
 # ---------------------------------------------------------------------------
-verificar_14() {
+verificar_17() {
   if [[ -z "$(arquivo_compose)" ]]; then
-    falhar "Não há um arquivo compose.yaml nesta pasta." "Crie compose.yaml com os serviços api e web (veja o enunciado)."
+    falhar "Não há um arquivo compose.yaml nesta pasta." \
+      "Escreva compose.yaml com os serviços api e web, como no enunciado (reset.sh 17 traz de volta o arquivo inicial, só com a api)."
     return 0
   fi
   if ! docker compose config >/dev/null 2>&1; then
@@ -466,9 +596,9 @@ verificar_14() {
 }
 
 # ---------------------------------------------------------------------------
-# Exercício 15 — Faxina
+# Exercício 18 — Faxina
 # ---------------------------------------------------------------------------
-verificar_15() {
+verificar_18() {
   local rodando parados
   rodando="$(docker ps -q | wc -l | tr -d ' ')"
   parados="$(docker ps -aq --filter status=exited --filter status=created | wc -l | tr -d ' ')"
@@ -484,76 +614,6 @@ verificar_15() {
   done
   if (( ${#sobras[@]} == 0 )); then extra_ok; else extra_nao; info "Ainda existem: ${sobras[*]} (missão extra)."; fi
   return 0
-}
-
-# ---------------------------------------------------------------------------
-# Exercício 16 — Desenvolvimento com Compose (opcional)
-# ---------------------------------------------------------------------------
-verificar_16() {
-  if [[ -z "$(arquivo_compose)" ]]; then
-    falhar "Não há um arquivo compose.yaml nesta pasta." "Crie o serviço api com build, image, ports e volumes, como no enunciado."
-    return 0
-  fi
-  if ! docker compose config >/dev/null 2>&1; then
-    falhar "O compose.yaml tem um erro de sintaxe." "Execute docker compose config e confira os espaços no início das linhas."
-    return 0
-  fi
-  local id tipo origem
-  id="$(docker compose ps -q api 2>/dev/null || true)"
-  if [[ -z "$id" ]]; then
-    falhar "O serviço api não está rodando." "docker compose up -d --build"
-    return 0
-  fi
-  tipo="$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/app"}}{{.Type}}{{end}}{{end}}' "$id")"
-  origem="$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/app"}}{{.Source}}{{end}}{{end}}' "$id")"
-  [[ "$tipo" == bind && "$origem" -ef . ]] || falhar "O serviço api não compartilha esta pasta em /app." \
-    'No serviço api, acrescente volumes: com - .:/app e execute docker compose up -d.'
-  exigir_imagem_do_container "$id" receitas-api:dev
-  grep -q 'Pudim' app.py || falhar "O app.py ainda não tem a receita de Pudim." "Acrescente a receita como no enunciado e salve."
-  exigir_porta "$id" 8000 8100 http://localhost:8100/receitas Pudim \
-    "Salve app.py e consulte docker compose logs api para conferir a recarga." || return 0
-  local dentro; dentro="$(docker run --rm receitas-api:dev cat /app/app.py 2>/dev/null || true)"
-  if [[ "$dentro" == *Pudim* ]]; then
-    falhar "A imagem já contém o Pudim: falta observar uma alteração recebida pelo bind mount." \
-      "Retire o Pudim, construa a imagem e inicie o serviço. Depois acrescente o Pudim e salve, sem refazer o build."
-  fi
-}
-
-# ---------------------------------------------------------------------------
-# Exercício 17 — Persistência com Compose (opcional)
-# ---------------------------------------------------------------------------
-verificar_17() {
-  if [[ -z "$(arquivo_compose)" ]]; then
-    falhar "Não há um arquivo compose.yaml nesta pasta." "Crie o serviço bloco e declare o volume notas, como no enunciado."
-    return 0
-  fi
-  if ! docker compose config >/dev/null 2>&1; then
-    falhar "O compose.yaml tem um erro de sintaxe." "Execute docker compose config. Declare volumes: também no nível principal."
-    return 0
-  fi
-  if ! docker compose config --services | grep -qx bloco; then
-    falhar "O compose.yaml não define o serviço bloco." "Use services: → bloco: → build: ."
-    return 0
-  fi
-  if ! docker compose config --volumes | grep -qx notas; then
-    falhar "O compose.yaml não declara o volume notas." "Monte notas:/dados no serviço bloco e declare volumes: → notas: no nível principal."
-    return 0
-  fi
-  imagem_existe receitas-notas:1.0 || falhar "A imagem receitas-notas:1.0 não existe." "docker compose build"
-  if ! volume_existe 17-compose-persistencia_notas; then
-    falhar "O volume do projeto ainda não foi criado." 'docker compose run --rm bloco "comprar cenouras"'
-    return 0
-  fi
-  local saida
-  # compose run lê a entrada padrão: com timeout e um terminal, ficaria parado
-  if ! saida="$(timeout 30 docker compose run --rm -T --no-deps bloco 2>&1 </dev/null)"; then
-    falhar "O serviço bloco não conseguiu ler as notas: $saida" "Confira o Dockerfile e a montagem notas:/dados no compose.yaml."
-    return 0
-  fi
-  if [[ "$saida" != *"1. comprar cenouras"* || "$saida" != *"2. assar o bolo"* ]]; then
-    falhar "O serviço bloco não encontrou as duas notas esperadas no volume." \
-      'Execute docker compose run --rm bloco "comprar cenouras" e depois docker compose run --rm bloco "assar o bolo".'
-  fi
 }
 
 # ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 # Exercício 3 — Ciclo de vida
 
-⏱ 5 minutos · Módulo 1: Fundamentos
+⏱ 5 minutos · Fundamentos
 
 ## Objetivo
 

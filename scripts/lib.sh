@@ -23,17 +23,18 @@ LAB_NOMES=(
   "o-que-nao-entra"
   "abrindo-portas"
   "configuracao-por-ambiente"
+  "api-com-compose"
   "editando-ao-vivo"
+  "compose-desenvolvimento"
   "dados-que-ficam"
+  "compose-persistencia"
   "site-estatico"
   "containers-conversando"
-  "docker-compose"
+  "site-e-api-com-compose"
   "faxina"
-  "compose-desenvolvimento"
-  "compose-persistencia"
 )
 
-# Os exercícios 4 a 14, 16 e 17 têm pasta em $LABS_DIR (os outros acontecem "no Docker
+# Os exercícios 4 a 17 têm pasta em $LABS_DIR (os outros acontecem "no Docker
 # inteiro": containers, imagens e volumes não moram em pasta nenhuma).
 PRIMEIRO_LAB_COM_PASTA=4
 ULTIMO_LAB_COM_PASTA=17
@@ -42,12 +43,12 @@ ULTIMO_LAB_COM_PASTA=17
 # execução de cada exercício não depender da rede.
 IMAGENS_BASE=(hello-world alpine python:3.12-slim nginx:alpine)
 
-# Tudo o que o curso cria no Docker, para o reset.sh e o exercício 15 saberem
+# Tudo o que o curso cria no Docker, para o reset.sh e o exercício 18 saberem
 # o que é "nosso".
 CONTAINERS_DO_CURSO=(explorador relogio descartavel api cozinha dev web receitas)
 IMAGENS_DO_CURSO=(receitas receitas-api receitas-web receitas-notas bloco)
-VOLUMES_DO_CURSO=(notas 17-compose-persistencia_notas)
-REDES_DO_CURSO=(cozinha 14-docker-compose_default 16-compose-desenvolvimento_default 17-compose-persistencia_default)
+VOLUMES_DO_CURSO=(notas 14-compose-persistencia_notas)
+REDES_DO_CURSO=(cozinha 10-api-com-compose_default 12-compose-desenvolvimento_default 14-compose-persistencia_default 17-site-e-api-com-compose_default)
 
 # ---------------------------------------------------------------------------
 # Saída
@@ -80,7 +81,7 @@ lab_dir()  { printf '%s/%s-%s' "$LABS_DIR" "$1" "$(lab_nome "$1")"; }
 
 lab_tem_pasta() {
   local n=$((10#$1))
-  (( n >= PRIMEIRO_LAB_COM_PASTA && n <= ULTIMO_LAB_COM_PASTA && n != 15 ))
+  (( n >= PRIMEIRO_LAB_COM_PASTA && n <= ULTIMO_LAB_COM_PASTA ))
 }
 
 # Descobre o exercício a partir do diretório atual (LABS_DIR/NN-nome/...).
@@ -110,7 +111,7 @@ resolver_lab() {
   fi
   local n=$((10#$nn))
   if (( n < 0 || n >= ${#LAB_NOMES[@]} )); then
-    erro "O exercício $nn não existe. Use um número de 00 a 17."
+    erro "O exercício $nn não existe. Use um número de 00 a 18."
     return 1
   fi
   printf '%s' "$nn"

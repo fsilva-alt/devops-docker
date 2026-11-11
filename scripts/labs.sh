@@ -29,7 +29,7 @@ EOF
 
 # app_py [env] [reload]
 #   env    -> lê a variável de ambiente COZINHA (exercícios 9 em diante)
-#   reload -> uvicorn com reload=True, que reinicia quando o arquivo muda (exercício 10)
+#   reload -> uvicorn com reload=True, que reinicia quando o arquivo muda (exercício 11)
 app_py() {
   local env=0 reload=0 a
   for a in "$@"; do
@@ -217,7 +217,7 @@ li { padding: 0.4rem 0; border-bottom: 1px solid #eee; }
 EOF
 }
 
-# site_app_js <url>   (receitas.json no exercício 12; /api/receitas no 14)
+# site_app_js <url>   (receitas.json no exercício 15; /api/receitas no 17)
 site_app_js() {
 cat <<EOF
 // Busca a lista de receitas e desenha na página.
@@ -406,67 +406,7 @@ gerar_09() {
 }
 limpar_09() { rm_container cozinha; rm_imagem receitas-api:1.4; }
 
-# ---------------------------------------------------------------------------
-# Exercício 10 — Editando ao vivo
-# ---------------------------------------------------------------------------
-gerar_10() {
-  local dir; dir="$(lab_dir 10)"
-  mkdir -p "$dir"
-  app_py env reload > "$dir/app.py"
-  requirements_txt > "$dir/requirements.txt"
-  dockerfile_api bom expose env > "$dir/Dockerfile"
-  printf '__pycache__/\n.venv/\n.env\n' > "$dir/.dockerignore"
-}
-limpar_10() { rm_container dev; rm_imagem receitas-api:1.5; }
-
-# ---------------------------------------------------------------------------
-# Exercício 11 — Dados que ficam
-# ---------------------------------------------------------------------------
-gerar_11() {
-  local dir; dir="$(lab_dir 11)"
-  mkdir -p "$dir"
-  bloco_py > "$dir/bloco.py"
-  dockerfile_bloco > "$dir/Dockerfile"
-}
-limpar_11() { rm_imagem bloco:1.0; rm_volume notas; }
-
-# ---------------------------------------------------------------------------
-# Exercício 12 — Site estático
-# ---------------------------------------------------------------------------
-gerar_12() {
-  local dir; dir="$(lab_dir 12)"
-  gerar_site "$dir/site" receitas.json
-}
-limpar_12() { rm_container web; rm_imagem receitas-web:1.0; }
-
-# ---------------------------------------------------------------------------
-# Exercício 13 — Containers conversando
-# ---------------------------------------------------------------------------
-gerar_13() {
-  local dir; dir="$(lab_dir 13)"
-  mkdir -p "$dir"
-  app_py env > "$dir/app.py"
-  requirements_txt > "$dir/requirements.txt"
-  dockerfile_api bom expose env > "$dir/Dockerfile"
-  printf '__pycache__/\n.venv/\n.env\n' > "$dir/.dockerignore"
-  cliente_py > "$dir/cliente.py"
-}
-limpar_13() { rm_container receitas; rm_rede cozinha; rm_imagem receitas-api:1.6; }
-
-# ---------------------------------------------------------------------------
-# Exercício 14 — Docker Compose
-# ---------------------------------------------------------------------------
-gerar_14() {
-  local dir; dir="$(lab_dir 14)"
-  mkdir -p "$dir/api" "$dir/web"
-  app_py env > "$dir/api/app.py"
-  requirements_txt > "$dir/api/requirements.txt"
-  dockerfile_api bom expose env > "$dir/api/Dockerfile"
-  printf '__pycache__/\n.venv/\n.env\n' > "$dir/api/.dockerignore"
-  dockerfile_web > "$dir/web/Dockerfile"
-  nginx_conf > "$dir/web/nginx.conf"
-  gerar_site "$dir/web/site" /api/receitas
-}
+# limpar_projeto_compose DIR — derruba o projeto do Compose de DIR e remove o que sobrar
 limpar_projeto_compose() {
   local dir="$1" f
   for f in compose.yaml compose.yml docker-compose.yaml docker-compose.yml; do
@@ -483,38 +423,116 @@ limpar_projeto_compose() {
   rm_rede "$(basename "$dir")_default"
   rm_imagem "$(basename "$dir")-api" "$(basename "$dir")-web"
 }
-limpar_14() { limpar_projeto_compose "$(lab_dir 14)"; }
 
 # ---------------------------------------------------------------------------
-# Exercício 16 — Desenvolvimento com Compose (opcional)
+# Exercício 10 — A API com Compose
 # ---------------------------------------------------------------------------
-gerar_16() {
-  local dir; dir="$(lab_dir 16)"
+gerar_10() {
+  local dir; dir="$(lab_dir 10)"
+  mkdir -p "$dir"
+  app_py env > "$dir/app.py"
+  requirements_txt > "$dir/requirements.txt"
+  dockerfile_api bom expose env > "$dir/Dockerfile"
+  printf '__pycache__/\n.venv/\n.env\n' > "$dir/.dockerignore"
+  printf '# Um valor por linha, sem aspas nem espaços em volta do =\nCOZINHA=Cozinha da Vovó\n' > "$dir/cozinha.env"
+}
+limpar_10() { limpar_projeto_compose "$(lab_dir 10)"; }
+
+# ---------------------------------------------------------------------------
+# Exercício 11 — Editando ao vivo
+# ---------------------------------------------------------------------------
+gerar_11() {
+  local dir; dir="$(lab_dir 11)"
   mkdir -p "$dir"
   app_py env reload > "$dir/app.py"
   requirements_txt > "$dir/requirements.txt"
   dockerfile_api bom expose env > "$dir/Dockerfile"
   printf '__pycache__/\n.venv/\n.env\n' > "$dir/.dockerignore"
 }
-limpar_16() {
-  limpar_projeto_compose "$(lab_dir 16)"
+limpar_11() { rm_container dev; rm_imagem receitas-api:1.5; }
+
+# ---------------------------------------------------------------------------
+# Exercício 12 — Desenvolvimento com Compose (opcional)
+# ---------------------------------------------------------------------------
+gerar_12() {
+  local dir; dir="$(lab_dir 12)"
+  mkdir -p "$dir"
+  app_py env reload > "$dir/app.py"
+  requirements_txt > "$dir/requirements.txt"
+  dockerfile_api bom expose env > "$dir/Dockerfile"
+  printf '__pycache__/\n.venv/\n.env\n' > "$dir/.dockerignore"
+}
+limpar_12() {
+  limpar_projeto_compose "$(lab_dir 12)"
   rm_imagem receitas-api:dev
 }
 
 # ---------------------------------------------------------------------------
-# Exercício 17 — Persistência com Compose (opcional)
+# Exercício 13 — Dados que ficam
 # ---------------------------------------------------------------------------
-gerar_17() {
-  local dir; dir="$(lab_dir 17)"
+gerar_13() {
+  local dir; dir="$(lab_dir 13)"
   mkdir -p "$dir"
   bloco_py > "$dir/bloco.py"
   dockerfile_bloco > "$dir/Dockerfile"
 }
-limpar_17() {
-  limpar_projeto_compose "$(lab_dir 17)"
-  rm_volume 17-compose-persistencia_notas
+limpar_13() { rm_imagem bloco:1.0; rm_volume notas; }
+
+# ---------------------------------------------------------------------------
+# Exercício 14 — Persistência com Compose (opcional)
+# ---------------------------------------------------------------------------
+gerar_14() {
+  local dir; dir="$(lab_dir 14)"
+  mkdir -p "$dir"
+  bloco_py > "$dir/bloco.py"
+  dockerfile_bloco > "$dir/Dockerfile"
+}
+limpar_14() {
+  limpar_projeto_compose "$(lab_dir 14)"
+  rm_volume 14-compose-persistencia_notas
   rm_imagem receitas-notas:1.0
 }
+
+# ---------------------------------------------------------------------------
+# Exercício 15 — Site estático
+# ---------------------------------------------------------------------------
+gerar_15() {
+  local dir; dir="$(lab_dir 15)"
+  gerar_site "$dir/site" receitas.json
+}
+limpar_15() { rm_container web; rm_imagem receitas-web:1.0; }
+
+# ---------------------------------------------------------------------------
+# Exercício 16 — Containers conversando
+# ---------------------------------------------------------------------------
+gerar_16() {
+  local dir; dir="$(lab_dir 16)"
+  mkdir -p "$dir"
+  app_py env > "$dir/app.py"
+  requirements_txt > "$dir/requirements.txt"
+  dockerfile_api bom expose env > "$dir/Dockerfile"
+  printf '__pycache__/\n.venv/\n.env\n' > "$dir/.dockerignore"
+  cliente_py > "$dir/cliente.py"
+}
+limpar_16() { rm_container receitas; rm_rede cozinha; rm_imagem receitas-api:1.6; }
+
+# ---------------------------------------------------------------------------
+# Exercício 17 — Site e API com Compose
+# ---------------------------------------------------------------------------
+gerar_17() {
+  local dir; dir="$(lab_dir 17)"
+  mkdir -p "$dir/api" "$dir/web"
+  app_py env > "$dir/api/app.py"
+  requirements_txt > "$dir/api/requirements.txt"
+  dockerfile_api bom expose env > "$dir/api/Dockerfile"
+  printf '__pycache__/\n.venv/\n.env\n' > "$dir/api/.dockerignore"
+  dockerfile_web > "$dir/web/Dockerfile"
+  nginx_conf > "$dir/web/nginx.conf"
+  gerar_site "$dir/web/site" /api/receitas
+  # O serviço api já vem pronto, como no exercício 10; o aluno acrescenta o web.
+  printf 'services:\n  api:\n    build: ./api\n' > "$dir/compose.yaml"
+}
+limpar_17() { limpar_projeto_compose "$(lab_dir 17)"; }
 
 # ---------------------------------------------------------------------------
 # gerar_lab NN — recria o exercício NN (apaga a pasta e o que ele criou no Docker)

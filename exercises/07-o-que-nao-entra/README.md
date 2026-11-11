@@ -1,6 +1,6 @@
 # Exercício 7 — O que não entra na imagem
 
-⏱ 4 minutos · Módulo 2: Dockerfile · **Opcional**
+⏱ 4 minutos · Dockerfile · **Opcional**
 
 Pode ser feito depois da aula. O exercício 8 já traz o próprio `.dockerignore`, então dá para seguir sem fazer este agora.
 

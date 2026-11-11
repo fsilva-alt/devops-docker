@@ -102,10 +102,14 @@ grep -q 'check.sh 00' <<<"$saida" && conta_ok "install.sh indica o primeiro pass
   || conta_falha "install.sh não indicou o próximo passo"
 [[ -x "$HOME/devops-docker/scripts/check.sh" ]] && conta_ok "curso clonado em ~/devops-docker" \
   || conta_falha "~/devops-docker/scripts/check.sh não existe"
-[[ -d "$HOME/labs/04-meu-primeiro-dockerfile" && -d "$HOME/labs/14-docker-compose/web/site" ]] \
+[[ -d "$HOME/labs/04-meu-primeiro-dockerfile" && -d "$HOME/labs/17-site-e-api-com-compose/web/site" ]] \
   && conta_ok "laboratórios gerados em ~/labs" || conta_falha "laboratórios não foram gerados em ~/labs"
-[[ -f "$HOME/labs/16-compose-desenvolvimento/app.py" && -f "$HOME/labs/17-compose-persistencia/bloco.py" && ! -d "$HOME/labs/15-faxina" ]] \
-  && conta_ok "laboratórios opcionais 16 e 17 gerados; faxina continua sem pasta" \
+[[ -f "$HOME/labs/10-api-com-compose/cozinha.env" && ! -f "$HOME/labs/10-api-com-compose/compose.yaml" \
+   && -f "$HOME/labs/17-site-e-api-com-compose/compose.yaml" ]] \
+  && conta_ok "laboratórios de Compose: o 10 sem compose.yaml, o 17 já com o serviço api" \
+  || conta_falha "pastas dos exercícios 10 e 17 incorretas"
+[[ -f "$HOME/labs/12-compose-desenvolvimento/app.py" && -f "$HOME/labs/14-compose-persistencia/bloco.py" && ! -d "$HOME/labs/18-faxina" ]] \
+  && conta_ok "laboratórios opcionais 12 e 14 gerados; faxina continua sem pasta" \
   || conta_falha "pastas dos opcionais de Compose incorretas"
 [[ -L "$WORKSPACE/labs" && "$WORKSPACE/labs" -ef "$HOME/labs" ]] \
   && conta_ok "atalho labs criado na pasta de onde o instalador foi executado" \
@@ -127,10 +131,17 @@ docker image inspect curso-docker-aquecimento >/dev/null 2>&1 && conta_falha "se
 
 # Rodar de novo: atualiza sem apagar nada e sem duplicar o PATH
 touch "$HOME/labs/04-meu-primeiro-dockerfile/marca"
+# Pasta de uma numeração anterior (o Compose era o 14): sai do caminho do check.sh
+mkdir -p "$HOME/labs/14-docker-compose"
+touch "$HOME/labs/14-docker-compose/compose.yaml"
 saida="$(CURSO_REPO="$ORIGEM" sh "$ORIGEM/install.sh" 2>&1)" && grep -q 'Atualizando' <<<"$saida" \
   && conta_ok "install.sh rodado de novo atualiza em vez de clonar" || conta_falha "segunda execução do install.sh"
 [[ -f "$HOME/labs/04-meu-primeiro-dockerfile/marca" ]] && conta_ok "segunda execução preserva os labs" \
   || conta_falha "segunda execução apagou os labs"
+[[ -f "$HOME/labs/versao-anterior/14-docker-compose/compose.yaml" && ! -e "$HOME/labs/14-docker-compose" \
+   && -d "$HOME/labs/14-compose-persistencia" ]] && grep -q 'versão anterior' <<<"$saida" \
+  && conta_ok "pasta de uma numeração anterior vai para versao-anterior/, sem perder arquivos" \
+  || { conta_falha "a pasta antiga 14-docker-compose não foi movida"; printf '%s\n' "$saida"; }
 (( $(grep -c '# >>> curso de docker >>>' "$HOME/.bashrc") == 1 )) && conta_ok "PATH não duplicado no ~/.bashrc" \
   || conta_falha "bloco do PATH duplicado no ~/.bashrc"
 # Bloco de uma instalação anterior, sem o ajuste de rede: o instalador o substitui
@@ -185,7 +196,7 @@ if saida="$(
 )"; then
   conta_falha "00 aprovou uma rede com comunicação entre containers bloqueada"
 elif [[ "$saida" == *"teste de comunicação pela rede falhou"* ]]; then
-  conta_ok "00 detecta timeout entre containers antes dos exercícios 13 e 14"
+  conta_ok "00 detecta timeout entre containers antes dos exercícios 16 e 17"
 else
   conta_falha "00 não explicou a falha de comunicação"; printf '%s\n' "$saida"
 fi
@@ -343,64 +354,131 @@ esperar_http localhost:8002/ || conta_falha "09: a API (env-file) não subiu em 
 aprova 09 "certo + extra (env-file)" extra
 
 # ---------------------------------------------------------------------------
-passo "Exercício 10 — Editando ao vivo"
-reprova 10 vazio "docker build"
-cd "$WORKSPACE/labs/10-editando-ao-vivo"
-build receitas-api:1.5
-run_d --name dev -p 8003:8000 receitas-api:1.5
-reprova 10 "errado (sem bind mount)" "montada em /app"
-docker rm -f dev >/dev/null
-run_d --name dev -p 8003:8000 -v "$PWD:/app" receitas-api:1.5
-reprova 10 "errado (não editou o app.py)" "Pudim"
-sed -i 's/^    {"nome": "Pão de queijo", "rende": "25 unidades"},$/&\n    {"nome": "Pudim", "rende": "8 porções"},/' app.py
-sleep 4   # o uvicorn percebe a mudança e reinicia
+passo "Exercício 10 — A API com Compose"
+reprova 10 vazio "compose.yaml"
+cd "$(lab_dir 10)"
+printf 'services:\n  api:\n    build: .\n' > compose.yaml
+reprova 10 "errado (sem up)" "não está rodando"
+docker compose up -d --build >/dev/null 2>&1
+reprova 10 "errado (sem ports)" "não publica a porta 8000"
+printf 'services:\n  api:\n    build: .\n    ports:\n      - "8011:8000"\n' > compose.yaml
+docker compose up -d >/dev/null 2>&1
+reprova 10 "errado (porta de fora errada)" "pede a 8010"
+printf 'services:\n  api:\n    build: .\n    ports:\n      - "8010:8000"\n' > compose.yaml
+docker compose up -d >/dev/null 2>&1
+reprova 10 "errado (sem environment)" "nome padrão da imagem"
+printf 'services:\n  api:\n    build: .\n    ports:\n      - "8010:8000"\n    environment:\n      COZINHA: "Cozinha do Compose"\n' > compose.yaml
+reprova 10 "errado (editou sem up)" "nome padrão da imagem"
+docker compose up -d >/dev/null 2>&1
+esperar_http localhost:8010/ || conta_falha "10: a API não subiu em 10 s"
 aprova 10 certo
-docker run --rm receitas-api:1.5 grep -q Pudim app.py && conta_falha "10: a imagem não deveria ter o Pudim" \
-  || conta_ok "10 a imagem continua sem o Pudim (é o bind mount)"
+curl -sf localhost:8010/ | grep -q 'Cozinha do Compose' && conta_ok "10 environment do compose.yaml chega à API" \
+  || conta_falha "10: a rota / não mostrou a cozinha do compose.yaml"
+docker compose down >/dev/null 2>&1
+reprova 10 "errado (depois do down)" "não está rodando"
+printf 'services:\n  api:\n    build: .\n    ports:\n      - "8010:8000"\n    env_file:\n      - cozinha.env\n' > compose.yaml
+docker compose up -d >/dev/null 2>&1
+esperar_http localhost:8010/ || conta_falha "10: a API (env_file) não subiu em 10 s"
+aprova 10 "certo + extra (env_file)" extra
 
 # ---------------------------------------------------------------------------
-passo "Exercício 11 — Dados que ficam"
-reprova 11 vazio "docker build -t bloco:1.0"
-cd "$(lab_dir 11)"
+passo "Exercício 11 — Editando ao vivo"
+reprova 11 vazio "docker build"
+cd "$WORKSPACE/labs/11-editando-ao-vivo"
+build receitas-api:1.5
+run_d --name dev -p 8003:8000 receitas-api:1.5
+reprova 11 "errado (sem bind mount)" "montada em /app"
+docker rm -f dev >/dev/null
+run_d --name dev -p 8003:8000 -v "$PWD:/app" receitas-api:1.5
+reprova 11 "errado (não editou o app.py)" "Pudim"
+sed -i 's/^    {"nome": "Pão de queijo", "rende": "25 unidades"},$/&\n    {"nome": "Pudim", "rende": "8 porções"},/' app.py
+sleep 4   # o uvicorn percebe a mudança e reinicia
+aprova 11 certo
+docker run --rm receitas-api:1.5 grep -q Pudim app.py && conta_falha "11: a imagem não deveria ter o Pudim" \
+  || conta_ok "11 a imagem continua sem o Pudim (é o bind mount)"
+
+# ---------------------------------------------------------------------------
+passo "Exercício 12 — Desenvolvimento com Compose"
+reprova 12 vazio "compose.yaml"
+cd "$(lab_dir 12)"
+printf 'services:\n  api:\n    build: .\n    image: receitas-api:dev\n    ports:\n      - "8100:8000"\n' > compose.yaml
+docker compose up -d --build >/dev/null 2>&1
+reprova 12 "errado (sem bind mount)" "não compartilha"
+printf '    volumes:\n      - .:/app\n' >> compose.yaml
+docker compose up -d >/dev/null 2>&1
+reprova 12 "errado (sem editar)" "Pudim"
+sed -i 's/^    {"nome": "Pão de queijo", "rende": "25 unidades"},$/&\n    {"nome": "Pudim", "rende": "8 porções"},/' app.py
+sleep 3
+aprova 12 certo
+docker run --rm receitas-api:dev grep -q Pudim app.py && conta_falha "12 imagem deveria continuar sem Pudim" \
+  || conta_ok "12 bind mount do Compose atualiza a API sem alterar a imagem"
+
+# ---------------------------------------------------------------------------
+passo "Exercício 13 — Dados que ficam"
+reprova 13 vazio "docker build -t bloco:1.0"
+cd "$(lab_dir 13)"
 build bloco:1.0
 docker run --rm bloco:1.0 "comprar cenouras" >/dev/null
 [[ "$(docker run --rm bloco:1.0 "assar o bolo" | grep -c '^[0-9]')" == "1" ]] \
-  && conta_ok "11 sem volume, cada container começa do zero" || conta_falha "11: sem volume, a nota anterior não deveria existir"
-reprova 11 "errado (sem volume)" "docker volume create notas"
+  && conta_ok "13 sem volume, cada container começa do zero" || conta_falha "13: sem volume, a nota anterior não deveria existir"
+reprova 13 "errado (sem volume)" "docker volume create notas"
 docker volume create notas >/dev/null
-reprova 11 "errado (volume vazio)" "está vazio"
+reprova 13 "errado (volume vazio)" "está vazio"
 docker run --rm -v notas:/dados bloco:1.0 "comprar cenouras" >/dev/null
-reprova 11 "errado (só uma nota)" "pelo menos 2"
-docker run --rm -v notas:/dados bloco:1.0 "assar o bolo" | grep -q '2. assar o bolo' || conta_falha "11: a segunda nota não apareceu"
-aprova 11 certo
+reprova 13 "errado (só uma nota)" "pelo menos 2"
+docker run --rm -v notas:/dados bloco:1.0 "assar o bolo" | grep -q '2. assar o bolo' || conta_falha "13: a segunda nota não apareceu"
+aprova 13 certo
 
 # ---------------------------------------------------------------------------
-passo "Exercício 12 — Site estático"
-reprova 12 vazio "Dockerfile"
-cd "$(lab_dir 12)"
+passo "Exercício 14 — Persistência com Compose"
+reprova 14 vazio "compose.yaml"
+cd "$(lab_dir 14)"
+printf 'services:\n  bloco:\n    build: .\n    image: receitas-notas:1.0\n' > compose.yaml
+reprova 14 "errado (sem volume declarado)" "não declara"
+printf '    volumes:\n      - notas:/dados\n\nvolumes:\n  notas:\n' >> compose.yaml
+docker compose build >/dev/null 2>&1
+reprova 14 "errado (volume ainda inexistente)" "ainda não foi criado"
+docker compose run --rm bloco "comprar cenouras" >/dev/null 2>&1
+reprova 14 "errado (uma nota)" "duas notas"
+docker compose run --rm bloco "assar o bolo" >/dev/null 2>&1
+docker compose down >/dev/null 2>&1
+aprova 14 "certo (notas preservadas depois do down)"
+docker compose down -v >/dev/null 2>&1
+docker compose run --rm bloco 2>/dev/null | grep -q 'Nenhuma nota ainda' \
+  && conta_ok "14 down -v remove os dados; próxima execução começa vazia" \
+  || conta_falha "14 notas sobreviveram ao down -v"
+reprova 14 "errado (volume recriado vazio)" "duas notas"
+docker compose run --rm bloco "comprar cenouras" >/dev/null 2>&1
+docker compose run --rm bloco "assar o bolo" >/dev/null 2>&1
+aprova 14 certo
+
+# ---------------------------------------------------------------------------
+passo "Exercício 15 — Site estático"
+reprova 15 vazio "Dockerfile"
+cd "$(lab_dir 15)"
 printf 'FROM nginx:alpine\nCOPY site/ /usr/share/nginx/html/site/\n' > Dockerfile
 build receitas-web:1.0
 run_d --name web -p 8080:80 receitas-web:1.0
-reprova 12 "errado (site numa subpasta)" "não com o nosso site"
+reprova 15 "errado (site numa subpasta)" "não com o nosso site"
 docker rm -f web >/dev/null
 printf 'FROM nginx:alpine\nCOPY site/ /usr/share/nginx/html/\n' > Dockerfile
 build receitas-web:1.0
-reprova 12 "errado (imagem nova, container velho não existe)" "docker run -d --name web"
+reprova 15 "errado (imagem nova, container velho não existe)" "docker run -d --name web"
 run_d --name web -p 8080:80 receitas-web:1.0
-aprova 12 certo
+aprova 15 certo
 
 # ---------------------------------------------------------------------------
-passo "Exercício 13 — Containers conversando"
-reprova 13 vazio "cozinha"
-cd "$(lab_dir 13)"
+passo "Exercício 16 — Containers conversando"
+reprova 16 vazio "cozinha"
+cd "$(lab_dir 16)"
 build receitas-api:1.6
 docker network create cozinha >/dev/null
-reprova 13 "errado (sem container)" "--network cozinha"
+reprova 16 "errado (sem container)" "--network cozinha"
 run_d --name receitas receitas-api:1.6
-reprova 13 "errado (fora da rede)" "não está na rede"
+reprova 16 "errado (fora da rede)" "não está na rede"
 docker rm -f receitas >/dev/null
 run_d --name receitas --network cozinha -p 8004:8000 receitas-api:1.6
-aprova 13 "certo (com -p, sem extra)"
+aprova 16 "certo (com -p, sem extra)"
 docker rm -f receitas >/dev/null
 # Simula um início lento, sem sleep no cliente ou na verificação.
 run_d --name receitas --network cozinha receitas-api:1.6 sh -c 'sleep 4; exec python app.py'
@@ -408,134 +486,97 @@ saida="$(docker run --rm --network cozinha -v "$PWD:/app" \
   -e HTTP_PROXY=http://127.0.0.1:9 -e http_proxy=http://127.0.0.1:9 \
   python:3.12-slim python /app/cliente.py 2>&1)"
 if [[ "$saida" == *"Bolo de cenoura"* && "$saida" == *"Aguardando a API"* ]]; then
-  conta_ok "13 cliente.py espera a API iniciar e ignora proxies externos"
+  conta_ok "16 cliente.py espera a API iniciar e ignora proxies externos"
 else
-  conta_falha "13 cliente.py falhou ao aguardar a API ou não repetiu o pedido"; printf '%s\n' "$saida"
+  conta_falha "16 cliente.py falhou ao aguardar a API ou não repetiu o pedido"; printf '%s\n' "$saida"
 fi
 docker run --rm -v "$PWD:/app" python:3.12-slim python /app/cliente.py >/dev/null 2>&1 \
-  && conta_falha "13: fora da rede o nome não deveria resolver" || conta_ok "13 fora da rede, o nome não resolve"
-aprova 13 "certo + extra" extra
+  && conta_falha "16: fora da rede o nome não deveria resolver" || conta_ok "16 fora da rede, o nome não resolve"
+aprova 16 "certo + extra" extra
 docker stop -t 1 receitas >/dev/null
 saida="$(docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py 2>&1)" \
-  && conta_falha "13 cliente deveria falhar com a API parada" \
+  && conta_falha "16 cliente deveria falhar com a API parada" \
   || { [[ "$saida" == *"após 8 tentativas"* && "$saida" != *Traceback* ]] \
-    && conta_ok "13 API indisponível produz diagnóstico limitado, sem traceback" \
-    || conta_falha "13 falha do cliente não explicou como conferir a rede"; }
+    && conta_ok "16 API indisponível produz diagnóstico limitado, sem traceback" \
+    || conta_falha "16 falha do cliente não explicou como conferir a rede"; }
 docker start receitas >/dev/null
 
 # ---------------------------------------------------------------------------
-passo "Exercício 14 — Docker Compose"
-reprova 14 vazio "compose.yaml"
-cd "$(lab_dir 14)"
-printf 'services:\n  api:\n    build: ./api\n' > compose.yaml
-reprova 14 "errado (só a api)" "serviço 'web'"
+passo "Exercício 17 — Site e API com Compose"
+reprova 17 "vazio (só a api do arquivo inicial)" "serviço 'web'"
+cd "$(lab_dir 17)"
+rm compose.yaml
+reprova 17 "errado (sem compose.yaml)" "compose.yaml"
 printf 'services:\n  api:\n    build: ./api\n\n  web:\n    build: ./web\n    ports:\n      - "8090:80"\n    depends_on:\n      - api\n' > compose.yaml
-reprova 14 "errado (sem up)" "docker compose up"
+reprova 17 "errado (sem up)" "docker compose up"
 docker compose up -d --build --quiet-pull >/dev/null 2>&1
-esperar_http localhost:8090/api/receitas || conta_falha "14: a API atrás do nginx não respondeu em 10 s"
-aprova 14 certo
-curl -sf localhost:8090/app.js | grep -q '/api/receitas' && conta_ok "14 o site pede as receitas em /api/receitas" \
-  || conta_falha "14: o app.js do site deveria apontar para /api/receitas"
+esperar_http localhost:8090/api/receitas || conta_falha "17: a API atrás do nginx não respondeu em 10 s"
+aprova 17 certo
+curl -sf localhost:8090/app.js | grep -q '/api/receitas' && conta_ok "17 o site pede as receitas em /api/receitas" \
+  || conta_falha "17: o app.js do site deveria apontar para /api/receitas"
 docker compose down >/dev/null 2>&1
-reprova 14 "errado (depois do down)" "docker compose up"
+reprova 17 "errado (depois do down)" "docker compose up"
 docker compose up -d >/dev/null 2>&1
-esperar_http localhost:8090/api/receitas || conta_falha "14: a API não voltou depois do up"
-aprova 14 "certo (up de novo, sem build)"
+esperar_http localhost:8090/api/receitas || conta_falha "17: a API não voltou depois do up"
+aprova 17 "certo (up de novo, sem build)"
 printf 'services:\n  api:\n    build: ./api\n    environment:\n      COZINHA: "Cozinha do Compose"\n\n  web:\n    build: ./web\n    ports:\n      - "8090:80"\n    depends_on:\n      - api\n' > compose.yaml
 docker compose up -d >/dev/null 2>&1
 for _ in $(seq 1 20); do curl -sf localhost:8090/api/ 2>/dev/null | grep -q 'Cozinha do Compose' && break; sleep 0.5; done
-curl -sf localhost:8090/api/ | grep -q 'Cozinha do Compose' && conta_ok "14 environment no compose chega à API (só o api foi recriado)" \
-  || conta_falha "14: environment do compose não chegou à API"
+curl -sf localhost:8090/api/ | grep -q 'Cozinha do Compose' && conta_ok "17 environment no compose chega à API (só o api foi recriado)" \
+  || conta_falha "17: environment do compose não chegou à API"
 
 # Ocupa o IP antigo para confirmar que o nginx encontra a API após ela mudar de IP.
 api_id="$(docker compose ps -q api)"
 ip_antigo="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$api_id")"
 web_antes="$(docker compose ps -q web)"
 docker compose rm -sf api >/dev/null 2>&1
-run_d --name ocupa-ip --network 14-docker-compose_default alpine sleep 60
+run_d --name ocupa-ip --network 17-site-e-api-com-compose_default alpine sleep 60
 docker compose up -d api >/dev/null 2>&1
 ip_novo="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$(docker compose ps -q api)")"
 if [[ "$ip_novo" != "$ip_antigo" && "$web_antes" == "$(docker compose ps -q web)" ]] && esperar_http localhost:8090/api/receitas; then
-  conta_ok "14 nginx reencontra a API com outro IP sem recriar web"
+  conta_ok "17 nginx reencontra a API com outro IP sem recriar web"
 else
-  conta_falha "14 nginx não reencontrou a API após a troca de IP"
+  conta_falha "17 nginx não reencontrou a API após a troca de IP"
 fi
 docker rm -f ocupa-ip >/dev/null
 curl -sf 'localhost:8090/api/receitas?teste=1' | grep -q 'Bolo de cenoura' \
-  && conta_ok "14 proxy remove /api/ e preserva uma URL com query string" \
-  || conta_falha "14 proxy falhou com query string"
+  && conta_ok "17 proxy remove /api/ e preserva uma URL com query string" \
+  || conta_falha "17 proxy falhou com query string"
 
 # ---------------------------------------------------------------------------
-passo "Exercício 16 — Desenvolvimento com Compose"
-reprova 16 vazio "compose.yaml"
-cd "$(lab_dir 16)"
-printf 'services:\n  api:\n    build: .\n    image: receitas-api:dev\n    ports:\n      - "8100:8000"\n' > compose.yaml
-docker compose up -d --build >/dev/null 2>&1
-reprova 16 "errado (sem bind mount)" "não compartilha"
-printf '    volumes:\n      - .:/app\n' >> compose.yaml
-docker compose up -d >/dev/null 2>&1
-reprova 16 "errado (sem editar)" "Pudim"
-sed -i 's/^    {"nome": "Pão de queijo", "rende": "25 unidades"},$/&\n    {"nome": "Pudim", "rende": "8 porções"},/' app.py
-sleep 3
-aprova 16 certo
-docker run --rm receitas-api:dev grep -q Pudim app.py && conta_falha "16 imagem deveria continuar sem Pudim" \
-  || conta_ok "16 bind mount do Compose atualiza a API sem alterar a imagem"
-
-passo "Exercício 17 — Persistência com Compose"
-reprova 17 vazio "compose.yaml"
-cd "$(lab_dir 17)"
-printf 'services:\n  bloco:\n    build: .\n    image: receitas-notas:1.0\n' > compose.yaml
-reprova 17 "errado (sem volume declarado)" "não declara"
-printf '    volumes:\n      - notas:/dados\n\nvolumes:\n  notas:\n' >> compose.yaml
-docker compose build >/dev/null 2>&1
-reprova 17 "errado (volume ainda inexistente)" "ainda não foi criado"
-docker compose run --rm bloco "comprar cenouras" >/dev/null 2>&1
-reprova 17 "errado (uma nota)" "duas notas"
-docker compose run --rm bloco "assar o bolo" >/dev/null 2>&1
-docker compose down >/dev/null 2>&1
-aprova 17 "certo (notas preservadas depois do down)"
-docker compose down -v >/dev/null 2>&1
-docker compose run --rm bloco 2>/dev/null | grep -q 'Nenhuma nota ainda' \
-  && conta_ok "17 down -v remove os dados; próxima execução começa vazia" \
-  || conta_falha "17 notas sobreviveram ao down -v"
-reprova 17 "errado (volume recriado vazio)" "duas notas"
-docker compose run --rm bloco "comprar cenouras" >/dev/null 2>&1
-docker compose run --rm bloco "assar o bolo" >/dev/null 2>&1
-aprova 17 certo
-
-# ---------------------------------------------------------------------------
-passo "Exercício 15 — Faxina"
-reprova 15 vazio "rodando"
+passo "Exercício 18 — Faxina"
+reprova 18 vazio "rodando"
 docker stop -t 1 $(docker ps -q) >/dev/null
-reprova 15 "errado (parados)" "docker container prune"
+reprova 18 "errado (parados)" "docker container prune"
 docker container prune -f >/dev/null
 if [[ -n "$(docker images -q --filter dangling=true)" ]]; then
-  reprova 15 "errado (imagens <none>)" "docker image prune"
+  reprova 18 "errado (imagens <none>)" "docker image prune"
   docker image prune -f >/dev/null
 fi
-aprova 15 certo
-( cd "$(lab_dir 14)" && docker compose down >/dev/null 2>&1 )
-( cd "$(lab_dir 16)" && docker compose down >/dev/null 2>&1 )
-( cd "$(lab_dir 17)" && docker compose down -v >/dev/null 2>&1 )
+aprova 18 certo
+( cd "$(lab_dir 10)" && docker compose down >/dev/null 2>&1 )
+( cd "$(lab_dir 17)" && docker compose down >/dev/null 2>&1 )
+( cd "$(lab_dir 12)" && docker compose down >/dev/null 2>&1 )
+( cd "$(lab_dir 14)" && docker compose down -v >/dev/null 2>&1 )
 docker volume rm notas >/dev/null
 docker network rm cozinha >/dev/null
 docker image rm -f $(docker images -q 'receitas*' | sort -u) bloco:1.0 >/dev/null 2>&1 || true
-docker image rm -f $(docker images -q '14-docker-compose-*' | sort -u) >/dev/null 2>&1 || true
-aprova 15 "certo + extra" extra
+docker image rm -f $(docker images -q '10-api-com-compose-*' '17-site-e-api-com-compose-*' | sort -u) >/dev/null 2>&1 || true
+aprova 18 "certo + extra" extra
 
 # ---------------------------------------------------------------------------
 passo "Utilitários"
-cd "$WORKSPACE/labs/13-containers-conversando"
-saida="$(check.sh 2>&1 || true)"     # reprova (a faxina apagou tudo), mas tem de detectar o 13
-grep -q 'Exercício 13' <<<"$saida" && conta_ok "check.sh sem argumento detecta o exercício pela pasta" \
+cd "$WORKSPACE/labs/16-containers-conversando"
+saida="$(check.sh 2>&1 || true)"     # reprova (a faxina apagou tudo), mas tem de detectar o 16
+grep -q 'Exercício 16' <<<"$saida" && conta_ok "check.sh sem argumento detecta o exercício pela pasta" \
   || { conta_falha "check.sh sem argumento não detectou o exercício pelo atalho labs"; printf '%s\n' "$saida"; }
 cd "$CURSO_DIR"
-setup.sh | grep -q '0 laboratório(s) gerado(s), 13 mantido(s)' && conta_ok "setup.sh é idempotente" \
+setup.sh | grep -q '0 laboratório(s) gerado(s), 14 mantido(s)' && conta_ok "setup.sh é idempotente" \
   || conta_falha "setup.sh regenerou labs existentes"
-[[ -f "$(lab_dir 14)/compose.yaml" ]] && conta_ok "setup.sh não apagou o trabalho" || conta_falha "setup.sh apagou o trabalho"
+[[ -f "$(lab_dir 17)/compose.yaml" ]] && conta_ok "setup.sh não apagou o trabalho" || conta_falha "setup.sh apagou o trabalho"
 check.sh 99 >/dev/null 2>&1 && conta_falha "check.sh 99 deveria falhar" || conta_ok "check.sh rejeita número inválido"
 reset.sh 00 >/dev/null 2>&1 && conta_falha "reset.sh 00 deveria falhar" || conta_ok "reset.sh recusa o exercício 00"
-reset.sh 15 >/dev/null 2>&1 && conta_falha "reset.sh 15 deveria falhar" || conta_ok "reset.sh recusa o exercício 15"
+reset.sh 18 >/dev/null 2>&1 && conta_falha "reset.sh 18 deveria falhar" || conta_ok "reset.sh recusa o exercício 18"
 cd "$(lab_dir 09)"
 build receitas-api:1.4
 run_d --name cozinha -p 8002:8000 -e COZINHA=x receitas-api:1.4

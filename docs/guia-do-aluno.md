@@ -10,14 +10,14 @@
 ## Como acompanhar os exercícios
 
 - Comece pelo slide **Como acompanhar a aula**. Ele apresenta o terminal, o editor, o comando que instala o material do curso e a diferença entre um comando e o conteúdo de um arquivo.
-- Siga a trilha principal: **0 → 1 → 2 → 3 → 4 → 5 → 8 → 9 → 10 → 12 → 13 → 14**. Ela inclui o 10 (Editando ao vivo).
-- Os exercícios 6, 7, 11, 15, 16 e 17 são opcionais, assim como as seções **Missão extra**. O 16 e o 17 são práticas de Compose para depois da aula. Faça a faxina (15) por último.
+- Siga a trilha principal: **0 → 1 → 2 → 3 → 4 → 5 → 8 → 9 → 10 → 11 → 15 → 16 → 17**. O Docker Compose entra no 10 e volta no 17.
+- Os exercícios 6, 7, 12, 13, 14 e 18 são opcionais, assim como as seções **Missão extra**. O 12 e o 14 são práticas de Compose para depois da aula. Faça a faxina (18) por último.
 - Em cada exercício, leia o objetivo, entre na pasta indicada, execute uma etapa por vez e compare o resultado com o enunciado.
 - Nos slides, o `$` marca um comando: copie a linha sem esse símbolo. Os blocos de Dockerfile, Python e YAML vão no editor, no arquivo indicado.
 - Salve com **Ctrl+S**, ou **Cmd+S** no Mac, antes de construir uma imagem ou consultar a API.
 - Ao terminar, execute `check.sh NN`, trocando `NN` pelo número do exercício. Se aparecer **concluído**, está certo; se aparecerem dicas, elas mostram o que ajustar.
 
-Nos exercícios 6 e 10, você acrescenta uma receita à lista `RECEITAS` em `app.py`. Cole a linha nova antes do `]` que fecha a lista e mantenha as aspas, a vírgula e o alinhamento das outras receitas. Não é preciso saber Python para isso.
+Nos exercícios 6 e 11, você acrescenta uma receita à lista `RECEITAS` em `app.py`. Cole a linha nova antes do `]` que fecha a lista e mantenha as aspas, a vírgula e o alinhamento das outras receitas. Não é preciso saber Python para isso.
 
 ## Onde você está trabalhando?
 
@@ -57,14 +57,15 @@ O material do curso fica em `~/devops-docker`, e os arquivos em que você pratic
 | Alteração não aparece na imagem | Salve o arquivo e repita `docker build`. Containers existentes continuam usando a imagem anterior; recrie-os para usar a nova. |
 | `docker build` reclama de falta de argumento | Faltou o ponto no final: `docker build -t receitas:1.0 .`. Ele indica a pasta do projeto. |
 | Pasta montada vazia ou arquivo ausente | Entre na pasta indicada antes de rodar `docker run -v "$PWD:/app" ...`. `$PWD` é a pasta atual e precisa ser a do laboratório. |
-| Pudim não aparece no exercício 10 | Salve `app.py`, confira a montagem com `docker inspect dev` e consulte `docker logs dev` para ver se o programa recarregou ou encontrou um erro de Python. |
-| `compose.yaml` inválido | Execute `docker compose config`. Use dois espaços por nível e copie também as linhas abaixo de `depends_on`. |
+| Pudim não aparece no exercício 11 | Salve `app.py`, confira a montagem com `docker inspect dev` e consulte `docker logs dev` para ver se o programa recarregou ou encontrou um erro de Python. |
+| `compose.yaml` inválido | Execute `docker compose config`. Use dois espaços por nível, sem Tab, e copie também as linhas abaixo de `ports`, `environment` e `depends_on`. |
+| `no configuration file provided: not found` | Os comandos `docker compose` precisam ser executados na pasta do `compose.yaml`. Entre nela com o `cd` do enunciado. |
 | Aba PORTS sem a porta esperada | Confira se o container está rodando e se a coluna PORTS de `docker ps` mostra a publicação. No Compose, use `docker compose ps`. |
 | Pasta não encontrada depois de `reset.sh` | Execute novamente o `cd` do enunciado; a pasta foi recriada. |
 | Containers rodando, mas a conexão entre eles expira (timeout) | Execute `rede.sh` e tente novamente. Ele corrige um bloqueio de firewall que ocorre em alguns Codespaces. |
 
 ## Ao terminar
 
-1. A faxina (exercício 15) remove os recursos Docker criados durante a aula. Depois dela, as verificações anteriores só voltam a aprovar se você refizer as tarefas.
+1. A faxina (exercício 18) remove os recursos Docker criados durante a aula. Depois dela, as verificações anteriores só voltam a aprovar se você refizer as tarefas.
 2. Pare ou exclua seu Codespace. Parado, ele ainda ocupa armazenamento; excluído, perde os arquivos e as alterações. Guarde o que quiser manter antes de excluí-lo.
 3. Para revisar, consulte o [gabarito](gabarito.md). Para continuar estudando, leia [Descomplicando Docker](https://livro.descomplicandodocker.com.br/) ou tente colocar um projeto seu em um container.

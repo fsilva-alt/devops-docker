@@ -1,6 +1,6 @@
 # Exercício 4 — Meu primeiro Dockerfile
 
-⏱ 6 minutos · Módulo 2: Dockerfile
+⏱ 6 minutos · Dockerfile
 
 ## Objetivo
 

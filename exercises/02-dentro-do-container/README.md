@@ -1,6 +1,6 @@
 # Exercício 2 — Dentro do container
 
-⏱ 5 minutos · Módulo 1: Fundamentos
+⏱ 5 minutos · Fundamentos
 
 ## Objetivo
 

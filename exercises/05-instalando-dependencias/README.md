@@ -1,6 +1,6 @@
 # Exercício 5 — Instalando dependências
 
-⏱ 6 minutos · Módulo 2: Dockerfile
+⏱ 6 minutos · Dockerfile
 
 ## Objetivo
 

@@ -11,13 +11,13 @@ Confirmar que o seu Codespace consegue **rodar containers**. Se algo estiver err
 
 ::::columns
 :::card Onde fazer
-No terminal do Codespace, em **qualquer pasta**. Estes comandos usam recursos gerenciados pelo Docker e não dependem de arquivos da pasta atual.
+No terminal do Codespace, em **qualquer pasta**. Quem cuida dos containers e das imagens é o Docker, então estes comandos não dependem da pasta em que você está.
 :::
-:::card Para este desafio
+:::card Para este exercício
 `⏱ tempo`
 : 3 min
 
-`módulo`
+`parte`
 : Abertura · feito antes da aula, logo depois do instalador
 
 `verificação`
@@ -42,13 +42,13 @@ To generate this message, Docker took the following steps:
  4. The Docker daemon streamed that output to the Docker client…
 ```
 
-O texto explica que o cliente fez um pedido, o serviço obteve a imagem, criou o container e mostrou a mensagem no terminal. Se a imagem já estiver disponível, não precisa ser baixada novamente.
+O texto em inglês conta o que aconteceu: o cliente enviou o pedido, e o serviço baixou a imagem, criou o container e mostrou a mensagem no terminal. Se a imagem já estiver no Codespace, o Docker não baixa de novo.
 :::
 
 :::card Como saber se está funcionando
-`docker version` mostra as seções **Client** (cliente) e **Server** (serviço). Se aparecer *Cannot connect to the Docker daemon*, o cliente não conseguiu acessar o serviço.
+`docker version` mostra as seções **Client** (cliente) e **Server** (serviço). Se aparecer *Cannot connect to the Docker daemon*, o cliente está instalado, mas não conseguiu falar com o serviço.
 
-Em um Codespace recém-aberto, espere um minuto e tente novamente.
+Em um Codespace recém-aberto, espere um minuto e tente de novo.
 :::
 
 :::note
@@ -63,7 +63,7 @@ Em um Codespace recém-aberto, espere um minuto e tente novamente.
 | --- | --- |
 | `docker version` | mostra as versões do cliente e do serviço Docker |
 | `docker info` | mostra informações do serviço: containers, imagens e armazenamento |
-| `docker run hello-world` | cria e executa um container de teste; baixa a imagem se ela não estiver disponível |
+| `docker run hello-world` | cria e roda um container de teste; baixa a imagem se ela ainda não estiver no Codespace |
 | `docker compose version` | mostra a versão do Compose instalado |
 
 :::card Documentação
@@ -73,27 +73,27 @@ Links para consultar depois. A documentação do Docker está em inglês.
 - [Visão geral do Docker](https://docs.docker.com/get-started/docker-overview/)<small>documentação oficial · em inglês</small>
 - [Docker Hub · hello-world](https://hub.docker.com/_/hello-world)
 - [Comando · docker run](https://docs.docker.com/reference/cli/docker/container/run/)<small>-d, -it, --rm, --name, -p, -e, -v, --network</small>
-- [Repositório do curso](https://github.com/fsilva-alt/devops-docker)<small>enunciados, gabarito, guia do professor</small>
+- [Repositório do curso](https://github.com/fsilva-alt/devops-docker)<small>enunciados, gabarito, guia do aluno</small>
 :::
 
 <p class="eyebrow">Tarefa · 3 min</p>
 
-## O desafio
+## O exercício
 
 :::steps
-1. Confira se aparecem as versões de **Client** e **Server**. Isso indica que o comando conseguiu acessar o serviço:
+1. Veja se aparecem as versões de **Client** e **Server**. Se as duas aparecerem, cliente e serviço estão se comunicando:
 
    ```console
    $ docker version
    ```
 
-2. Execute o container de teste e procure a mensagem **Hello from Docker!**:
+2. Rode seu primeiro container e procure a mensagem **Hello from Docker!**:
 
    ```console
    $ docker run hello-world
    ```
 
-3. Confira a versão do Compose, a ferramenta que usaremos no desafio 14 para iniciar o site e a API juntos:
+3. Confira se o Compose também está instalado. Ele aparece a partir do exercício 10 e serve para iniciar a API e, mais adiante, o site e a API juntos:
 
    ```console
    $ docker compose version
@@ -105,13 +105,13 @@ Links para consultar depois. A documentação do Docker está em inglês.
 $ check.sh 00
 ```
 
-Confere também que o instalador baixou as quatro imagens-base da aula (`hello-world`, `alpine`, `python:3.12-slim`, `nginx:alpine`). Faltou alguma? `setup.sh`.
+Além do Docker, a verificação confere se o instalador baixou as quatro imagens-base da aula (`hello-world`, `alpine`, `python:3.12-slim`, `nginx:alpine`). Se faltar alguma, rode `setup.sh`.
 :::
 
 :::warning
-**Depois, pare o Codespace** — em github.com/codespaces, ⋯ → *Stop codespace*, para não gastar a franquia. No dia da aula é só abrir de novo: imagens e laboratórios continuam lá.
+**Depois, pare o Codespace** para não gastar sua franquia gratuita: em github.com/codespaces, use ⋯ → *Stop codespace*. No dia da aula, é só abrir o mesmo Codespace. As imagens e os laboratórios continuam nele.
 :::
 
 :::card Missão extra · opcional
-Execute `docker info` para consultar um resumo do serviço Docker. Procure a linha `Containers:`: ela mostra o total de containers, incluindo os parados. O `hello-world` deve estar nessa contagem.
+Rode `docker info` para ver um resumo do serviço Docker. Procure a linha `Containers:`, que mostra o total de containers, incluindo os parados. O container do `hello-world` entra nessa conta.
 :::

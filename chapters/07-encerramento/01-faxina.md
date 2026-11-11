@@ -5,23 +5,23 @@ duration: 4
 # Faxina
 
 {.lead}
-Consultar o espaço usado pelo Docker e remover recursos criados durante a aula. **Faça este desafio por último:** a limpeza remove containers e imagens usados nos exercícios anteriores.
+Ver quanto disco o Docker está usando e limpar o que você criou durante a aula. **Faça este exercício por último**, porque a limpeza remove containers e imagens que as verificações anteriores usam.
 
 `docker system df` `docker stop $(docker ps -q)` `docker container prune` `docker image prune`
 
 ::::columns
 :::card Onde fazer
-No terminal do Codespace, em **qualquer pasta**. Estes comandos usam recursos gerenciados pelo Docker e não dependem de arquivos da pasta atual.
+No terminal do Codespace, em **qualquer pasta**. Quem cuida dos containers e das imagens é o Docker, então estes comandos não dependem da pasta em que você está.
 :::
-:::card Para este desafio
+:::card Para este exercício
 `⏱ tempo`
 : 4 min · pode ficar para depois da aula
 
-`módulo`
+`parte`
 : Encerramento
 
 `verificação`
-: `check.sh 15`
+: `check.sh 18`
 :::
 ::::
 
@@ -32,9 +32,9 @@ No terminal do Codespace, em **qualquer pasta**. Estes comandos usam recursos ge
 | O quê | De onde veio |
 | --- | --- |
 | `containers parados` | continuam no disco até serem removidos, junto com seus arquivos e logs |
-| `imagens <none> (dangling)` | versões que podem ficar sem nome ao reconstruir uma imagem com a mesma tag |
-| `cache de build` | resultados de etapas anteriores, reutilizados na construção (desafio 6) |
-| `volumes e redes` | notas e cozinha continuam existindo até alguém apagar |
+| `imagens <none> (dangling)` | versões antigas, que ficam sem nome quando você reconstrói uma imagem com a mesma tag |
+| `cache de build` | etapas já construídas, que o Docker guarda para reaproveitar (exercício 6) |
+| `volumes e redes` | o volume notas e a rede cozinha continuam existindo até você apagar |
 
 ```console
 $ docker system df
@@ -50,7 +50,7 @@ Build Cache     31      0        180MB    180MB
 : remove todos os containers parados
 
 `docker image prune`
-: só as imagens sem nome; -a remove toda imagem sem container
+: remove só as imagens sem nome; com -a, remove todas as que nenhum container usa
 
 `docker volume prune`
 : remove volumes anônimos sem uso; o volume nomeado notas é removido com docker volume rm notas
@@ -63,7 +63,7 @@ Build Cache     31      0        180MB    180MB
 :::
 
 :::note Como ler docker system df:
-SIZE é o espaço ocupado; RECLAIMABLE é o que pode ser liberado. Os números do exemplo variam conforme o uso. Na limpeza, removemos primeiro os containers parados e depois as imagens que eles usavam.
+SIZE é o espaço ocupado, e RECLAIMABLE é quanto dá para liberar. Os seus números vão ser diferentes dos do exemplo. Na limpeza, os containers parados saem primeiro, e depois as imagens que eles usavam.
 :::
 
 <p class="eyebrow">Referência</p>
@@ -72,18 +72,18 @@ SIZE é o espaço ocupado; RECLAIMABLE é o que pode ser liberado. Os números d
 
 | Comando | Para quê |
 | --- | --- |
-| `docker system df` | quanto disco cada categoria ocupa e quanto é recuperável |
-| `docker stop $(docker ps -q)` | para todos os que estão rodando |
-| `docker container prune` | remove os parados |
-| `docker image prune [-a]` | imagens sem nome \[ou todas sem container\] |
-| `docker system prune -a --volumes` | amplia a limpeza para imagens sem uso e volumes anônimos sem uso; pode incluir as imagens-base |
-| `docker compose down [-v]` | para e remove os recursos do projeto; -v inclui os volumes gerenciados pelo Compose |
+| `docker system df` | mostra quanto disco cada categoria ocupa e quanto dá para liberar |
+| `docker stop $(docker ps -q)` | para todos os containers que estão rodando |
+| `docker container prune` | remove os containers parados |
+| `docker image prune [-a]` | remove as imagens sem nome; com -a, todas as que nenhum container usa |
+| `docker system prune -a --volumes` | faz uma limpeza mais ampla, que inclui imagens sem uso e volumes anônimos; pode apagar as imagens-base |
+| `docker compose down [-v]` | para e remove os containers e a rede do projeto; com -v, também os volumes dele |
 
 :::card O que estudar depois
-- **Compartilhar imagens:** publicar no Docker Hub ou no GitHub Container Registry com `docker push`.
-- **Reduzir o tamanho das imagens:** estudar imagens-base menores e construções em múltiplas etapas, chamadas de *multi-stage builds*.
-- **Definir permissões:** executar o programa com um usuário sem privilégios de administrador, em vez de `root`.
-- **Usar várias máquinas:** conhecer o Kubernetes, que gerencia a execução de containers em vários computadores.
+- Publicar suas imagens no Docker Hub ou no GitHub Container Registry, com `docker push`.
+- Deixar as imagens menores, com imagens-base enxutas e construções em várias etapas, os *multi-stage builds*.
+- Rodar o programa com um usuário comum, sem os privilégios do `root`.
+- Usar várias máquinas com o Kubernetes, que distribui containers entre vários computadores.
 :::
 
 :::card Documentação
@@ -97,36 +97,36 @@ Links para consultar depois. A documentação do Docker está em inglês.
 - [Comando · docker compose down](https://docs.docker.com/reference/cli/docker/compose/down/)<small>-v, --rmi</small>
 - [Onde as imagens são publicadas?](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-registry/)<small>Docker Hub e outros registros · em inglês</small>
 - [Descomplicando Docker (livro gratuito)](https://livro.descomplicandodocker.com.br/)<small>pt-br</small>
-- [Repositório do curso](https://github.com/fsilva-alt/devops-docker)<small>enunciados, gabarito, guia do professor</small>
+- [Repositório do curso](https://github.com/fsilva-alt/devops-docker)<small>enunciados, gabarito, guia do aluno</small>
 :::
 
 <p class="eyebrow">Tarefa · 4 min · pode ficar para depois da aula</p>
 
-## O desafio
+## O exercício
 
 :::steps
-1. Consulte o espaço usado e a lista de containers:
+1. Veja o espaço usado e a lista de containers:
 
    ```console
    $ docker system df
    $ docker ps -a
    ```
 
-2. Pare os containers em execução e remova os parados. `$(docker ps -q)` insere a lista de IDs no comando `stop`. Se a lista estiver vazia, ele avisará que falta um argumento; nesse caso, siga para `prune`. Leia a confirmação e responda `y` para remover:
+2. Pare tudo o que está rodando e remova os containers parados. O trecho `$(docker ps -q)` coloca no comando `stop` os IDs dos containers em execução. Se não houver nenhum, o `stop` avisa que falta um argumento, e você pode seguir para o `prune`. O `prune` pede confirmação, e você responde `y`:
 
    ```console
    $ docker stop $(docker ps -q)
    $ docker container prune
    ```
 
-3. As imagens sem nome, sobras dos builds:
+3. Remova as imagens sem nome, que são sobras dos builds:
 
    ```console
    $ docker image prune
    $ docker images
    ```
 
-4. Consulte o espaço novamente e compare com a primeira etapa:
+4. Veja o espaço usado de novo e compare com o da primeira etapa:
 
    ```console
    $ docker system df
@@ -135,28 +135,29 @@ Links para consultar depois. A documentação do Docker está em inglês.
 
 :::card Verificação
 ```console
-$ check.sh 15
+$ check.sh 18
 ```
 
-Aprova sem nenhum container (rodando ou parado) e sem imagens `<none>`. Extra: nada do curso sobrou (volume, rede, imagens).
+Aprova quando não há nenhum container, rodando ou parado, nem imagens `<none>`. A missão extra conta como feita quando não sobra nada do curso: volume, rede e imagens.
 :::
 
 :::note
-**Para praticar de novo:** use `reset.sh NN`, substituindo `NN` pelo número do desafio, e siga o enunciado desde o início. As verificações que dependem dos containers removidos deixam de aprovar até você refazê-los.
+**Para praticar de novo:** use `reset.sh NN`, trocando `NN` pelo número do exercício, e siga o enunciado desde o início. As verificações que dependem dos containers removidos só voltam a aprovar depois que você refizer o exercício.
 :::
 
 :::card Missão extra · volume, rede e imagens
 ```console
-$ cd ~/labs/14-docker-compose && docker compose down && cd -
+$ cd ~/labs/10-api-com-compose && docker compose down && cd -
+$ cd ~/labs/17-site-e-api-com-compose && docker compose down && cd -
 $ docker volume rm notas
 $ docker network rm cozinha
 $ docker images                 # confira as imagens restantes
 $ docker image rm -f $(docker images -q 'receitas*' | sort -u) bloco:1.0
 ```
 
-A primeira linha remove os recursos do Compose e volta à pasta anterior. Na última, `sort -u` retira IDs repetidos, e `-f` permite remover imagens com mais de uma tag. A remoção do volume também apaga as notas.
+As duas primeiras linhas removem o que o Compose criou e voltam à pasta anterior. Se você fez os opcionais 12 e 14, faça o mesmo nas pastas deles. No 14, use `down -v` para apagar também o volume. Na última linha, `sort -u` tira os IDs repetidos, e `-f` permite remover imagens com mais de uma tag. Remover o volume `notas` apaga as notas guardadas nele.
 :::
 
 :::warning
-**Ao terminar:** pare ou exclua o Codespace. Parado, ele ainda ocupa armazenamento. Excluído, perde os arquivos e alterações; o instalador recria apenas o material inicial do curso.
+**Ao terminar:** pare ou exclua o Codespace. Parado, ele ainda ocupa armazenamento da sua franquia. Se você excluir, perde os arquivos e as alterações que fez. O instalador recria só o material inicial do curso.
 :::

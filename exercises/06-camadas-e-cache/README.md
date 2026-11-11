@@ -1,6 +1,6 @@
 # Exercício 6 — Camadas e cache
 
-⏱ 5 minutos · Módulo 2: Dockerfile · **Opcional**
+⏱ 5 minutos · Dockerfile · **Opcional**
 
 Pode ser feito depois da aula. O exercício 8 não depende deste, porque já traz um Dockerfile com a ordem ajustada.
 

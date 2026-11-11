@@ -18,8 +18,8 @@ if (( n == 0 )); then
   info "Para refazer, rode docker run hello-world e depois check.sh 00"
   exit 2
 fi
-if (( n == 15 )); then
-  erro "O exercício 15 é a faxina do Docker inteiro; não há o que recriar."
+if (( n == 18 )); then
+  erro "O exercício 18 é a faxina do Docker inteiro; não há o que recriar."
   info "Para 'desfazer' a faxina, refaça os exercícios que quiser: reset.sh NN e o enunciado."
   exit 2
 fi

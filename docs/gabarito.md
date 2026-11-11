@@ -4,7 +4,7 @@ Aqui estão os arquivos e comandos completos de cada exercício; as explicaçõe
 
 ## Como usar
 
-- Nos exercícios 4 a 14, 16 e 17, entre primeiro na pasta indicada na seção **Onde** do enunciado (o comando `cd` muda a pasta do terminal). Os outros podem ser feitos em qualquer pasta.
+- Nos exercícios 4 a 17, entre primeiro na pasta indicada na seção **Onde** do enunciado (o comando `cd` muda a pasta do terminal). Os outros podem ser feitos em qualquer pasta.
 - Execute os comandos um por vez no terminal. Os blocos de Dockerfile e YAML vão no editor, no arquivo indicado; salve antes de continuar.
 - Ao terminar, execute `check.sh` com o número do exercício, como `check.sh 05`. Use os mesmos nomes de imagens, containers e arquivos dos exemplos.
 
@@ -170,7 +170,36 @@ docker run -d --name cozinha -p 8002:8000 --env-file cozinha.env receitas-api:1.
 curl localhost:8002/
 ```
 
-## Exercício 10 — Editando ao vivo
+## Exercício 10 — A API com Compose
+
+Crie e salve o arquivo `compose.yaml`, mantendo os espaços no início de cada linha:
+
+```yaml
+services:
+  api:
+    build: .
+    ports:
+      - "8010:8000"
+    environment:
+      COZINHA: "Cozinha do Compose"
+```
+
+```bash
+docker compose config
+docker compose up -d --build
+docker compose ps
+curl localhost:8010/
+docker compose logs api
+```
+
+Missão extra: troque as duas linhas de `environment` por `env_file`, salve e execute `docker compose up -d` de novo:
+
+```yaml
+    env_file:
+      - cozinha.env
+```
+
+## Exercício 11 — Editando ao vivo
 
 ```bash
 docker build -t receitas-api:1.5 .
@@ -189,74 +218,9 @@ Salve o arquivo e consulte a API no terminal:
 curl localhost:8003/receitas
 ```
 
-## Exercício 11 — Dados que ficam · opcional
+## Exercício 12 — Desenvolvimento com Compose · opcional
 
-```bash
-docker build -t bloco:1.0 .
-docker run --rm bloco:1.0 "comprar cenouras"
-docker run --rm bloco:1.0 "assar o bolo"      # só uma nota: o primeiro container foi removido
-docker volume create notas
-docker run --rm -v notas:/dados bloco:1.0 "comprar cenouras"
-docker run --rm -v notas:/dados bloco:1.0 "assar o bolo"
-```
-
-## Exercício 12 — Site estático
-
-Crie e salve o `Dockerfile` com este conteúdo:
-
-```dockerfile
-FROM nginx:alpine
-COPY site/ /usr/share/nginx/html/
-```
-
-```bash
-docker build -t receitas-web:1.0 .
-docker run -d --name web -p 8080:80 receitas-web:1.0
-curl localhost:8080/
-```
-
-Um erro comum é escrever `COPY site/ /usr/share/nginx/html/site/`. Nesse caso, o nginx mostra a página padrão dele em vez do site.
-
-## Exercício 13 — Containers conversando
-
-```bash
-docker build -t receitas-api:1.6 .
-docker network create cozinha
-docker run -d --name receitas --network cozinha receitas-api:1.6
-docker logs receitas
-docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py
-```
-
-Enquanto a API inicia, o cliente fica tentando de novo. Se a conexão continuar expirando, siga o [diagnóstico do exercício 13](../exercises/13-containers-conversando/README.md#se-a-api-não-responder). Se o container `receitas` sobrou de uma tentativa anterior, remova-o com `docker rm -f receitas` antes de repetir o `docker run`.
-
-A verificação também percebe quando o `receitas` não publica nenhuma porta.
-
-## Exercício 14 — Docker Compose
-
-Crie e salve o arquivo `compose.yaml`, mantendo os espaços no início de cada linha:
-
-```yaml
-services:
-  api:
-    build: ./api
-
-  web:
-    build: ./web
-    ports:
-      - "8090:80"
-    depends_on:
-      - api
-```
-
-```bash
-docker compose up -d --build
-docker compose ps
-curl localhost:8090/api/receitas
-```
-
-## Exercício 16 — Desenvolvimento com Compose · opcional
-
-Na pasta `~/labs/16-compose-desenvolvimento`, crie `compose.yaml`:
+Na pasta `~/labs/12-compose-desenvolvimento`, crie `compose.yaml`:
 
 ```yaml
 services:
@@ -279,12 +243,23 @@ Acrescente `{"nome": "Pudim", "rende": "8 porções"},` à lista `RECEITAS` em `
 curl localhost:8100/receitas
 docker compose exec api cat /app/app.py
 docker run --rm receitas-api:dev cat /app/app.py
-check.sh 16
+check.sh 12
 ```
 
-## Exercício 17 — Persistência com Compose · opcional
+## Exercício 13 — Dados que ficam · opcional
 
-Na pasta `~/labs/17-compose-persistencia`, crie `compose.yaml`:
+```bash
+docker build -t bloco:1.0 .
+docker run --rm bloco:1.0 "comprar cenouras"
+docker run --rm bloco:1.0 "assar o bolo"      # só uma nota: o primeiro container foi removido
+docker volume create notas
+docker run --rm -v notas:/dados bloco:1.0 "comprar cenouras"
+docker run --rm -v notas:/dados bloco:1.0 "assar o bolo"
+```
+
+## Exercício 14 — Persistência com Compose · opcional
+
+Na pasta `~/labs/14-compose-persistencia`, crie `compose.yaml`:
 
 ```yaml
 services:
@@ -304,18 +279,72 @@ docker compose run --rm bloco "comprar cenouras"
 docker compose run --rm bloco "assar o bolo"
 docker compose down
 docker compose run --rm bloco
-check.sh 17
+check.sh 14
 ```
 
 Missão extra, depois da verificação: `docker compose down -v` apaga as notas. A próxima execução começa com um volume vazio.
 
-## Exercício 15 — Faxina · opcional
+## Exercício 15 — Site estático
 
-Faça por último. Se você fez os exercícios 16 e 17, remova também os recursos deles:
+Crie e salve o `Dockerfile` com este conteúdo:
+
+```dockerfile
+FROM nginx:alpine
+COPY site/ /usr/share/nginx/html/
+```
 
 ```bash
-docker compose -f ~/labs/16-compose-desenvolvimento/compose.yaml down
-docker compose -f ~/labs/17-compose-persistencia/compose.yaml down -v
+docker build -t receitas-web:1.0 .
+docker run -d --name web -p 8080:80 receitas-web:1.0
+curl localhost:8080/
+```
+
+Um erro comum é escrever `COPY site/ /usr/share/nginx/html/site/`. Nesse caso, o nginx mostra a página padrão dele em vez do site.
+
+## Exercício 16 — Containers conversando
+
+```bash
+docker build -t receitas-api:1.6 .
+docker network create cozinha
+docker run -d --name receitas --network cozinha receitas-api:1.6
+docker logs receitas
+docker run --rm --network cozinha -v "$PWD:/app" python:3.12-slim python /app/cliente.py
+```
+
+Enquanto a API inicia, o cliente fica tentando de novo. Se a conexão continuar expirando, siga o [diagnóstico do exercício 16](../exercises/16-containers-conversando/README.md#se-a-api-não-responder). Se o container `receitas` sobrou de uma tentativa anterior, remova-o com `docker rm -f receitas` antes de repetir o `docker run`.
+
+A verificação também percebe quando o `receitas` não publica nenhuma porta.
+
+## Exercício 17 — Site e API com Compose
+
+O `compose.yaml` já vem com o serviço `api`. Acrescente o `web`, alinhado com ele, e salve:
+
+```yaml
+services:
+  api:
+    build: ./api
+
+  web:
+    build: ./web
+    ports:
+      - "8090:80"
+    depends_on:
+      - api
+```
+
+```bash
+docker compose up -d --build
+docker compose ps
+curl localhost:8090/api/receitas
+```
+
+## Exercício 18 — Faxina · opcional
+
+Faça por último. Se você fez os exercícios 12 e 14, remova também os recursos deles:
+
+```bash
+docker compose -f ~/labs/12-compose-desenvolvimento/compose.yaml down
+docker compose -f ~/labs/14-compose-persistencia/compose.yaml down -v
 ```
 
 ```bash
@@ -328,7 +357,8 @@ docker image prune
 Missão extra:
 
 ```bash
-cd ~/labs/14-docker-compose && docker compose down && cd -
+cd ~/labs/10-api-com-compose && docker compose down && cd -
+cd ~/labs/17-site-e-api-com-compose && docker compose down && cd -
 docker volume rm notas
 docker network rm cozinha
 docker image rm -f $(docker images -q 'receitas*' | sort -u) bloco:1.0

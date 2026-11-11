@@ -15,7 +15,7 @@ Comece por [Antes da aula](#antes-da-aula) e depois siga a [Sequência da aula](
 - acessar um programa pelo navegador e ajustar suas configurações;
 - compartilhar pastas com um container e guardar dados mesmo depois de removê-lo;
 - executar um site e uma API, que fornece dados para outros programas;
-- usar o Docker Compose para iniciar o site e a API juntos;
+- usar o Docker Compose para guardar a configuração num arquivo e iniciar o site e a API juntos;
 - remover os recursos criados durante a aula e liberar espaço.
 
 A ementa completa, com cronograma, está em [docs/ementa.md](docs/ementa.md).
@@ -63,9 +63,9 @@ Nos exemplos genéricos, troque `NN` pelo número do exercício; para o 5, por e
 |---|---|
 | `~/devops-docker/` | Este repositório: enunciados, scripts e documentos |
 | `~/devops-docker/exercises/NN-nome/README.md` | O enunciado de cada exercício |
-| `~/labs/NN-nome/` | Os arquivos de partida dos exercícios 4 a 14, 16 e 17 (código, Dockerfiles, site) |
+| `~/labs/NN-nome/` | Os arquivos de partida dos exercícios 4 a 17 (código, Dockerfiles, site) |
 
-Os exercícios 0 a 3 e 15 não têm pasta própria. Os comandos deles funcionam em qualquer pasta do terminal, porque só consultam ou alteram o que o Docker gerencia.
+Os exercícios 0 a 3 e 18 não têm pasta própria. Os comandos deles funcionam em qualquer pasta do terminal, porque só consultam ou alteram o que o Docker gerencia.
 
 Comandos disponíveis no terminal:
 
@@ -92,22 +92,23 @@ Dentro da pasta de um laboratório, `check.sh` e `reset.sh` funcionam sem o núm
 | [7](exercises/07-o-que-nao-entra/README.md) | O que não entra na imagem · **opcional** | `.dockerignore` |
 | [8](exercises/08-abrindo-portas/README.md) | Abrindo portas | `-p`, `EXPOSE`, aba PORTS, `/docs` |
 | [9](exercises/09-configuracao-por-ambiente/README.md) | Configuração por ambiente | `ENV`, `-e`, `--env-file`, `exec` |
-| [10](exercises/10-editando-ao-vivo/README.md) | Editando ao vivo | bind mount `-v "$PWD:/app"` |
-| [11](exercises/11-dados-que-ficam/README.md) | Dados que ficam · **opcional** | `docker volume`, `ENTRYPOINT` |
-| [12](exercises/12-site-estatico/README.md) | Site estático | `nginx:alpine` + HTML/JS |
-| [13](exercises/13-containers-conversando/README.md) | Containers conversando | `network create`, DNS por nome |
-| [14](exercises/14-docker-compose/README.md) | Docker Compose | `compose.yaml`, `up -d`, `ps`, `logs`, `down` |
-| [16](exercises/16-compose-desenvolvimento/README.md) | Desenvolvimento com Compose · **opcional** | bind mount em YAML, recarga do código, `compose exec` |
-| [17](exercises/17-compose-persistencia/README.md) | Persistência com Compose · **opcional** | volumes nomeados, `compose run --rm`, `down` × `down -v` |
-| [15](exercises/15-faxina/README.md) | Faxina · **opcional** | `system df`, `prune` |
+| [10](exercises/10-api-com-compose/README.md) | A API com Compose | `compose.yaml` com `build`, `ports` e `environment`; `up -d`, `ps`, `logs`, `down` |
+| [11](exercises/11-editando-ao-vivo/README.md) | Editando ao vivo | bind mount `-v "$PWD:/app"` |
+| [12](exercises/12-compose-desenvolvimento/README.md) | Desenvolvimento com Compose · **opcional** | bind mount em YAML, recarga do código, `compose exec` |
+| [13](exercises/13-dados-que-ficam/README.md) | Dados que ficam · **opcional** | `docker volume`, `ENTRYPOINT` |
+| [14](exercises/14-compose-persistencia/README.md) | Persistência com Compose · **opcional** | volumes nomeados, `compose run --rm`, `down` × `down -v` |
+| [15](exercises/15-site-estatico/README.md) | Site estático | `nginx:alpine` + HTML/JS |
+| [16](exercises/16-containers-conversando/README.md) | Containers conversando | `network create`, DNS por nome |
+| [17](exercises/17-site-e-api-com-compose/README.md) | Site e API com Compose | dois serviços, `depends_on`, a rede do projeto |
+| [18](exercises/18-faxina/README.md) | Faxina · **opcional** | `system df`, `prune` |
 
-A trilha principal é **0 → 1 → 2 → 3 → 4 → 5 → 8 → 9 → 10 → 12 → 13 → 14**, e o 10 (Editando ao vivo) faz parte dela. Ela vai dos primeiros containers até o site e a API rodando juntos com Compose. Os exercícios 6, 7, 11, 15, 16 e 17 são opcionais, e a seção **Missão extra** de cada enunciado também. O 16 e o 17 são práticas de Compose para depois da aula, com arquivos próprios. Faça a **faxina (15) por último**, depois das práticas que escolher.
+A trilha principal é **0 → 1 → 2 → 3 → 4 → 5 → 8 → 9 → 10 → 11 → 15 → 16 → 17**. O Compose entra no 10, logo depois de portas e configuração, e volta no 17, quando o site e a API passam a rodar juntos. Os exercícios 6, 7, 12, 13, 14 e 18 são opcionais, e a seção **Missão extra** de cada enunciado também. O 12 e o 14 repetem, com o Compose, o bind mount do 11 e o volume do 13. Eles ficam para depois da aula e têm arquivos próprios. Faça a **faxina (18) por último**, depois das práticas que escolher.
 
-O exemplo que acompanha a aula é um livro de receitas. Primeiro, um programa Python mostra as receitas no terminal. Depois, uma API fornece esses dados pela rede. Por fim, um site exibe a lista no navegador, e o Docker Compose inicia os containers do site e da API juntos.
+O exemplo que acompanha a aula é um livro de receitas. Primeiro, um programa Python mostra as receitas no terminal. Depois, uma API entrega esses dados pela rede, e você aprende a iniciá-la com o Docker Compose. Por fim, um site mostra a lista no navegador, e o Compose inicia os containers do site e da API juntos.
 
 ## Ao final da aula
 
-1. Se ainda não fez a faxina (exercício 15), `docker ps -a` mostra os containers que sobraram.
+1. Se ainda não fez a faxina (exercício 18), `docker ps -a` mostra os containers que sobraram.
 2. **Pare ou exclua o Codespace.** Mesmo parado, ele ocupa armazenamento da franquia gratuita. Se você excluí-lo, perde os arquivos e as alterações feitas nele. O instalador consegue preparar os arquivos iniciais do curso em outro Codespace, mas não recupera o seu trabalho.
 3. Para continuar estudando: o livro gratuito [Descomplicando Docker](https://livro.descomplicandodocker.com.br/), em português, e os guias [Docker concepts](https://docs.docker.com/get-started/docker-concepts/) da documentação oficial.
 

@@ -3,27 +3,35 @@
 # coursekit/templates/starter/course.yml.
 
 title: Docker no Codespaces
-subtitle: "Aprenda Docker desde os primeiros comandos, com explicações em português e 16 desafios no GitHub Codespaces. Não é preciso saber programar."
+subtitle: "Aprenda Docker desde os primeiros comandos, com explicações em português e 19 exercícios no GitHub Codespaces. Não é preciso saber programar."
 description: |
-  Aprenda Docker em uma aula ao vivo de 3 horas, com exercícios no navegador. Não é preciso saber programar. Abra a introdução para conhecer o ambiente e, depois, siga os desafios na ordem.
+  Aprenda Docker em uma aula ao vivo de 3 horas, com exercícios no navegador. Não é preciso saber programar. Abra a introdução para conhecer o ambiente e, depois, siga os exercícios na ordem.
 
-  - Prepare o ambiente e faça o desafio 0 antes da aula. Na aula, siga do 1 ao 15, com intervalo depois do 7.
-  - Enunciados, gabarito e guia do professor: [github.com/fsilva-alt/devops-docker](https://github.com/fsilva-alt/devops-docker)
+  - Prepare o ambiente e faça o exercício 0 antes da aula. Na aula, siga do 1 ao 18, com intervalo depois do 7. O 12 e o 14 ficam para depois da aula.
+  - Enunciados, gabarito e guia do aluno: [github.com/fsilva-alt/devops-docker](https://github.com/fsilva-alt/devops-docker)
   - Leitura sugerida: [Descomplicando Docker (livro gratuito, pt-br)](https://livro.descomplicandodocker.com.br/)
-updated: auto            # data do capítulo editado mais recentemente
+updated: auto            # data do módulo editado mais recentemente
 language: pt-BR
+
+# Cada item clicável da lista à esquerda é um módulo; as partes agrupam os módulos.
+labels:
+  chapter: "Módulo {n}"
+  chapters: "Módulos"
+  chapters_count: "{n} módulos"
+  toggle_sidebar: "Mostrar ou ocultar a lista de módulos"
+  edit: "Editar este módulo"
 
 accent: "#c2560c"         # cor do curso no modo claro
 accent_dark: "#ff8c42"    # e no modo escuro
 
-numbering: none          # sem números: o da ficha de cada desafio é o que vale (check.sh NN)
+numbering: none          # sem números: o da ficha de cada exercício é o que vale (check.sh NN)
 transition: none
 highlight: true
 line_numbers: false
 typographer: false       # mantém aspas e traços exatamente como foram escritos
 
-# Cada subpasta de chapters/ é um módulo (título em _part.yml) e cada arquivo .md dentro
-# dela é um capítulo: o conteúdo de um desafio, que termina com o próprio desafio.
+# Cada subpasta de chapters/ é uma parte (título em _part.yml) e cada arquivo .md dentro
+# dela é um módulo: o conteúdo de um exercício, que termina com o próprio exercício.
 
 styles:
   - styles/custom.css

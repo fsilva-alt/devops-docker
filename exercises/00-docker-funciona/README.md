@@ -37,7 +37,7 @@ Se aparecer *Cannot connect to the Docker daemon* (não foi possível conectar a
 
    Procure a mensagem **Hello from Docker!**. O texto em inglês que vem em seguida descreve o que aconteceu. O cliente enviou o pedido, e o serviço obteve a imagem, criou um container e mostrou a mensagem no terminal. Se a imagem já estiver no Codespace, o Docker não a baixa de novo.
 
-3. Confira se o Docker Compose também está instalado. Ele aparece no exercício 14 e serve para iniciar vários serviços com um único comando:
+3. Confira se o Docker Compose também está instalado. Ele aparece a partir do exercício 10 e serve para iniciar vários serviços com um único comando:
 
    ```bash
    docker compose version
@@ -49,7 +49,7 @@ Se aparecer *Cannot connect to the Docker daemon* (não foi possível conectar a
 check.sh 00
 ```
 
-Além do Docker, a verificação confere se o instalador baixou as quatro imagens-base da aula (`hello-world`, `alpine`, `python:3.12-slim`, `nginx:alpine`). Se faltar alguma, rode `setup.sh`. Em seguida, ela cria dois containers em uma rede temporária, testa se um encontra o outro pelo nome e apaga o que criou para o teste. É essa comunicação pela rede que os exercícios 13 e 14 vão usar. Se algo falhar, siga a dica exibida e consulte o [guia do aluno](../../docs/guia-do-aluno.md).
+Além do Docker, a verificação confere se o instalador baixou as quatro imagens-base da aula (`hello-world`, `alpine`, `python:3.12-slim`, `nginx:alpine`). Se faltar alguma, rode `setup.sh`. Em seguida, ela cria dois containers em uma rede temporária, testa se um encontra o outro pelo nome e apaga o que criou para o teste. É essa comunicação pela rede que os exercícios 16 e 17 vão usar. Se algo falhar, siga a dica exibida e consulte o [guia do aluno](../../docs/guia-do-aluno.md).
 
 ## Dica
 
